@@ -1,0 +1,51 @@
+repos:
+  # remove unused imports
+  # additional configs are in the pyproject.toml file
+  - repo: https://github.com/hadialqattan/pycln.git
+    rev: v2.4.0
+    hooks:
+      - id: pycln
+
+  # import formatter with black configurations
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort (python)
+        args: ["--profile", "black", "--filter-files"]
+
+  # Code formatter for both python files and jupyter notebooks
+  # support pep 8 standards
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black-jupyter
+      - id: black
+        language_version: python3.10
+
+  - repo: https://github.com/adamchainz/blacken-docs
+    rev: "1.16.0"  # replace with latest tag on GitHub
+    hooks:
+      - id: blacken-docs
+
+  # adding ruff with auto fix on
+  # additional configs are in the pyproject.toml file
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: "v0.1.13"
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  # additional hooks found with in the pre-commit lib
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace # removes trailing white spaces
+      - id: mixed-line-ending # removes mixed end of line
+        args:
+          - --fix=lf
+      - id: pretty-format-json # JSON Formatter
+        args:
+          - --autofix
+          - --indent=4
+          - --no-sort-keys
