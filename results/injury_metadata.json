@@ -1,0 +1,283 @@
+{
+    "Cytoskeletal": {
+        "n_wells": 1472,
+        "n_compounds": 15,
+        "compound_list": [
+            "Nocodazole",
+            "Colchicine",
+            "Paclitaxel",
+            "Vinblastine",
+            "Ispinesib",
+            "ARQ 621",
+            "SB-743921",
+            "Epothilone B",
+            "Cytochalasin B",
+            "Monastrol",
+            "Cytochalasin D",
+            "Latrunculin B",
+            "Citrinin",
+            "Podophyllotoxin",
+            "Citreoviridin"
+        ]
+    },
+    "Hsp90": {
+        "n_wells": 552,
+        "n_compounds": 3,
+        "compound_list": [
+            "Radicicol",
+            "Geldanamycin",
+            "17-AAG"
+        ]
+    },
+    "Kinase": {
+        "n_wells": 1104,
+        "n_compounds": 13,
+        "compound_list": [
+            "Wortmannin",
+            "Staurosporine",
+            "PI-103",
+            "BEZ-235",
+            "AZD 1152-HQPA",
+            "Saracatinib",
+            "PKC 412",
+            "Lestaurtinib",
+            "Dasatinib",
+            "LY294002",
+            "Sorafenib",
+            "KW 2449",
+            "Sunitinib"
+        ]
+    },
+    "Genotoxin": {
+        "n_wells": 944,
+        "n_compounds": 22,
+        "compound_list": [
+            "Camptothecin",
+            "CX-5461",
+            "Doxorubicin",
+            "Cladribine",
+            "Etoposide",
+            "Aphidicolin",
+            "Gemcitabine",
+            "Cisplatin",
+            "Oxaliplatin",
+            "Carboplatin",
+            "Dacarbazine",
+            "Lomustine",
+            "SN-38",
+            "Decitabine",
+            "Busulfan",
+            "Irinotecan",
+            "Chlorambucil",
+            "Thio-TEPA",
+            "Carmustine",
+            "Melphalan",
+            "Cyclophosphamide",
+            "\u03b2-Amanitin"
+        ]
+    },
+    "Miscellaneous": {
+        "n_wells": 1304,
+        "n_compounds": 39,
+        "compound_list": [
+            "L-Buthionine-(S,R)-sulfoximine",
+            "CDDO Im",
+            "Cinobufagin",
+            "Puromycin",
+            "Brefeldin A",
+            "Tetrandrine",
+            "Pristimerin",
+            "Perifosine",
+            "Chloroquine",
+            "Niclosamide",
+            "Withaferin A",
+            "Bay 11-7821",
+            "Chelerythrine",
+            "UMI-77",
+            "MIM1",
+            "Chaetocin",
+            "Fisetin",
+            "Emetine",
+            "DZNep",
+            "BSI-201",
+            "Quercetin",
+            "Bruceine A",
+            "trans-Resveratrol",
+            "Aloisine RP106",
+            "Cycloheximide",
+            "Kenpaullone",
+            "Aurintricarboxylic acid",
+            "Gliotoxin",
+            "MitoPQ",
+            "Streptozotocin",
+            "cis-Resveratrol",
+            "Piceatannol",
+            "Tert-butylhydroquinone",
+            "Pyrogallol",
+            "RRx-001",
+            "Beauvericin",
+            "Ochratoxin A",
+            "Cantharidin",
+            "Cercosporin"
+        ]
+    },
+    "Redox": {
+        "n_wells": 312,
+        "n_compounds": 12,
+        "compound_list": [
+            "Menadione",
+            "PKF118-310",
+            "4-Amino-1-naphthol (HCl)",
+            "Dunnione",
+            "MGR2",
+            "SIN-1 (chloride)",
+            "AAPH",
+            "MGR1",
+            "Phenazine (methosulfate)",
+            "DA-3003-2",
+            "IT-901",
+            "DMNQ"
+        ]
+    },
+    "HDAC": {
+        "n_wells": 168,
+        "n_compounds": 5,
+        "compound_list": [
+            "AR-42",
+            "SAHA",
+            "ITF 2357",
+            "Panobinostat",
+            "Apicidin"
+        ]
+    },
+    "mTOR": {
+        "n_wells": 96,
+        "n_compounds": 2,
+        "compound_list": [
+            "Torin 1",
+            "Rapamycin"
+        ]
+    },
+    "Proteasome": {
+        "n_wells": 144,
+        "n_compounds": 4,
+        "compound_list": [
+            "Carfilzomib",
+            "Bortezomib",
+            "(S)-MG132",
+            "(R)-MG132"
+        ]
+    },
+    "Saponin": {
+        "n_wells": 288,
+        "n_compounds": 11,
+        "compound_list": [
+            "Digitonin",
+            "Saikosaponin A",
+            "Polygalasaponin F",
+            "Bacopasaponin C",
+            "Pulsatilla Saponin D",
+            "Hederacoside C",
+            "Glycyrrhizic acid",
+            "Platycodin D",
+            "Onjisaponin B",
+            "Ginsenoside Ro",
+            "Protodioscin"
+        ]
+    },
+    "Mitochondria": {
+        "n_wells": 144,
+        "n_compounds": 4,
+        "compound_list": [
+            "Antimycin A",
+            "CCCP",
+            "Rotenone",
+            "Oligomycin A"
+        ]
+    },
+    "Ferroptosis": {
+        "n_wells": 96,
+        "n_compounds": 4,
+        "compound_list": [
+            "ML-162",
+            "ML-210",
+            "(1S,3R)-RSL3",
+            "Erastin"
+        ]
+    },
+    "Tannin": {
+        "n_wells": 96,
+        "n_compounds": 4,
+        "compound_list": [
+            "Gallotannin",
+            "Corilagin",
+            "Chebulagic acid",
+            "Punicalagin"
+        ]
+    },
+    "Nonspecific reactive": {
+        "n_wells": 128,
+        "n_compounds": 6,
+        "compound_list": [
+            NaN,
+            "Ebselen",
+            "IPA-3",
+            "2-Tert-butyl-1,4-benzoquinone",
+            "2-Chloro-1,4-naphthoquinone",
+            "Ebselen oxide"
+        ]
+    },
+    "NaN": {
+        "n_wells": 2728,
+        "n_compounds": 47,
+        "compound_list": [
+            "Anacardic acid",
+            "Rottlerin",
+            "Isogarcinol",
+            "MG149",
+            "TH 1834",
+            "CTK7A",
+            "Gossypol",
+            "Rtt109 Inhibitor",
+            "NSC-663284",
+            "EGCG",
+            "CAY10669",
+            "SPV-106",
+            "HAT Inhibitor II",
+            "Windorphen",
+            "C646",
+            "Nordihydroguaiaretic acid",
+            "EML425",
+            "Embellin",
+            "NU-9056",
+            "MB-3",
+            "Windorphen-NC",
+            "Beta-lapachone",
+            "L002",
+            "CPTH2",
+            "A-485",
+            "A-486",
+            "WM-8014",
+            "WM-1119",
+            "WM-2474",
+            "Plumbagin",
+            "Garcinol",
+            "CNX-774",
+            "Osimertinib",
+            "Neratinib",
+            "Ibrutinib",
+            "WZ-4002",
+            "Afatinib",
+            "PF-6274484",
+            "PF-299804 ",
+            "FIIN-2",
+            "ARS-1620",
+            "Canertinib",
+            "THZ1",
+            "Curcumin",
+            "Lys-CoA",
+            "JNK-IN-8",
+            NaN
+        ]
+    }
+}
