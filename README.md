@@ -1,5 +1,7 @@
 # Metadata Search
 
+The objective is to identify the number of unique compounds associated with each cell injury and subsequently cross-reference this information with the screening profile. The aim is to assess the feasibility of using the data for training a machine learning model to predict cell injury.
+
 ## Data Sources
 
 | Data Source | Description |
