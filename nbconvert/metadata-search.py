@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Improved Metadata Search
+# # Metadata Search
 #
 # This notebook focuses on metadata search using two essential files: the annotations data extracted from the actual screening profile (available in the [IDR repository](https://github.com/IDR/idr0133-dahlin-cellpainting/tree/main/screenA)) and the metadata retrieved from the supplementary section of the [research paper](https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-36829-x/MediaObjects/41467_2023_36829_MOESM5_ESM.xlsx).
 #
@@ -11,6 +11,7 @@
 # In[1]:
 
 
+import json
 import pathlib
 from collections import defaultdict
 
@@ -28,8 +29,8 @@ results_dir = pathlib.Path("./results")
 results_dir.mkdir(exist_ok=True)
 
 # data paths
-suppl_meta_path = data_dir / "41467_2023_36829_MOESM5_ESM.csv"
-screen_anno_path = data_dir / "idr0133-screenA-annotation.csv"
+suppl_meta_path = data_dir / "41467_2023_36829_MOESM5_ESM.csv.gz"
+screen_anno_path = data_dir / "idr0133-screenA-annotation.csv.gz"
 
 # load data
 image_profile_df = pd.read_csv(screen_anno_path)
@@ -106,10 +107,38 @@ injury_meta_df
 # > It includes details such as the number of components used along with the list of the components responsible for the identified injury type.
 #
 
+# Next we take table 2 and format it into json format for improved readability
+
+# In[6]:
+
+
+# collect metadata from table
+injury_meta_dict = {}
+for row in injury_meta_df.iterrows():
+    # selecting row based on injury type
+    selected_row = row[1].values.tolist()
+    injury_name = selected_row[0]
+    print(injury_name)
+
+    # creating a sub dictionary gathers all meta data
+    meta_dict = dict(
+        n_wells=selected_row[1],
+        n_compounds=selected_row[2],
+        compound_list=selected_row[3],
+    )
+
+    # adding to main dictionary
+    injury_meta_dict[selected_row[0]] = meta_dict
+
+# save dictionary into a json file
+with open(results_dir / "injury_metadata.json", mode="w") as stream:
+    json.dump(injury_meta_dict, stream)
+
+
 # Lastly, we extract of all control wells, which are treated with DMSO.
 #
 
-# In[6]:
+# In[7]:
 
 
 # getting only control wells
