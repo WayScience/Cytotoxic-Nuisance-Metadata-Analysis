@@ -1,8 +1,8 @@
 {
     "compartments": [
         "Cells",
-        "Nuclei",
-        "Cytoplasm"
+        "Cytoplasm",
+        "Nuclei"
     ],
     "meta_features": [
         "injury_type",
