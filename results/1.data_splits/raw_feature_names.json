@@ -1,8 +1,8 @@
 {
     "compartments": [
         "Cells",
-        "Cytoplasm",
-        "Nuclei"
+        "Nuclei",
+        "Cytoplasm"
     ],
     "meta_features": [
         "Compound BRD (short)",
