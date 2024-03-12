@@ -201,14 +201,57 @@ with open(data_split_dir / "plate_info.json", mode="w") as stream:
 #  - treatment hold out
 #  - well hold out
 #
-# Each of these held outdata will be stored in the `results/0.data_splits` directory
+# Each of these held outdata will be stored in the `results/1.data_splits` directory
 #
+
+# ## Holdout plate
+#
+# Plates are randomly selected based on their Plate ID and save them as our `plate_holdout` data.
+
+# In[10]:
+
+
+# plate
+seed = 0
+n_plates = 10
+
+# setting random seed globally
+np.random.seed(seed)
+
+# selecting plates randomly from a list
+selected_plates = (
+    np.random.choice(fs_profile_df["Plate"].unique().tolist(), (n_plates, 1))
+    .flatten()
+    .tolist()
+)
+plate_holdout_df = fs_profile_df.loc[fs_profile_df["Plate"].isin(selected_plates)]
+
+# take the indices of the held out data frame and use it to drop those samples from
+# the main dataset. And then check if those indices are dropped
+plate_idx_to_drop = plate_holdout_df.index.tolist()
+fs_profile_df = fs_profile_df.drop(plate_idx_to_drop)
+assert all(
+    [
+        True if num not in fs_profile_df.index.tolist() else False
+        for num in plate_idx_to_drop
+    ]
+), "index to be dropped found in the main dataframe"
+
+# saving the holdout data
+plate_holdout_df.to_csv(
+    data_split_dir / "plate_holdout.csv.gz", index=False, compression="gzip"
+)
+
+# display
+print("plate holdout shape:", plate_holdout_df.shape)
+plate_holdout_df.head()
+
 
 # ### Holdout out a treatment holdout plate
 #
-# Here we are randomly select 15 wells from each treatment from the main dataframe `labeled_df`. Then we remove those wells from the main dataframe
+# To create our treatment holdout dataset, we group all wells treated with the same compound, then randomly select 15 wells per treatment group.
 
-# In[10]:
+# In[11]:
 
 
 #### Plate heldout dataset
@@ -218,7 +261,7 @@ n_samples = 15
 # collecting randomly select wells based on treatment
 treatment_holdout_df = []
 for treatment, df in fs_profile_df.groupby("Compound Name", as_index=False):
-    heldout_treatment = df.sample(n=15, random_state=seed)
+    heldout_treatment = df.sample(n=10, random_state=seed, replace="True")
     treatment_holdout_df.append(heldout_treatment)
 
 # genearte treatment holdout dataframe
@@ -245,13 +288,11 @@ print("Treatment holdout shape:", treatment_holdout_df.shape)
 treatment_holdout_df.head()
 
 
-# > Table containig all the held out treatment samples. Saved as `treatment_holdout.csv.gz` in the `results/0.data_splits`
-
 # ### Generating well holdout data
 #
 # To generate the well hold out data, each plate was iterated and random wells were selected. However, an additional step was condcuting which was to seperate the control wells and the treated wells, due to the large label imbalance with the controls. Therefore, 5 wells were randomly selected and 10 wells were randomly selected from each individual plate
 
-# In[11]:
+# In[12]:
 
 
 # parameters
@@ -261,7 +302,6 @@ n_samples = 10
 
 # setting random seed globally
 np.random.seed(seed)
-
 
 # collecting randomly select wells based on treatment
 wells_heldout_df = []
@@ -302,47 +342,6 @@ wells_heldout_df.to_csv(
 # display
 print("Wells holdout shape:", wells_heldout_df.shape)
 wells_heldout_df.head()
-
-
-# > Table containig all the held out treatment samples. Saved as `wells_holdout.csv.gz` in the `results/0.data_splits`
-
-# In[12]:
-
-
-# plate
-seed = 0
-n_plates = 10
-
-# setting random seed globally
-np.random.seed(seed)
-
-# selecting 10 plates randomly from a list
-selected_plates = (
-    np.random.choice(fs_profile_df["Plate"].unique().tolist(), (n_plates, 1))
-    .flatten()
-    .tolist()
-)
-plate_holdout_df = fs_profile_df.loc[fs_profile_df["Plate"].isin(selected_plates)]
-
-# take the indices of the held out data frame and use it to drop those samples from
-# the main dataset. And then check if those indices are dropped
-plate_idx_to_drop = plate_holdout_df.index.tolist()
-fs_profile_df = fs_profile_df.drop(plate_idx_to_drop)
-assert all(
-    [
-        True if num not in fs_profile_df.index.tolist() else False
-        for num in treatment_idx_to_drop
-    ]
-), "index to be dropped found in the main dataframe"
-
-# saving the holdout data
-plate_holdout_df.to_csv(
-    data_split_dir / "plate_holdout.csv.gz", index=False, compression="gzip"
-)
-
-# display
-print("plate holdout shape:", plate_holdout_df.shape)
-plate_holdout_df.head()
 
 
 # In[13]:
@@ -405,7 +404,7 @@ seed = 0
 X = fs_profile_df[X_cols]
 y = fs_profile_df[y_col]
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.20, random_state=seed
+    X, y, test_size=0.20, random_state=seed, stratify=y
 )
 
 
