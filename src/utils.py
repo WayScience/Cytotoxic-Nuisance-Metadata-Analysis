@@ -4,6 +4,7 @@ This module contains utility functions for the analysis notebook.
 
 from typing import Optional
 
+import numpy as np
 import pandas as pd
 
 
@@ -80,3 +81,45 @@ def drop_na_samples(
     ).reset_index(drop=True)
 
     return profile
+
+
+def shuffle_features(feature_vals: np.array, seed: Optional[int] = 0) -> np.array:
+    """suffles all values within feature space
+
+    Parameters
+    ----------
+    feature_vals : np.array
+        shuffled
+
+    seed : Optional[int]
+        setting random seed
+
+    Returns
+    -------
+    np.array
+        Returns shuffled values within the feature space
+
+    Raises
+    ------
+    TypeError
+        Raised if a numpy array is not provided
+    """
+    # setting seed
+    np.random.seed(seed)
+
+    # shuffle given array
+    if not isinstance(feature_vals, np.ndarray):
+        raise TypeError("'feature_vals' must be a numpy array")
+    if feature_vals.ndim != 2:
+        raise TypeError("'feature_vals' must be a 2x2 matrix")
+
+    # creating a copy for feature vales to prevent overwriting of global variables
+    feature_vals = np.copy(feature_vals)
+
+    # shuffling feature space
+    n_cols = feature_vals.shape[1]
+    for col_idx in range(0, n_cols):
+        # selecting column, shuffle, and update:
+        feature_vals[:, col_idx] = np.random.permutation(feature_vals[:, col_idx])
+
+    return feature_vals
