@@ -305,6 +305,7 @@ shuffle_train_precision_recall_df, shuffle_train_f1_score_df = evaluate(
 # setting seed
 seed = 0
 np.random.seed(seed)
+n_classes = len(np.unique(y_labels.values))
 
 # loading all holdouts
 plate_holdout_df = pd.read_csv(plate_holdout_path)
@@ -315,19 +316,19 @@ well_holdout_df = pd.read_csv(wells_holdout_path)
 X_plate_holdout = plate_holdout_df[feat_cols]
 y_plate_holout = label_binarize(
     y=plate_holdout_df["injury_code"],
-    classes=[*range(len(plate_holdout_df["injury_code"].unique()))],
+    classes=[*range(n_classes)],
 )
 
 X_treatment_holdout = treatment_holdout_df[feat_cols]
 y_treatment_holout = label_binarize(
     y=treatment_holdout_df["injury_code"],
-    classes=[*range(len(treatment_holdout_df["injury_code"].unique()))],
+    classes=[*range(n_classes)],
 )
 
 X_well_holdout = well_holdout_df[feat_cols]
 y_well_holout = label_binarize(
     y=well_holdout_df["injury_code"],
-    classes=[*range(len(well_holdout_df["injury_code"].unique()))],
+    classes=[*range(n_classes)],
 )
 
 

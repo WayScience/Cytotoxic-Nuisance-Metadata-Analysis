@@ -82,7 +82,7 @@ injured_df = pd.concat(injury_profiles)
 
 # drop wells that do not have an injury
 injured_df = injured_df.dropna(subset="injury_type").reset_index(drop=True)
-print("Number of wells", len(injured_df["Plate"].unique()))
+print("Number of plates", len(injured_df["Plate"].unique()))
 
 # display df
 print("shape:", injured_df.shape)
