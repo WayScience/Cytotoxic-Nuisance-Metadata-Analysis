@@ -161,9 +161,6 @@ def shuffle_features(feature_vals: np.array, seed: Optional[int] = 0) -> np.arra
     if feature_vals.ndim != 2:
         raise TypeError("'feature_vals' must be a 2x2 matrix")
 
-    # creating a copy for feature values to prevent overwriting of global variables
-    feature_vals = np.copy(feature_vals)
-
     # shuffling feature space
     n_cols = feature_vals.shape[1]
     for col_idx in range(0, n_cols):
