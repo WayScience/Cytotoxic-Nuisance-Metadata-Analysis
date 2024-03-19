@@ -23,6 +23,9 @@ warnings.filterwarnings("ignore")
 # setting global seed
 np.random.seed(0)
 
+# PROJECT DIR PATH
+PROJECT_DIR_PATH = pathlib.Path(__file__).parent.parent
+
 
 def load_json_file(fpath: str | pathlib.Path) -> dict:
     """Wrapper function that loads in a json file
@@ -265,9 +268,10 @@ def evaluate(
     n_classes = len(np.unique(y, axis=0))
 
     # loading in injury_codes
-    injury_codes = load_json_file(
-        pathlib.Path("../results/1.data_splits/injury_codes.json").resolve(strict=True)
-    )
+    injury_code_path = (
+        PROJECT_DIR_PATH / "results/1.data_splits/injury_codes.json"
+    ).resolve(strict=True)
+    injury_codes = load_json_file(injury_code_path)
 
     # making predictions
     predictions = model.predict(X)
