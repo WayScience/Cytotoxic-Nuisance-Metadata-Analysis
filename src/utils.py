@@ -2,10 +2,58 @@
 This module contains utility functions for the analysis notebook.
 """
 
+import json
+import pathlib
+import warnings
 from typing import Optional
 
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, precision_recall_curve
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.utils import parallel_backend
+
+# catch warnings
+warnings.filterwarnings("ignore")
+
+# setting global seed
+np.random.seed(0)
+
+
+def load_json_file(fpath: str | pathlib.Path) -> dict:
+    """Wrapper function that loads in a json file
+
+    Parameters
+    ----------
+    fpath : pathlib.Path
+        path to json file
+
+    Returns
+    -------
+    dict
+        contents of the json file
+
+    Raises
+    ------
+    TypeError
+        Raised if pathlib.Path or str types are not passed
+    FileNotFoundError
+        Raised if the file path provides does not exist
+    """
+
+    # type checking
+    if isinstance(fpath, str):
+        fpath = pathlib.Path(fpath).resolve(strict=True)
+    if not isinstance(fpath, pathlib.Path):
+        raise TypeError("'fpath' must be a pathlib.Path or str object")
+
+    # loading json file
+    with open(fpath, mode="r") as contents:
+        return json.load(contents)
 
 
 def drop_na_samples(
@@ -123,3 +171,137 @@ def shuffle_features(feature_vals: np.array, seed: Optional[int] = 0) -> np.arra
         feature_vals[:, col_idx] = np.random.permutation(feature_vals[:, col_idx])
 
     return feature_vals
+
+
+def train_multiclass(
+    X_train: np.ndarray, y_train: np.ndarray, param_grid: dict, seed: Optional[int] = 0
+) -> BaseEstimator:
+    """This approach utilizes RandomizedSearchCV to explore a range of parameters
+    specified in the param_grid, ultimately identifying the most suitable model
+    configuration
+
+    This function will return the best model.
+
+    Parameters
+    ----------
+    X_train : np.ndarray
+        Training features
+    y_train : np.ndarray
+        Training labels
+    param_grid : dict
+        parameters to tune
+    seed : Optional[int]
+        set random seed, default = 0
+
+    Returns
+    -------
+    BaseEstimator
+        Best model
+    """
+    # setting seed:
+    np.random.seed(seed)
+
+    # create a Logistic regression model with One vs Rest scheme (ovr)
+    logistic_regression_model = LogisticRegression(class_weight="balanced")
+    ovr_model = OneVsRestClassifier(logistic_regression_model)
+
+    # next is to use RandomizedSearchCV for hyper parameter turning
+    with parallel_backend("multiprocessing"):
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore", category=ConvergenceWarning, module="sklearn"
+            )
+            warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
+
+            # execute RandomizedResearchCV
+            random_search = RandomizedSearchCV(
+                estimator=ovr_model,
+                param_distributions=param_grid,
+                n_iter=10,
+                cv=5,
+                random_state=seed,
+                n_jobs=-1,
+            )
+
+            # fit with training data
+            random_search.fit(X_train, y_train)
+
+    # get the best model
+    best_model = random_search.best_estimator_
+    return best_model
+
+
+def evaluate(
+    model: BaseEstimator,
+    X: np.ndarray,
+    y: np.ndarray,
+    dataset: str,
+    shuffled: bool,
+    seed: Optional[int] = 0,
+) -> tuple[pd.DataFrame]:
+    """calculates the precision/recall and f1
+
+    Parameters
+    ----------
+    model : BaseEstimator
+        best model
+    X : np.ndarray
+        features
+    y : np.ndarray
+        labels
+    shuffled : bool
+        Flag indicating if the data has been shuffled
+    seed : Optional[int], optional
+        _description_, by default 0
+
+    Returns
+    -------
+    tuple[pd.DataFrame]
+        returns a tuple that contains the f1 scores and precision/recall scores
+        in a dataframe
+    """
+
+    # setting seed
+    np.random.seed(seed)
+
+    # number of classes
+    n_classes = len(np.unique(y, axis=0))
+
+    # loading in injury_codes
+    injury_codes = load_json_file(
+        pathlib.Path("../results/1.data_splits/injury_codes.json").resolve(strict=True)
+    )
+
+    # making predictions
+    predictions = model.predict(X)
+    probability = model.predict_proba(X)
+
+    # computing and collecting  precision and recall curve
+    precision_recall_scores = []
+    for i in range(n_classes):
+        # precision_recall_curve calculation
+        precision, recall, _ = precision_recall_curve(y[:, i], probability[:, i])
+
+        # iterate all scores and save all data into a list
+        for i in range(len(precision)):
+            precision_recall_scores.append([dataset, shuffled, precision[i], recall[i]])
+
+    # creating scores df
+    precision_recall_scores = pd.DataFrame(
+        precision_recall_scores, columns=["dataset", "shuffled", "precision", "recall"]
+    )
+
+    # Compute F1 score
+    f1_scores = []
+    for i in range(n_classes):
+        y_true = y[:, i]
+        y_pred = predictions[:, i]
+        f1 = f1_score(y_true, y_pred)
+        f1_scores.append([dataset, shuffled, injury_codes["decoder"][str(i)], f1])
+
+    # convert to data frame and display
+    f1_scores = pd.DataFrame(
+        f1_scores, columns=["data_set", "shuffled", "class", "f1_score"]
+    )
+
+    return (precision_recall_scores, f1_scores)
