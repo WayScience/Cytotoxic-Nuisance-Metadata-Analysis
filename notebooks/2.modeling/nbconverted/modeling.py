@@ -4,98 +4,25 @@
 # In[1]:
 
 
-import json
 import pathlib
 import sys
-import warnings
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 from scipy.stats import uniform
-from sklearn.base import BaseEstimator
-from sklearn.exceptions import ConvergenceWarning
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score, precision_recall_curve
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize
-from sklearn.utils import parallel_backend
 
-# catch warnings
-warnings.filterwarnings("ignore")
-
-#
+# import local modules
 sys.path.append("../../")
-from src.utils import shuffle_features  # noqa
-
-# ## Helper functions
+from src.utils import evaluate, load_json_file, shuffle_features, train_multiclass
 
 # In[2]:
 
 
-def train_multiclass(
-    X_train: np.ndarray, y_train: np.ndarray, param_grid: dict, seed: Optional[int] = 0
-) -> BaseEstimator:
-    """Develops a Logistic Regression model employing the One vs Rest training
-    scheme and incorporates RandomizedSearchCV for optimal parameter selection.
-    This approach utilizes RandomizedSearchCV to explore a range of parameters
-    specified in the param_grid, ultimately identifying the most suitable model
-    configuration
-
-    This function will return best model.
-
-    Parameters
-    ----------
-    X_train : np.ndarray
-        Training features
-    y_train : np.ndarray
-        Training labels
-    param_grid : dict
-        parameters to tune
-    seed : Optional[int]
-        set random seed, default = 0
-
-    Returns
-    -------
-    BaseEstimator
-        Best model
-    """
-    # setting seed:
-    np.random.seed(seed)
-
-    # create a Logistic regression model with One vs Rest scheme (ovr)
-    logistic_regression_model = LogisticRegression(class_weight="balanced")
-    ovr_model = OneVsRestClassifier(logistic_regression_model)
-
-    # next is to use RandomizedSearchCV for hyper parameter turning
-    with parallel_backend("multiprocessing"):
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore", category=ConvergenceWarning, module="sklearn"
-            )
-            warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
-
-            # execute RandomizedResearchCV
-            random_search = RandomizedSearchCV(
-                estimator=ovr_model,
-                param_distributions=param_grid,
-                n_iter=10,
-                cv=5,
-                random_state=seed,
-                n_jobs=-1,
-            )
-
-            # fit with training data
-            random_search.fit(X_train, y_train)
-
-    # get the best model
-    best_model = random_search.best_estimator_
-    return best_model
-
-
-# In[3]:
-
+# setting random seeds varaibles
+seed = 0
+np.random.seed(seed)
 
 # setting paths and parameters
 results_dir = pathlib.Path("../../results").resolve(strict=True)
@@ -124,12 +51,11 @@ param_grid = {
 }
 
 
-# In[4]:
+# In[3]:
 
 
-# loading injury codes
-with open(data_splits_dir / "injury_codes.json") as json_file:
-    injury_codes = json.load(json_file)
+# loading injurt codes
+injury_codes = load_json_file(data_splits_dir / "injury_codes.json")
 
 # loading in the dataset
 training_df = pd.read_csv(training_dataset_path)
@@ -139,14 +65,7 @@ print("Shape: ", training_df.shape)
 training_df.head()
 
 
-# In[5]:
-
-
-# setting random seeds
-seed = 0
-np.random.seed(seed)
-
-# setting a one hot encoder
+# In[4]:
 
 
 # splitting between meta and feature columns
@@ -168,91 +87,17 @@ y = label_binarize(y_labels, classes=[*range(n_classes)])
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed, stratify=y)
 
 
-# In[6]:
-
-
-def evaluate(
-    model: BaseEstimator,
-    X: np.ndarray,
-    y: np.ndarray,
-    dataset: str,
-    shuffled: bool,
-    seed: Optional[int] = 0,
-) -> tuple[pd.DataFrame]:
-    """calculates the precision/recall and f1
-
-    Parameters
-    ----------
-    model : BaseEstimator
-        best model
-    X : np.ndarray
-        features
-    y : np.ndarray
-        labels
-    shuffled : bool
-        Flag indicating if the data has been shuffled
-    seed : Optional[int], optional
-        _description_, by default 0
-
-    Returns
-    -------
-    tuple[pd.DataFrame]
-        returns a tuple that contains the f1 scores and precision/recall scores
-        in a dataframe
-    """
-
-    # setting seed
-    np.random.seed(seed)
-
-    # number of classes
-    n_classes = len(np.unique(y, axis=0))
-
-    # making predictions
-    predictions = model.predict(X)
-    probability = model.predict_proba(X)
-
-    # computing and collecting  precision and recall curve
-    precision_recall_scores = []
-    for i in range(n_classes):
-        # precision_recall_curve calculation
-        precision, recall, _ = precision_recall_curve(y[:, i], probability[:, i])
-
-        # iterate all scores and save all data into a list
-        for i in range(len(precision)):
-            precision_recall_scores.append([dataset, shuffled, precision[i], recall[i]])
-
-    # creating scores df
-    precision_recall_scores = pd.DataFrame(
-        precision_recall_scores, columns=["dataset", "shuffled", "precision", "recall"]
-    )
-
-    # Compute F1 score
-    f1_scores = []
-    for i in range(n_classes):
-        y_true = y[:, i]
-        y_pred = predictions[:, i]
-        f1 = f1_score(y_true, y_pred)
-        f1_scores.append([dataset, shuffled, injury_codes["decoder"][str(i)], f1])
-
-    # convert to data frame and display
-    f1_scores = pd.DataFrame(
-        f1_scores, columns=["data_set", "shuffled", "class", "f1_score"]
-    )
-
-    return (precision_recall_scores, f1_scores)
-
-
 # ## Training and Evaluating Multi-class Logistic Model with original dataset split
 #
 
-# In[7]:
+# In[5]:
 
 
 # train and get the best_model
 best_model = train_multiclass(X_train, y_train, param_grid=param_grid, seed=0)
 
 
-# In[ ]:
+# In[6]:
 
 
 test_precision_recall_df, test_f1_score_df = evaluate(
@@ -266,18 +111,14 @@ train_precision_recall_df, train_f1_score_df = evaluate(
 # ## Training and Evaluating Multi-class Logistic Model with shuffled dataset split
 #
 
-# In[ ]:
+# In[7]:
 
-
-# setting random seed
-seed = 0
-np.random.seed(seed)
 
 # shuffle feature space
 shuffled_X_train = shuffle_features(X_train, seed=seed)
 
 
-# In[ ]:
+# In[8]:
 
 
 shuffled_best_model = train_multiclass(
@@ -285,7 +126,7 @@ shuffled_best_model = train_multiclass(
 )
 
 
-# In[ ]:
+# In[9]:
 
 
 shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate(
@@ -298,13 +139,11 @@ shuffle_train_precision_recall_df, shuffle_train_f1_score_df = evaluate(
 
 # ## Evaluating Multi-class model with holdout data
 
-# In[ ]:
+# In[10]:
 
 
 # loading in holdout data
 # setting seed
-seed = 0
-np.random.seed(seed)
 n_classes = len(np.unique(y_labels.values))
 
 # loading all holdouts
@@ -334,7 +173,7 @@ y_well_holout = label_binarize(
 
 # ### Evaluating Multi-class model trained with original split with holdout data
 
-# In[ ]:
+# In[11]:
 
 
 # evaluating with plate holdout
@@ -394,7 +233,7 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_train_f1_score_df = evaluat
 )
 
 
-# In[ ]:
+# In[12]:
 
 
 # storing all f1 scores
@@ -412,9 +251,15 @@ all_f1_scores = pd.concat(
         well_ho_shuffle_train_f1_score_df,
     ]
 )
+
+# saving all f1 scores
 all_f1_scores.to_csv(
     modeling_dir / "all_f1_scores.csv.gz", index=False, compression="gzip"
 )
+
+
+# In[13]:
+
 
 # storing pr scores
 all_pr_scores = pd.concat(
@@ -431,6 +276,8 @@ all_pr_scores = pd.concat(
         well_ho_shuffle_precision_recall_df,
     ]
 )
+
+# saving pr scores
 all_pr_scores.to_csv(
     modeling_dir / "precision_recall_scores.csv.gz", index=False, compression="gzip"
 )
