@@ -89,7 +89,7 @@ def shuffle_features(feature_vals: np.array, seed: Optional[int] = 0) -> np.arra
     Parameters
     ----------
     feature_vals : np.array
-        shuffled
+        Values to be shuffled.
 
     seed : Optional[int]
         setting random seed
