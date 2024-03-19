@@ -84,7 +84,7 @@ def drop_na_samples(
 
 
 def shuffle_features(feature_vals: np.array, seed: Optional[int] = 0) -> np.array:
-    """suffles all values within feature space
+    """Shuffles all values within feature space
 
     Parameters
     ----------
