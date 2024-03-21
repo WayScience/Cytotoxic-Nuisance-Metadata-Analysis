@@ -306,3 +306,39 @@ def evaluate(
     )
 
     return (precision_recall_scores, f1_scores)
+
+
+def check_feature_order(ref_feat_order: list[str], input_feat_order: list[str]) -> bool:
+    """Check if the input feature order follows the same sequence as the reference feature order.
+
+    Parameters
+    ----------
+    ref_feat_order : list[str]
+        The reference feature space defining the expected order of features.
+    input_feat_order : list[str]
+        The feature space to be checked against the reference feature order.
+
+    Returns
+    -------
+    bool
+        True if the inputted feature space has the same order as the reference feature
+        space, else False.
+
+    Raises
+    ------
+    ValueError
+        When the feature spaces are not of the same size.
+    """
+
+    # Check if both feature spaces have the same size
+    if len(ref_feat_order) != len(input_feat_order):
+        raise ValueError("Feature spaces are not of the same size")
+
+    # Check if the order is the same
+    for idx in range(len(ref_feat_order)):
+        # If there's a mismatch, return False
+        if ref_feat_order[idx] != input_feat_order[idx]:
+            return False
+
+    # Return True if the order is identical
+    return True

@@ -4,8 +4,8 @@
 # In[1]:
 
 
-import pathlib
 import sys
+import pathlib
 
 import numpy as np
 import pandas as pd
@@ -15,7 +15,8 @@ from sklearn.preprocessing import label_binarize
 
 # import local modules
 sys.path.append("../../")
-from src.utils import evaluate, load_json_file, shuffle_features, train_multiclass
+from src.utils import shuffle_features, evaluate, train_multiclass, load_json_file
+
 
 # In[2]:
 
@@ -88,37 +89,37 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed, str
 
 
 # ## Training and Evaluating Multi-class Logistic Model with original dataset split
-#
+# 
 
 # In[5]:
 
 
 # train and get the best_model
-best_model = train_multiclass(X_train, y_train, param_grid=param_grid, seed=0)
+best_model = train_multiclass(X_train, y_train, param_grid=param_grid, seed=seed)
 
 
-# In[6]:
+# In[ ]:
 
 
 test_precision_recall_df, test_f1_score_df = evaluate(
-    model=best_model, X=X_test, y=y_test, dataset="test", shuffled=False, seed=0
+    model=best_model, X=X_test, y=y_test, dataset="test", shuffled=False, seed=seed
 )
 train_precision_recall_df, train_f1_score_df = evaluate(
-    model=best_model, X=X_train, y=y_train, dataset="train", shuffled=False, seed=0
+    model=best_model, X=X_train, y=y_train, dataset="train", shuffled=False, seed=seed
 )
 
 
 # ## Training and Evaluating Multi-class Logistic Model with shuffled dataset split
-#
+# 
 
-# In[7]:
+# In[ ]:
 
 
 # shuffle feature space
 shuffled_X_train = shuffle_features(X_train, seed=seed)
 
 
-# In[8]:
+# In[ ]:
 
 
 shuffled_best_model = train_multiclass(
@@ -126,20 +127,25 @@ shuffled_best_model = train_multiclass(
 )
 
 
-# In[9]:
+# In[ ]:
 
 
 shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate(
-    model=best_model, X=X_test, y=y_test, dataset="test", shuffled=True, seed=0
+    model=best_model, X=X_test, y=y_test, dataset="test", shuffled=True, seed=seed
 )
 shuffle_train_precision_recall_df, shuffle_train_f1_score_df = evaluate(
-    model=best_model, X=X_train, y=y_train, dataset="train", shuffled=True, seed=0
+    model=best_model,
+    X=shuffled_X_train,
+    y=y_train,
+    dataset="train",
+    shuffled=True,
+    seed=seed,
 )
 
 
 # ## Evaluating Multi-class model with holdout data
 
-# In[10]:
+# In[ ]:
 
 
 # loading in holdout data
@@ -171,9 +177,9 @@ y_well_holout = label_binarize(
 )
 
 
-# ### Evaluating Multi-class model trained with original split with holdout data
+# ### Evaluating Multi-class model trained with original split with holdout data 
 
-# In[11]:
+# In[ ]:
 
 
 # evaluating with plate holdout
@@ -183,7 +189,7 @@ plate_ho_precision_recall_df, plate_ho_f1_score_df = evaluate(
     y=y_plate_holout,
     dataset="plate_holdout",
     shuffled=False,
-    seed=0,
+    seed=seed,
 )
 plate_ho_shuffle_precision_recall_df, plate_ho_shuffle_train_f1_score_df = evaluate(
     model=shuffled_best_model,
@@ -191,7 +197,7 @@ plate_ho_shuffle_precision_recall_df, plate_ho_shuffle_train_f1_score_df = evalu
     y=y_plate_holout,
     dataset="plate_holdout",
     shuffled=True,
-    seed=0,
+    seed=seed,
 )
 
 # evaluating with treatment holdout
@@ -201,7 +207,7 @@ treatment_ho_precision_recall_df, treatment_ho_f1_score_df = evaluate(
     y=y_treatment_holout,
     dataset="treatment_holdout",
     shuffled=False,
-    seed=0,
+    seed=seed,
 )
 treatment_ho_shuffle_precision_recall_df, treatment_ho_shuffle_train_f1_score_df = (
     evaluate(
@@ -210,7 +216,7 @@ treatment_ho_shuffle_precision_recall_df, treatment_ho_shuffle_train_f1_score_df
         y=y_treatment_holout,
         dataset="treatment_holdout",
         shuffled=True,
-        seed=0,
+        seed=seed,
     )
 )
 
@@ -221,7 +227,7 @@ well_ho_precision_recall_df, well_ho_test_f1_score_df = evaluate(
     y=y_well_holout,
     dataset="well_holdout",
     shuffled=False,
-    seed=0,
+    seed=seed,
 )
 well_ho_shuffle_precision_recall_df, well_ho_shuffle_train_f1_score_df = evaluate(
     model=shuffled_best_model,
@@ -229,11 +235,11 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_train_f1_score_df = evaluat
     y=y_well_holout,
     dataset="well_holdout",
     shuffled=True,
-    seed=0,
+    seed=seed,
 )
 
 
-# In[12]:
+# In[ ]:
 
 
 # storing all f1 scores
@@ -258,7 +264,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[13]:
+# In[ ]:
 
 
 # storing pr scores
@@ -281,3 +287,4 @@ all_pr_scores = pd.concat(
 all_pr_scores.to_csv(
     modeling_dir / "precision_recall_scores.csv.gz", index=False, compression="gzip"
 )
+

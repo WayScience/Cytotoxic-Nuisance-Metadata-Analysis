@@ -4,26 +4,30 @@
 # # Spliting Data
 # Here, we utilize the feature-selected profiles generated in the preceding module notebook [here](../0.freature_selection/), focusing on dividing the data into training, testing, and holdout sets for machine learning training.
 
-# In[1]:
+# In[24]:
 
 
 import json
 import pathlib
 import warnings
 
-import numpy as np
 import pandas as pd
+import numpy as np
 
 # ignoring warnings
 warnings.catch_warnings(action="ignore")
 
 
 # ## Paramters
-#
+# 
 # Below are the parameters defined that are used in this notebook
 
-# In[2]:
+# In[25]:
 
+
+# setting seed constants
+seed = 0
+np.random.seed(seed)
 
 # directory to get all the inputs for this notebook
 data_dir = pathlib.Path("../../data").resolve(strict=True)
@@ -31,7 +35,6 @@ results_dir = pathlib.Path("../../results").resolve(strict=True)
 fs_dir = (results_dir / "0.feature_selection").resolve(strict=True)
 
 # directory to store all the output of this notebook
-
 data_split_dir = (results_dir / "1.data_splits").resolve()
 data_split_dir.mkdir(exist_ok=True)
 
@@ -51,10 +54,10 @@ fs_profile_df.head()
 
 
 # ## Exploring the data set
-#
+# 
 # Below is a  exploration of the selected features dataset. The aim is to identify treatments, extract metadata, and gain a understanding of the experiment's design.
 
-# Below demonstrates the amount of wells does each treatment have.
+# Below demonstrates the amount of wells does each treatment have. 
 
 # In[4]:
 
@@ -80,7 +83,7 @@ cell_injury_well_counts
 
 
 # Next we wanted to extract some metadata regarding how many compound and wells are treated with a given compounds
-#
+# 
 # This will be saved in the `results/0.data_splits` directory
 
 # In[6]:
@@ -109,7 +112,7 @@ injury_meta_df
 # > Barchart showing the number of wells that are labeled with a given injury
 
 # Next, we construct the profile metadata. This provides a structured overview of how the treatments assicoated with injuries were applied, detailing the treatments administered to each plate.
-#
+# 
 # This will be saved in the `results/0.data_splits` directory
 
 # In[7]:
@@ -143,7 +146,7 @@ with open(data_split_dir / "injury_metadata.json", mode="w") as stream:
 
 
 # Here we build a plate metadata infromations where we look at the type of treatments and amount of wells with the treatment that are present in the dataset
-#
+# 
 # This will be saved in `results/0.data_splits`
 
 # In[8]:
@@ -210,23 +213,23 @@ print(fs_profile_df["injury_type"].unique())
 print(fs_profile_df["injury_code"].unique())
 
 
-# ## Data Splitting
+# ## Data Splitting 
 # ---
 
 # ### Holdout Dataset
-#
+# 
 # Here we collected out holdout dataset. The holdout dataset is a subset of the dataset that is not used during model training or tuning. Instead, it is reserved solely for evaluating the model's performance after it has been trained.
-#
+# 
 # In this notebook, we will include three different types of held-out datasets before proceeding with our machine learning training and evaluation.
-#  - Plate hold out
-#  - treatment hold out
-#  - well hold out
-#
-# Each of these held outdata will be stored in the `results/1.data_splits` directory
-#
+#  - Plate hold out 
+#  - treatment hold out 
+#  - well hold out 
+# 
+# Each of these held outdata will be stored in the `results/1.data_splits` directory 
+# 
 
 # ### Plate Holdout
-#
+# 
 # Plates are randomly selected based on their Plate ID and save them as our `plate_holdout` data.
 
 # In[11]:
@@ -269,39 +272,29 @@ plate_holdout_df.head()
 
 
 # ### Treatment holdout
-#
+# 
 # To establish our treatment holdout, we first need to find the number of treatments and wells associated with a specific cell injury, considering the removal of randomly selected plates from the previous step.
-#
+# 
 # To determine which cell injuries should be considered for a single treatment holdout, we establish a threshold of 10 unique compounds. This means that a cell injury type must have at least 10 unique compounds to qualify for selection in the treatment holdout. Any cell injury types failing to meet this criterion will be disregarded.
-#
+# 
 # Once the cell injuries are identified for treatment holdout, we select our holdout treatment by grouping each injury type and choosing the treatment with the fewest wells. This becomes our treatment holdout dataset.
 
-# In[12]:
+# In[23]:
 
 
-# first we need to find what the treatment and well metadata after removing plates
-injury_treatment_metadata = []
-for injury_type, df in fs_profile_df.groupby("injury_type"):
-    for treatment, df2 in df.groupby("Compound Name"):
-        n_wells = df2.shape[0]
-        injury_treatment_metadata.append([injury_type, treatment, n_wells])
-
-# convert to df
-injury_treatment_metadata = pd.DataFrame(
-    injury_treatment_metadata, columns="injury_type treatment n_wells".split()
+injury_treatment_metadata = (
+    fs_profile_df.groupby(["injury_type", "Compound Name"])
+    .size()
+    .reset_index(name="n_wells")
 )
 injury_treatment_metadata
 
 
-# In[13]:
+# In[27]:
 
 
 # setting random seed
-seed = 0
 min_treatments_per_injury = 10
-
-# setting random seed globally
-np.random.seed(seed)
 
 # Filter out the injury types for which we can select a complete treatment.
 # We are using a threshold of 10. If an injury type is associated with fewer than 10 compounds,
@@ -331,14 +324,8 @@ print("Below are the accepted cell injuries and treatments to be held out")
 selected_treatments_to_holdout
 
 
-# In[14]:
+# In[28]:
 
-
-seed = 0
-n_samples = 15
-
-# setting random seed globally
-np.random.seed(seed)
 
 # select all wells that have the treatments to be heldout
 treatment_holdout_df = fs_profile_df.loc[
@@ -367,8 +354,8 @@ print("Treatment holdout shape:", treatment_holdout_df.shape)
 treatment_holdout_df.head()
 
 
-# ### Well holdout
-#
+# ### Well holdout 
+# 
 # To generate the well hold out data, each plate was iterated and random wells were selected. However, an additional step was condcuting which was to seperate the control wells and the treated wells, due to the large label imbalance with the controls. Therefore, 5 wells were randomly selected and 10 wells were randomly selected from each individual plate
 
 # In[15]:
@@ -469,3 +456,4 @@ fs_profile_df.head()
 fs_profile_df.to_csv(
     data_split_dir / "training_data.csv.gz", index=False, compression="gzip"
 )
+
