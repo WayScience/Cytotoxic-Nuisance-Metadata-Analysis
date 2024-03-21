@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[14]:
+# In[1]:
 
 
 import os
@@ -10,7 +10,7 @@ import pathlib
 import pandas as pd
 import requests
 
-# In[6]:
+# In[2]:
 
 
 # read
@@ -18,7 +18,7 @@ platemap_df = pd.read_csv("./barcode_platemap.csv")
 platemap_df.head()
 
 
-# In[14]:
+# In[3]:
 
 
 # download normalized data
@@ -36,17 +36,19 @@ for plate_id in platemap_df["Assay_Plate_Barcode"]:
                 f.write(chunk)
 
 
-# In[15]:
+# In[4]:
 
 
 # after downloading all dataset, concat into a single dataframe
 data_files = list(pathlib.Path.cwd().glob("*.csv.gz"))
 
-# create main df
+# create main df by concatenating all file
 main_df = pd.concat([pd.read_csv(file) for file in data_files])
 
 # remove single_dfs
 [os.remove(file) for file in data_files]
 
-# save concatenated df
-main_df.to_csv("all_plates_normalized_negcon.csv.gz", index=False, compression="gzip")
+# save concatenated df into ./data/JUMP_data folders
+main_df.to_csv(
+    "JUMP_all_plates_normalized_negcon.csv.gz", index=False, compression="gzip"
+)

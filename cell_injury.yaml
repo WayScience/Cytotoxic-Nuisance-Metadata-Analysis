@@ -4,11 +4,9 @@ channels:
   - defaults
 dependencies:
   - python=3.11
-  - pip
   - pandas
   - numpy
   - pre-commit
   - ipykernel
-  - requests
-  - pip:
-    - pycytominer
+  - requestss
+  - conda-forge::pycytominer==1.1.0

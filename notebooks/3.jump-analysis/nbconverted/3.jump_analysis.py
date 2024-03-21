@@ -88,11 +88,7 @@ compartments = list(
 
 # find CP features in JUMP dataset
 jump_cp_features = infer_cp_features(jump_df, compartments=compartments)
-meta_features = [
-    meta_feature
-    for meta_feature in jump_df.columns.tolist()
-    if meta_feature.startswith(metadata_prefix)
-]
+meta_features = infer_cp_features(jump_df, compartments=compartments, metadata=True)
 
 # display number of features of both profiles
 print("Number of Metadata Features:", len(meta_features))
@@ -181,7 +177,7 @@ pred_proba_df.columns = [
     injury_codes["decoder"][str(colname)] for colname in pred_proba_df.columns.tolist()
 ]
 
-# augment the probability scores by merging with the metadata associated with each well
+# augment the porbability scores by meringing with the metadata associated with each well
 pred_proba_df = jump_df[meta_features].merge(
     pred_proba_df, left_index=True, right_index=True
 )
