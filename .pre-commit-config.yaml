@@ -44,3 +44,4 @@ repos:
           - --autofix
           - --indent=4
           - --no-sort-keys
+      - id: end-of-file-fixer # adds new line to files if not present
