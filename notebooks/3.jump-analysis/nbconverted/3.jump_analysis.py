@@ -4,9 +4,9 @@
 # In[1]:
 
 
-import sys
 import json
 import pathlib
+import sys
 
 import joblib
 import pandas as pd
@@ -16,8 +16,7 @@ from pycytominer.cyto_utils.features import infer_cp_features
 sys.path.append("../../")  # noqa
 from src.utils import check_feature_order  # noqa
 
-
-# ## Setting up file paths and parameters 
+# ## Setting up file paths and parameters
 
 # In[2]:
 
@@ -66,10 +65,10 @@ jump_df.head()
 
 
 # ## Feature alignment
-# In this section, we are identifying the shared features present in both the cell injury and JUMP datasets. 
+# In this section, we are identifying the shared features present in both the cell injury and JUMP datasets.
 # Once these features are identified, we update the JUMP dataset to include only those features that are shared between both profiles for our machine learning application.
 
-# First we identify the CellProfiler (CP) features present in the JUMP data. 
+# First we identify the CellProfiler (CP) features present in the JUMP data.
 # We accomplish this by utilizing `pycytominer`'s  'infer_cp_features()', which helps us identify CP features in the JUMP dataset.
 
 # In[4]:
@@ -119,13 +118,13 @@ print("Number of shapred features of both profiles", len(aligned_features))
 
 
 # The objective of this step is to preserve the order of the feature space.
-# 
-# Since we have identified the shared feature space across both profiles, we still need to address those that are missing. 
+#
+# Since we have identified the shared feature space across both profiles, we still need to address those that are missing.
 # Therefore, to maintain the feature space order, we opted to use the cell injury feature space as our reference feature space order, as our multi-class model was trained to understand this specific order.
-# 
+#
 # Next, we addressed features that were not found within the JUMP dataset.
 # This was done by including them in the alignment process, but defaulted their values to 0.
-# 
+#
 # Ultimately, we generated a new profile called `aligned_jump_df`, which contains the correctly aligned and ordered feature space from the cell injury dataset.
 
 # In[6]:
@@ -158,8 +157,8 @@ assert check_feature_order(
 
 
 # ## Applying to our Multi-Class trained model
-# 
-# We applying the aligned JUMP dataset to our trained multi-class model and measure the probabiltiies of which cell injury each well possessed. 
+#
+# We applying the aligned JUMP dataset to our trained multi-class model and measure the probabiltiies of which cell injury each well possessed.
 
 # In[7]:
 
@@ -193,4 +192,3 @@ pred_proba_df.to_csv(jump_analysis_dir / "JUMP_injury_proba.csv.gz", compression
 # # display shape and size
 print("Probability shape:", pred_proba_df.shape)
 pred_proba_df.head()
-

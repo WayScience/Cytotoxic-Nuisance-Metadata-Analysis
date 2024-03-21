@@ -3,17 +3,17 @@
 
 # # Feature Processing and Selection
 # This notebook focuses on exploration using two essential files: the annotations data extracted from the actual screening profile (available in the [IDR repository](https://github.com/IDR/idr0133-dahlin-cellpainting/tree/main/screenA)) and the metadata retrieved from the supplementary section of the [research paper](https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-36829-x/MediaObjects/41467_2023_36829_MOESM5_ESM.xlsx).
-# 
+#
 # We explore the number of unique compounds associated with each cell injury and subsequently cross-reference this information with the screening profile. The aim is to assess the feasibility of using the data for training a machine learning model to predict cell injury.
-# 
+#
 # We apply feature selection through [pycytominer](https://github.com/cytomining/pycytominer) to capture the most informative features representing various cellular injury types within the morphology space. Then, we utilize the selected feature profiles for machine learning applications.
-# 
+#
 
 # In[1]:
 
 
-import sys
 import pathlib
+import sys
 from collections import defaultdict
 
 import pandas as pd
@@ -21,7 +21,6 @@ from pycytominer import feature_select
 
 sys.path.append("../../")
 from src import utils
-
 
 # In[2]:
 
@@ -176,4 +175,3 @@ fs_profile.to_csv(
 cell_injuries = fs_profile["injury_type"].unique()
 print("number of cell injury types", len(cell_injuries))
 cell_injuries
-

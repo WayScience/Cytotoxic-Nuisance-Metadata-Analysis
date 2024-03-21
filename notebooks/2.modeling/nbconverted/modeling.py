@@ -4,8 +4,8 @@
 # In[1]:
 
 
-import sys
 import pathlib
+import sys
 
 import numpy as np
 import pandas as pd
@@ -15,8 +15,7 @@ from sklearn.preprocessing import label_binarize
 
 # import local modules
 sys.path.append("../../")
-from src.utils import shuffle_features, evaluate, train_multiclass, load_json_file
-
+from src.utils import evaluate, load_json_file, shuffle_features, train_multiclass
 
 # In[2]:
 
@@ -89,7 +88,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed, str
 
 
 # ## Training and Evaluating Multi-class Logistic Model with original dataset split
-# 
+#
 
 # In[5]:
 
@@ -110,7 +109,7 @@ train_precision_recall_df, train_f1_score_df = evaluate(
 
 
 # ## Training and Evaluating Multi-class Logistic Model with shuffled dataset split
-# 
+#
 
 # In[ ]:
 
@@ -177,7 +176,7 @@ y_well_holout = label_binarize(
 )
 
 
-# ### Evaluating Multi-class model trained with original split with holdout data 
+# ### Evaluating Multi-class model trained with original split with holdout data
 
 # In[ ]:
 
@@ -287,4 +286,3 @@ all_pr_scores = pd.concat(
 all_pr_scores.to_csv(
     modeling_dir / "precision_recall_scores.csv.gz", index=False, compression="gzip"
 )
-

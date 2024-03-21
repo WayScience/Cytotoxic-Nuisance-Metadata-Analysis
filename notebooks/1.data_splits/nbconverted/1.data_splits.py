@@ -11,15 +11,15 @@ import json
 import pathlib
 import warnings
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 # ignoring warnings
 warnings.catch_warnings(action="ignore")
 
 
 # ## Paramters
-# 
+#
 # Below are the parameters defined that are used in this notebook
 
 # In[2]:
@@ -54,10 +54,10 @@ fs_profile_df.head()
 
 
 # ## Exploring the data set
-# 
+#
 # Below is a  exploration of the selected features dataset. The aim is to identify treatments, extract metadata, and gain a understanding of the experiment's design.
 
-# Below demonstrates the amount of wells does each treatment have. 
+# Below demonstrates the amount of wells does each treatment have.
 
 # In[4]:
 
@@ -83,7 +83,7 @@ cell_injury_well_counts
 
 
 # Next we wanted to extract some metadata regarding how many compound and wells are treated with a given compounds
-# 
+#
 # This will be saved in the `results/0.data_splits` directory
 
 # In[6]:
@@ -112,7 +112,7 @@ injury_meta_df
 # > Barchart showing the number of wells that are labeled with a given injury
 
 # Next, we construct the profile metadata. This provides a structured overview of how the treatments assicoated with injuries were applied, detailing the treatments administered to each plate.
-# 
+#
 # This will be saved in the `results/0.data_splits` directory
 
 # In[7]:
@@ -146,7 +146,7 @@ with open(data_split_dir / "injury_metadata.json", mode="w") as stream:
 
 
 # Here we build a plate metadata infromations where we look at the type of treatments and amount of wells with the treatment that are present in the dataset
-# 
+#
 # This will be saved in `results/0.data_splits`
 
 # In[8]:
@@ -213,23 +213,23 @@ print(fs_profile_df["injury_type"].unique())
 print(fs_profile_df["injury_code"].unique())
 
 
-# ## Data Splitting 
+# ## Data Splitting
 # ---
 
 # ### Holdout Dataset
-# 
+#
 # Here we collected out holdout dataset. The holdout dataset is a subset of the dataset that is not used during model training or tuning. Instead, it is reserved solely for evaluating the model's performance after it has been trained.
-# 
+#
 # In this notebook, we will include three different types of held-out datasets before proceeding with our machine learning training and evaluation.
-#  - Plate hold out 
-#  - treatment hold out 
-#  - well hold out 
-# 
-# Each of these held outdata will be stored in the `results/1.data_splits` directory 
-# 
+#  - Plate hold out
+#  - treatment hold out
+#  - well hold out
+#
+# Each of these held outdata will be stored in the `results/1.data_splits` directory
+#
 
 # ### Plate Holdout
-# 
+#
 # Plates are randomly selected based on their Plate ID and save them as our `plate_holdout` data.
 
 # In[11]:
@@ -272,11 +272,11 @@ plate_holdout_df.head()
 
 
 # ### Treatment holdout
-# 
+#
 # To establish our treatment holdout, we first need to find the number of treatments and wells associated with a specific cell injury, considering the removal of randomly selected plates from the previous step.
-# 
+#
 # To determine which cell injuries should be considered for a single treatment holdout, we establish a threshold of 10 unique compounds. This means that a cell injury type must have at least 10 unique compounds to qualify for selection in the treatment holdout. Any cell injury types failing to meet this criterion will be disregarded.
-# 
+#
 # Once the cell injuries are identified for treatment holdout, we select our holdout treatment by grouping each injury type and choosing the treatment with the fewest wells. This becomes our treatment holdout dataset.
 
 # In[12]:
@@ -354,8 +354,8 @@ print("Treatment holdout shape:", treatment_holdout_df.shape)
 treatment_holdout_df.head()
 
 
-# ### Well holdout 
-# 
+# ### Well holdout
+#
 # To generate the well hold out data, each plate was iterated and random wells were selected. However, an additional step was condcuting which was to seperate the control wells and the treated wells, due to the large label imbalance with the controls. Therefore, 5 wells were randomly selected and 10 wells were randomly selected from each individual plate
 
 # In[15]:
@@ -471,4 +471,3 @@ all_feature_col_names = {
 # save as a json file
 with open(data_split_dir / "feature_cols.json", mode="w") as f:
     json.dump(all_feature_col_names, f)
-
