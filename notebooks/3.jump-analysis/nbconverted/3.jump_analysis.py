@@ -181,7 +181,7 @@ pred_proba_df.columns = [
     injury_codes["decoder"][str(colname)] for colname in pred_proba_df.columns.tolist()
 ]
 
-# augment the porbability scores by meringing with the metadata associated with each well
+# augment the probability scores by merging with the metadata associated with each well
 pred_proba_df = jump_df[meta_features].merge(
     pred_proba_df, left_index=True, right_index=True
 )
