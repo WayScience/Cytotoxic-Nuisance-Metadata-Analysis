@@ -48,7 +48,7 @@ jump_analysis_dir.mkdir(exist_ok=True)
 # In[3]:
 
 
-# loading in the negatlive controled normalized profiles
+# loading in the negative control normalized profiles
 jump_df = pd.read_csv(jump_data_path)
 
 # loading json file containing selected feature names
