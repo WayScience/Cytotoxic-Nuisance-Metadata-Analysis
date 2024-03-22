@@ -436,7 +436,6 @@ injury_meta_df = pd.DataFrame(
     meta_injury,
     columns=["injury_type", "injury_code", "n_wells", "n_compounds", "compound_list"],
 ).sort_values("n_wells", ascending=False)
-injury_meta_df.to_csv(data_split_dir / "injury_well_counts_table.csv", index=False)
 
 # display
 injury_meta_df
