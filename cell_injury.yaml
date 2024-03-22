@@ -8,5 +8,5 @@ dependencies:
   - numpy
   - pre-commit
   - ipykernel
-  - requestss
+  - requests
   - conda-forge::pycytominer==1.1.0
