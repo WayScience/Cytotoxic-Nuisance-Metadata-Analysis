@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[9]:
 
 
 import json
@@ -18,7 +18,7 @@ from src.utils import check_feature_order  # noqa
 
 # ## Setting up file paths and parameters
 
-# In[2]:
+# In[10]:
 
 
 # setting up paths
@@ -29,7 +29,7 @@ modeling_dir = pathlib.Path("../../results/2.modeling").resolve(strict=True)
 
 
 # data files
-jump_data_path = (jump_data_dir / "all_plates_normalized_negcon.csv.gz").resolve(
+jump_data_path = (jump_data_dir / "JUMP_all_plates_normalized_negcon.csv.gz").resolve(
     strict=True
 )
 multi_class_model_path = (modeling_dir / "multi_class_model.joblib").resolve(
@@ -45,10 +45,10 @@ jump_analysis_dir.mkdir(exist_ok=True)
 
 # ## loading files
 
-# In[3]:
+# In[11]:
 
 
-# loading in the negative control normalized profiles
+# loading in the negatlive controled normalized profiles
 jump_df = pd.read_csv(jump_data_path)
 
 # loading json file containing selected feature names
@@ -71,7 +71,7 @@ jump_df.head()
 # First we identify the CellProfiler (CP) features present in the JUMP data.
 # We accomplish this by utilizing `pycytominer`'s  'infer_cp_features()', which helps us identify CP features in the JUMP dataset.
 
-# In[4]:
+# In[12]:
 
 
 # get compartments
@@ -101,7 +101,7 @@ print("Number of CP features that JUMP has:", len(jump_cp_features))
 
 # Now that we have identified the features present in both datasets, the next step is to align them. This involves identifying the common features between both profiles and utilizing these features to update our JUMP dataset for our machine learning model.
 
-# In[5]:
+# In[13]:
 
 
 cell_injury_cp_features = cell_injury_cp_feature_cols["feature_cols"]
@@ -123,7 +123,7 @@ print("Number of shapred features of both profiles", len(aligned_features))
 #
 # Ultimately, we generated a new profile called `aligned_jump_df`, which contains the correctly aligned and ordered feature space from the cell injury dataset.
 
-# In[6]:
+# In[14]:
 
 
 # multiplier is the number of samples in JUMP data
@@ -156,14 +156,14 @@ assert check_feature_order(
 #
 # We applying the aligned JUMP dataset to our trained multi-class model and measure the probabiltiies of which cell injury each well possessed.
 
-# In[7]:
+# In[15]:
 
 
 # loading in mutliclass model
 multi_class_cell_injury_model = joblib.load(multi_class_model_path)
 
 
-# In[8]:
+# In[16]:
 
 
 # apply
