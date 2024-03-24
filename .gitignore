@@ -160,4 +160,4 @@ cython_debug/
 #.idea/
 
 # large dataset
-data/JUMP_data/all_plates_normalized_negcon.csv.gz
+data/JUMP_data/JUMP_all_plates_normalized_negcon.csv.gz
