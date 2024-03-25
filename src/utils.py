@@ -236,6 +236,7 @@ def evaluate(
     X: np.ndarray,
     y: np.ndarray,
     dataset: str,
+    mapped_classes: dict,
     shuffled: bool,
     seed: Optional[int] = 0,
 ) -> tuple[pd.DataFrame]:
@@ -249,6 +250,11 @@ def evaluate(
         features
     y : np.ndarray
         labels
+    dataset: str
+        label indicating what type of dataset you are using
+    mapped_classes: dict
+        dictionary that contains the class label and binarized classes as key
+        value pairs.
     shuffled : bool
         Flag indicating if the data has been shuffled
     seed : Optional[int], optional
@@ -265,7 +271,7 @@ def evaluate(
     np.random.seed(seed)
 
     # number of classes
-    n_classes = len(np.unique(y, axis=0))
+    bin_classes = np.unique(y, axis=0).tolist()
 
     # loading in injury_codes
     injury_code_path = (
@@ -279,30 +285,45 @@ def evaluate(
 
     # computing and collecting  precision and recall curve
     precision_recall_scores = []
-    for i in range(n_classes):
+    for bin_class in bin_classes:
+        # using binary class to get the injury code and type
+        injury_code = mapped_classes[str(bin_class)]
+        injury_type = injury_codes["decoder"][str(injury_code)]
+
         # precision_recall_curve calculation
-        precision, recall, _ = precision_recall_curve(y[:, i], probability[:, i])
+        precision, recall, _ = precision_recall_curve(
+            y[:, injury_code], probability[:, injury_code]
+        )
 
         # iterate all scores and save all data into a list
         for i in range(len(precision)):
-            precision_recall_scores.append([dataset, shuffled, precision[i], recall[i]])
+            precision_recall_scores.append(
+                [dataset, injury_type, shuffled, precision[i], recall[i]]
+            )
 
     # creating scores df
     precision_recall_scores = pd.DataFrame(
-        precision_recall_scores, columns=["dataset", "shuffled", "precision", "recall"]
+        precision_recall_scores,
+        columns=["dataset", "injury_type", "shuffled", "precision", "recall"],
     )
 
     # Compute F1 score
     f1_scores = []
-    for i in range(n_classes):
-        y_true = y[:, i]
-        y_pred = predictions[:, i]
+    for bin_class in bin_classes:
+        # using binary class to get the injury code and type
+        injury_code = mapped_classes[str(bin_class)]
+        injury_type = injury_codes["decoder"][str(injury_code)]
+
+        y_true = y[:, injury_code]
+        y_pred = predictions[:, injury_code]
         f1 = f1_score(y_true, y_pred)
-        f1_scores.append([dataset, shuffled, injury_codes["decoder"][str(i)], f1])
+
+        # append score
+        f1_scores.append([dataset, shuffled, injury_type, f1])
 
     # convert to data frame and display
     f1_scores = pd.DataFrame(
-        f1_scores, columns=["data_set", "shuffled", "class", "f1_score"]
+        f1_scores, columns=["data_set", "shuffled", "injury_type", "f1_score"]
     )
 
     return (precision_recall_scores, f1_scores)

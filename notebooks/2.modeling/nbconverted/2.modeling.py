@@ -104,25 +104,47 @@ joblib.dump(best_model, modeling_dir / "multi_class_model.joblib")
 # In[6]:
 
 
+bin_labels = label_binarize(
+    np.unique(y_labels.values), classes=[*range(n_classes)]
+).tolist()
+labeled_bin = {str(bin_label): idx for idx, bin_label in enumerate(bin_labels)}
+
+
+# In[7]:
+
+
 test_precision_recall_df, test_f1_score_df = evaluate(
-    model=best_model, X=X_test, y=y_test, dataset="test", shuffled=False, seed=seed
+    model=best_model,
+    X=X_test,
+    y=y_test,
+    mapped_classes=labeled_bin,
+    dataset="test",
+    shuffled=False,
+    seed=seed,
 )
+
 train_precision_recall_df, train_f1_score_df = evaluate(
-    model=best_model, X=X_train, y=y_train, dataset="train", shuffled=False, seed=seed
+    model=best_model,
+    X=X_train,
+    y=y_train,
+    mapped_classes=labeled_bin,
+    dataset="train",
+    shuffled=False,
+    seed=seed,
 )
 
 
 # ## Training and Evaluating Multi-class Logistic Model with shuffled dataset split
 #
 
-# In[7]:
+# In[8]:
 
 
 # shuffle feature space
 shuffled_X_train = shuffle_features(X_train, seed=seed)
 
 
-# In[8]:
+# In[9]:
 
 
 shuffled_best_model = train_multiclass(
@@ -130,16 +152,23 @@ shuffled_best_model = train_multiclass(
 )
 
 
-# In[ ]:
+# In[10]:
 
 
 shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate(
-    model=best_model, X=X_test, y=y_test, dataset="test", shuffled=True, seed=seed
+    model=best_model,
+    X=X_test,
+    y=y_test,
+    mapped_classes=labeled_bin,
+    dataset="test",
+    shuffled=True,
+    seed=seed,
 )
 shuffle_train_precision_recall_df, shuffle_train_f1_score_df = evaluate(
     model=best_model,
     X=shuffled_X_train,
     y=y_train,
+    mapped_classes=labeled_bin,
     dataset="train",
     shuffled=True,
     seed=seed,
@@ -148,7 +177,7 @@ shuffle_train_precision_recall_df, shuffle_train_f1_score_df = evaluate(
 
 # ## Evaluating Multi-class model with holdout data
 
-# In[ ]:
+# In[11]:
 
 
 # loading in holdout data
@@ -182,7 +211,7 @@ y_well_holout = label_binarize(
 
 # ### Evaluating Multi-class model trained with original split with holdout data
 
-# In[ ]:
+# In[12]:
 
 
 # evaluating with plate holdout
@@ -190,6 +219,7 @@ plate_ho_precision_recall_df, plate_ho_f1_score_df = evaluate(
     model=best_model,
     X=X_plate_holdout,
     y=y_plate_holout,
+    mapped_classes=labeled_bin,
     dataset="plate_holdout",
     shuffled=False,
     seed=seed,
@@ -198,6 +228,7 @@ plate_ho_shuffle_precision_recall_df, plate_ho_shuffle_train_f1_score_df = evalu
     model=shuffled_best_model,
     X=X_plate_holdout,
     y=y_plate_holout,
+    mapped_classes=labeled_bin,
     dataset="plate_holdout",
     shuffled=True,
     seed=seed,
@@ -208,6 +239,7 @@ treatment_ho_precision_recall_df, treatment_ho_f1_score_df = evaluate(
     model=best_model,
     X=X_treatment_holdout,
     y=y_treatment_holout,
+    mapped_classes=labeled_bin,
     dataset="treatment_holdout",
     shuffled=False,
     seed=seed,
@@ -217,6 +249,7 @@ treatment_ho_shuffle_precision_recall_df, treatment_ho_shuffle_train_f1_score_df
         model=shuffled_best_model,
         X=X_treatment_holdout,
         y=y_treatment_holout,
+        mapped_classes=labeled_bin,
         dataset="treatment_holdout",
         shuffled=True,
         seed=seed,
@@ -228,6 +261,7 @@ well_ho_precision_recall_df, well_ho_test_f1_score_df = evaluate(
     model=best_model,
     X=X_well_holdout,
     y=y_well_holout,
+    mapped_classes=labeled_bin,
     dataset="well_holdout",
     shuffled=False,
     seed=seed,
@@ -236,13 +270,14 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_train_f1_score_df = evaluat
     model=shuffled_best_model,
     X=X_well_holdout,
     y=y_well_holout,
+    mapped_classes=labeled_bin,
     dataset="well_holdout",
     shuffled=True,
     seed=seed,
 )
 
 
-# In[ ]:
+# In[13]:
 
 
 # storing all f1 scores
@@ -267,7 +302,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[ ]:
+# In[14]:
 
 
 # storing pr scores
@@ -290,18 +325,6 @@ all_pr_scores = pd.concat(
 all_pr_scores.to_csv(
     modeling_dir / "precision_recall_scores.csv.gz", index=False, compression="gzip"
 )
-
-
-# In[ ]:
-
-
-# In[ ]:
-
-
-# In[ ]:
-
-
-# In[ ]:
 
 
 # In[ ]:
