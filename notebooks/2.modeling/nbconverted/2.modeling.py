@@ -150,6 +150,7 @@ shuffled_X_train = shuffle_features(X_train, seed=seed)
 shuffled_best_model = train_multiclass(
     shuffled_X_train, y_train, param_grid=param_grid, seed=seed
 )
+joblib.dump(shuffled_best_model, modeling_dir / "shuffled_multi_class_model.joblib")
 
 
 # In[10]:
@@ -325,6 +326,3 @@ all_pr_scores = pd.concat(
 all_pr_scores.to_csv(
     modeling_dir / "precision_recall_scores.csv.gz", index=False, compression="gzip"
 )
-
-
-# In[ ]:
