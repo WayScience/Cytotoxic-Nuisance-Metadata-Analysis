@@ -1,0 +1,6 @@
+name: cell-injury-r
+channels:
+  - conda-forge
+  - anaconda
+dependencies:
+  - conda-forge::r-essentials

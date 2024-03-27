@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[9]:
+# In[1]:
 
 
 import json
@@ -18,7 +18,7 @@ from src.utils import check_feature_order  # noqa
 
 # ## Setting up file paths and parameters
 
-# In[10]:
+# In[2]:
 
 
 # setting up paths
@@ -27,7 +27,6 @@ data_split_dir = (results_dir / "1.data_splits/").resolve(strict=True)
 jump_data_dir = pathlib.Path("../../data/JUMP_data").resolve(strict=True)
 modeling_dir = pathlib.Path("../../results/2.modeling").resolve(strict=True)
 
-
 # data files
 jump_data_path = (jump_data_dir / "JUMP_all_plates_normalized_negcon.csv.gz").resolve(
     strict=True
@@ -35,6 +34,9 @@ jump_data_path = (jump_data_dir / "JUMP_all_plates_normalized_negcon.csv.gz").re
 multi_class_model_path = (modeling_dir / "multi_class_model.joblib").resolve(
     strict=True
 )
+shuffled_multi_class_model_path = (
+    modeling_dir / "shuffled_multi_class_model.joblib"
+).resolve(strict=True)
 feature_col_names = (data_split_dir / "feature_cols.json").resolve(strict=True)
 
 
@@ -45,7 +47,7 @@ jump_analysis_dir.mkdir(exist_ok=True)
 
 # ## loading files
 
-# In[11]:
+# In[3]:
 
 
 # loading in the negatlive controled normalized profiles
@@ -71,7 +73,7 @@ jump_df.head()
 # First we identify the CellProfiler (CP) features present in the JUMP data.
 # We accomplish this by utilizing `pycytominer`'s  'infer_cp_features()', which helps us identify CP features in the JUMP dataset.
 
-# In[12]:
+# In[4]:
 
 
 # get compartments
@@ -101,7 +103,7 @@ print("Number of CP features that JUMP has:", len(jump_cp_features))
 
 # Now that we have identified the features present in both datasets, the next step is to align them. This involves identifying the common features between both profiles and utilizing these features to update our JUMP dataset for our machine learning model.
 
-# In[13]:
+# In[5]:
 
 
 cell_injury_cp_features = cell_injury_cp_feature_cols["feature_cols"]
@@ -123,7 +125,7 @@ print("Number of shapred features of both profiles", len(aligned_features))
 #
 # Ultimately, we generated a new profile called `aligned_jump_df`, which contains the correctly aligned and ordered feature space from the cell injury dataset.
 
-# In[14]:
+# In[6]:
 
 
 # multiplier is the number of samples in JUMP data
@@ -156,14 +158,14 @@ assert check_feature_order(
 #
 # We applying the aligned JUMP dataset to our trained multi-class model and measure the probabiltiies of which cell injury each well possessed.
 
-# In[15]:
+# In[7]:
 
 
 # loading in mutliclass model
 multi_class_cell_injury_model = joblib.load(multi_class_model_path)
 
 
-# In[16]:
+# In[8]:
 
 
 # apply
@@ -177,14 +179,57 @@ pred_proba_df.columns = [
     injury_codes["decoder"][str(colname)] for colname in pred_proba_df.columns.tolist()
 ]
 
-# augment the porbability scores by meringing with the metadata associated with each well
-pred_proba_df = jump_df[meta_features].merge(
-    pred_proba_df, left_index=True, right_index=True
-)
-
-# # save the probability dataframe
-pred_proba_df.to_csv(jump_analysis_dir / "JUMP_injury_proba.csv.gz", compression="gzip")
+# adding shuffle label
+pred_proba_df.insert(0, "shuffled_model", False)
 
 # # display shape and size
 print("Probability shape:", pred_proba_df.shape)
 pred_proba_df.head()
+
+
+# ## Applying to our Shuffled Multi-Class trained model
+#
+# We applying the aligned JUMP dataset to our trained multi-class model and measure the probabiltiies of which cell injury each well possessed.
+
+# In[9]:
+
+
+# loading shuffled model
+shuffled_multi_class_cell_injury_model = joblib.load(shuffled_multi_class_model_path)
+
+
+# In[10]:
+
+
+# apply
+shuffled_pred_proba = shuffled_multi_class_cell_injury_model.predict_proba(
+    aligned_jump_feats_df
+)
+
+# convert prediction probabilities to a pandas daraframe
+shuffled_pred_proba_df = pd.DataFrame(shuffled_pred_proba)
+
+# update the column names with the name of the injury class
+shuffled_pred_proba_df.columns = [
+    injury_codes["decoder"][str(colname)]
+    for colname in shuffled_pred_proba_df.columns.tolist()
+]
+
+# # adding label True
+shuffled_pred_proba_df.insert(0, "shuffled_model", True)
+
+
+# Saving all probabilities from both shuffle and regular models
+
+# In[11]:
+
+
+# concat both shuffled
+all_probas = pd.concat([pred_proba_df, shuffled_pred_proba_df]).reset_index(drop=True)
+
+# save the mode
+all_probas.to_csv(jump_analysis_dir / "JUMP_injury_proba.csv.gz")
+
+print("Shape of the probabilities", all_probas.shape)
+print("Unique Models", list(all_probas["shuffled_model"].unique()))
+all_probas.head()
