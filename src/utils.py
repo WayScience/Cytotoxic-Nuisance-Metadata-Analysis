@@ -14,7 +14,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, precision_recall_curve
 from sklearn.model_selection import RandomizedSearchCV
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.preprocessing import label_binarize
 from sklearn.utils import parallel_backend
 
 # catch warnings
@@ -201,9 +201,8 @@ def train_multiclass(
     # setting seed:
     np.random.seed(seed)
 
-    # create a Logistic regression model with One vs Rest scheme (ovr)
-    logistic_regression_model = LogisticRegression(class_weight="balanced")
-    ovr_model = OneVsRestClassifier(logistic_regression_model)
+    # create a Logistic regression model with multi_
+    lr_model = LogisticRegression(multi_class="multinomial")
 
     # next is to use RandomizedSearchCV for hyper parameter turning
     with parallel_backend("multiprocessing"):
@@ -212,14 +211,14 @@ def train_multiclass(
                 "ignore", category=ConvergenceWarning, module="sklearn"
             )
             warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
-
             # execute RandomizedResearchCV
             random_search = RandomizedSearchCV(
-                estimator=ovr_model,
+                lr_model,
                 param_distributions=param_grid,
                 n_iter=10,
                 cv=5,
-                random_state=seed,
+                verbose=0,
+                random_state=0,
                 n_jobs=-1,
             )
 
@@ -231,102 +230,130 @@ def train_multiclass(
     return best_model
 
 
-def evaluate(
+def calculate_multi_class_pr_curve(
     model: BaseEstimator,
     X: np.ndarray,
     y: np.ndarray,
-    dataset: str,
-    mapped_classes: dict,
+    dataset_type: str,
     shuffled: bool,
-    seed: Optional[int] = 0,
-) -> tuple[pd.DataFrame]:
-    """calculates the precision/recall and f1
+) -> pd.DataFrame:
+    """Calculates precision and recall from multi-class model.
+
+    This code was heavily influenced by @roshankern:
+    https://github.com/WayScience/phenotypic_profiling/blob/main/utils/evaluate_utils.py
 
     Parameters
     ----------
     model : BaseEstimator
-        best model
+        mutli-class model to evaluate
     X : np.ndarray
-        features
+        Feature dataset
     y : np.ndarray
-        labels
-    dataset: str
-        label indicating what type of dataset you are using
-    mapped_classes: dict
-        dictionary that contains the class label and binarized classes as key
-        value pairs.
+        associated labels
+    dataset_type : str
+        label indicating what type of data you are evaluating on the model
     shuffled : bool
-        Flag indicating if the data has been shuffled
-    seed : Optional[int], optional
-        _description_, by default 0
-
-    Returns
-    -------
-    tuple[pd.DataFrame]
-        returns a tuple that contains the f1 scores and precision/recall scores
-        in a dataframe
+        label indicating wether the data is shuffled or not
     """
 
-    # setting seed
-    np.random.seed(seed)
+    # get injury_type classes
+    injury_types = model.classes_
 
-    # number of classes
-    bin_classes = np.unique(y, axis=0).tolist()
+    # binarize labels
+    y_binarized = label_binarize(y, classes=injury_types)
+
+    # predict the probability scores
+    y_scores = model.predict_proba(X)
 
     # loading in injury_codes
     injury_code_path = (
         PROJECT_DIR_PATH / "results/1.data_splits/injury_codes.json"
     ).resolve(strict=True)
-    injury_codes = load_json_file(injury_code_path)
+    injury_codes = load_json_file(injury_code_path)["decoder"]
 
-    # making predictions
-    predictions = model.predict(X)
-    probability = model.predict_proba(X)
+    # storing all dataframes containing pr scores per class
+    pr_data = []
 
-    # computing and collecting  precision and recall curve
-    precision_recall_scores = []
-    for bin_class in bin_classes:
-        # using binary class to get the injury code and type
-        injury_code = mapped_classes[str(bin_class)]
-        injury_type = injury_codes["decoder"][str(injury_code)]
-
-        # precision_recall_curve calculation
+    for injury_type in injury_types:
+        # get pr scores
         precision, recall, _ = precision_recall_curve(
-            y[:, injury_code], probability[:, injury_code]
+            y_binarized[:, injury_type], y_scores[:, injury_type]
         )
 
-        # iterate all scores and save all data into a list
-        for i in range(len(precision)):
-            precision_recall_scores.append(
-                [dataset, injury_type, shuffled, precision[i], recall[i]]
+        # store data
+        pr_data.append(
+            pd.DataFrame(
+                {
+                    "dataset_type": dataset_type,
+                    "shuffled": shuffled,
+                    "injury_type": injury_codes[str(injury_type)],
+                    "precision": precision,
+                    "recall": recall,
+                }
             )
+        )
 
-    # creating scores df
-    precision_recall_scores = pd.DataFrame(
-        precision_recall_scores,
-        columns=["dataset", "injury_type", "shuffled", "precision", "recall"],
+    # return the scores in tidy long format
+    return pd.concat(pr_data, axis=0).reset_index(drop=True)
+
+
+def calculate_multi_class_f1score(
+    model: BaseEstimator,
+    X: np.ndarray,
+    y: np.ndarray,
+    dataset_type: str,
+    shuffled: bool,
+) -> pd.DataFrame:
+    """Calculate weighted and individual class f1 scores.
+
+    This code was heavily influenced by @roshankern:
+    https://github.com/WayScience/phenotypic_profiling/blob/main/utils/evaluate_utils.py
+
+    Parameters
+    ----------
+    model : BaseEstimator
+        mutli-class model to evaluate
+    X : np.ndarray
+        Feature dataset
+    y : np.ndarray
+        associated labels
+    dataset_type : str
+        label indicating what type of data you are evaluating on the model
+    shuffled : bool
+        label indicating wether the data is shuffled or not
+    """
+
+    # loading injury codes
+    injury_code_path = (
+        PROJECT_DIR_PATH / "results/1.data_splits/injury_codes.json"
+    ).resolve(strict=True)
+    injury_codes = load_json_file(injury_code_path)["decoder"]
+
+    # injury classes
+    injury_labels = model.classes_
+    injury_types = [injury_codes[str(injury_code)] for injury_code in injury_labels]
+
+    # prediction
+    y_pred = model.predict(X)
+
+    # calculate f1 score per injust and weighted scores across all injuries
+    scores = f1_score(y, y_pred, average=None, labels=injury_labels, zero_division=0)
+    weighted_score = f1_score(
+        y, y_pred, average="weighted", labels=injury_labels, zero_division=0
     )
 
-    # Compute F1 score
-    f1_scores = []
-    for bin_class in bin_classes:
-        # using binary class to get the injury code and type
-        injury_code = mapped_classes[str(bin_class)]
-        injury_type = injury_codes["decoder"][str(injury_code)]
+    # add scores into a data frame
+    scores = pd.DataFrame(scores).transpose()
+    scores.columns = injury_types
+    scores["weighted"] = weighted_score
+    scores = scores.transpose().reset_index()
+    scores.columns = ["injury_type", "f1_score"]
 
-        y_true = y[:, injury_code]
-        y_pred = predictions[:, injury_code]
-        f1 = f1_score(y_true, y_pred)
+    # inserting data info columns
+    scores.insert(0, "dataset_type", dataset_type)
+    scores.insert(1, "shuffled", shuffled)
 
-        # append score
-        f1_scores.append([dataset, shuffled, injury_type, f1])
-
-    # convert to data frame and display
-    f1_scores = pd.DataFrame(
-        f1_scores, columns=["data_set", "shuffled", "injury_type", "f1_score"]
-    )
-
-    return (precision_recall_scores, f1_scores)
+    return scores
 
 
 def check_feature_order(ref_feat_order: list[str], input_feat_order: list[str]) -> bool:
