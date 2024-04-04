@@ -12,7 +12,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score, precision_recall_curve
+from sklearn.metrics import confusion_matrix, f1_score, precision_recall_curve
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.preprocessing import label_binarize
 from sklearn.utils import parallel_backend
@@ -202,7 +202,7 @@ def train_multiclass(
     np.random.seed(seed)
 
     # create a Logistic regression model with multi_
-    lr_model = LogisticRegression(multi_class="multinomial")
+    lr_model = LogisticRegression(multi_class="multinomial", class_weight="balanced")
 
     # next is to use RandomizedSearchCV for hyper parameter turning
     with parallel_backend("multiprocessing"):
@@ -354,6 +354,64 @@ def calculate_multi_class_f1score(
     scores.insert(1, "shuffled", shuffled)
 
     return scores
+
+
+def generate_confusion_matrix(
+    model: BaseEstimator,
+    X: np.ndarray,
+    y: np.ndarray,
+    shuffled: bool,
+    dataset_type: str,
+) -> pd.DataFrame:
+    """Generates a multi-class confusion matrix with given predicted and true labels
+
+    Parameters
+    ----------
+    mode : BaseEstimator
+        model to measure performance
+    X : np.ndarray
+
+    y : np.ndarray
+        true labels
+
+    Returns
+    -------
+    pd.DataFrame
+        confusion matrix
+    """
+
+    # extracting all classes the models has learned from
+    class_labels = model.classes_
+
+    # loading in injury_codes
+    injury_code_path = (
+        PROJECT_DIR_PATH / "results/1.data_splits/injury_codes.json"
+    ).resolve(strict=True)
+    injury_codes = load_json_file(injury_code_path)["decoder"]
+
+    # predicting labels with given X values
+    predictions = model.predict(X)
+
+    # generate confusing matrix and convert to pandas dataframe
+    cm_df = pd.DataFrame(
+        data=confusion_matrix(y_true=y, y_pred=predictions, labels=class_labels)
+    )
+
+    # update the data frame by replace injury codes with injury name
+    cm_df.columns = [
+        injury_codes[str(injury_code)] for injury_code in cm_df.columns.tolist()
+    ]
+    cm_df.index = [
+        injury_codes[str(injury_code)] for injury_code in cm_df.index.tolist()
+    ]
+
+    # insert data type name in the matrix
+    cm_df.insert(0, "dataset_type", dataset_type)
+
+    # insert shuffled label
+    cm_df.insert(1, "shuffled_model", shuffled)
+
+    return cm_df
 
 
 def check_feature_order(ref_feat_order: list[str], input_feat_order: list[str]) -> bool:

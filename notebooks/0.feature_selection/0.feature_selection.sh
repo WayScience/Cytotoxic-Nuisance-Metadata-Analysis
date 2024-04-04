@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # exit on error
-set -e
+# set -e
 
 # activate conda env
 conda activate cell-injury

@@ -17,6 +17,7 @@ sys.path.append("../../")
 from src.utils import (
     calculate_multi_class_f1score,
     calculate_multi_class_pr_curve,
+    generate_confusion_matrix,
     load_json_file,
     shuffle_features,
     train_multiclass,
@@ -136,17 +137,29 @@ test_f1_score_df = calculate_multi_class_f1score(
 )
 
 
+# In[8]:
+
+
+# creating confusing matrix for both train and test set on non-shuffled model
+cm_train_df = generate_confusion_matrix(
+    model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="train"
+)
+cm_test_df = generate_confusion_matrix(
+    model=best_model, X=X_test, y=y_test, shuffled=False, dataset_type="test"
+)
+
+
 # ## Training and Evaluating Multi-class Logistic Model with shuffled dataset split
 #
 
-# In[8]:
+# In[9]:
 
 
 # shuffle feature space
 shuffled_X_train = shuffle_features(X_train, seed=seed)
 
 
-# In[9]:
+# In[10]:
 
 
 shuffled_best_model = train_multiclass(
@@ -155,10 +168,10 @@ shuffled_best_model = train_multiclass(
 joblib.dump(shuffled_best_model, modeling_dir / "shuffled_multi_class_model.joblib")
 
 
-# In[10]:
+# In[11]:
 
 
-# evaluating mode on train dataset
+# evaluating model on train dataset
 shuffle_train_precision_recall_df = calculate_multi_class_pr_curve(
     model=shuffled_best_model,
     X=shuffled_X_train,
@@ -174,7 +187,7 @@ shuffle_train_f1_score_df = calculate_multi_class_f1score(
     dataset_type="train",
 )
 
-# evaluating on test dataset
+# evaluating model on train dataset
 shuffle_test_precision_recall_df = calculate_multi_class_pr_curve(
     model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="test"
 )
@@ -183,11 +196,26 @@ shuffle_test_f1_score_df = calculate_multi_class_f1score(
 )
 
 
+# In[12]:
+
+
+shuffled_cm_train_df = generate_confusion_matrix(
+    model=shuffled_best_model,
+    X=shuffled_X_train,
+    y=y_train,
+    shuffled=True,
+    dataset_type="train",
+)
+shuffled_cm_test_df = generate_confusion_matrix(
+    model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="test"
+)
+
+
 # ## Evaluating Multi-class model with holdout data
 
 # Loading in all the hold out data
 
-# In[11]:
+# In[13]:
 
 
 # loading all holdouts
@@ -197,46 +225,46 @@ well_holdout_df = pd.read_csv(wells_holdout_path)
 
 # splitting the dataset into X = features , y = injury_types
 X_plate_holdout = plate_holdout_df[feat_cols]
-y_plate_holout = plate_holdout_df["injury_code"]
+y_plate_holdout = plate_holdout_df["injury_code"]
 
 X_treatment_holdout = treatment_holdout_df[feat_cols]
-y_treatment_holout = treatment_holdout_df["injury_code"]
+y_treatment_holdout = treatment_holdout_df["injury_code"]
 
 X_well_holdout = well_holdout_df[feat_cols]
-y_well_holout = well_holdout_df["injury_code"]
+y_well_holdout = well_holdout_df["injury_code"]
 
 
 # ### Evaluating Multi-class model trained with original split with holdout data
 
-# In[12]:
+# In[14]:
 
 
 # evaluating plate holdout data with both trained original and shuffled model
 plate_ho_precision_recall_df = calculate_multi_class_pr_curve(
     model=best_model,
     X=X_plate_holdout,
-    y=y_plate_holout,
+    y=y_plate_holdout,
     shuffled=False,
     dataset_type="plate_holdout",
 )
 plate_ho_f1_score_df = calculate_multi_class_f1score(
     model=best_model,
     X=X_plate_holdout,
-    y=y_plate_holout,
+    y=y_plate_holdout,
     shuffled=False,
     dataset_type="plate_holdout",
 )
 plate_ho_shuffle_precision_recall_df = calculate_multi_class_pr_curve(
     model=shuffled_best_model,
     X=X_plate_holdout,
-    y=y_plate_holout,
+    y=y_plate_holdout,
     shuffled=True,
     dataset_type="plate_holdout",
 )
 plate_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
     model=shuffled_best_model,
     X=X_plate_holdout,
-    y=y_plate_holout,
+    y=y_plate_holdout,
     shuffled=True,
     dataset_type="plate_holdout",
 )
@@ -245,28 +273,28 @@ plate_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
 treatment_ho_precision_recall_df = calculate_multi_class_pr_curve(
     model=best_model,
     X=X_treatment_holdout,
-    y=y_treatment_holout,
+    y=y_treatment_holdout,
     shuffled=False,
     dataset_type="treatment_holout",
 )
 treatment_ho_f1_score_df = calculate_multi_class_f1score(
     model=best_model,
     X=X_treatment_holdout,
-    y=y_treatment_holout,
+    y=y_treatment_holdout,
     shuffled=False,
     dataset_type="treatment_holdout",
 )
 treatment_ho_shuffle_precision_recall_df = calculate_multi_class_pr_curve(
     model=shuffled_best_model,
     X=X_treatment_holdout,
-    y=y_treatment_holout,
+    y=y_treatment_holdout,
     shuffled=True,
     dataset_type="treatment_holdout",
 )
 treatment_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
     model=shuffled_best_model,
     X=X_treatment_holdout,
-    y=y_treatment_holout,
+    y=y_treatment_holdout,
     shuffled=True,
     dataset_type="treatment_holdout",
 )
@@ -275,28 +303,80 @@ treatment_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
 well_ho_precision_recall_df = calculate_multi_class_pr_curve(
     model=best_model,
     X=X_well_holdout,
-    y=y_well_holout,
+    y=y_well_holdout,
     shuffled=False,
     dataset_type="well_holdout",
 )
 well_ho_f1_score_df = calculate_multi_class_f1score(
     model=best_model,
     X=X_well_holdout,
-    y=y_well_holout,
+    y=y_well_holdout,
     shuffled=False,
     dataset_type="well_holdout",
 )
 well_ho_shuffle_precision_recall_df = calculate_multi_class_pr_curve(
     model=shuffled_best_model,
     X=X_well_holdout,
-    y=y_well_holout,
+    y=y_well_holdout,
     shuffled=True,
     dataset_type="well_holdout",
 )
 well_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
     model=shuffled_best_model,
     X=X_well_holdout,
-    y=y_well_holout,
+    y=y_well_holdout,
+    shuffled=True,
+    dataset_type="well_holdout",
+)
+
+
+# In[15]:
+
+
+# creating confusing matrix with plate holdout (shuffled and not snuffled)
+plate_ho_cm_df = generate_confusion_matrix(
+    model=best_model,
+    X=X_plate_holdout,
+    y=y_plate_holdout,
+    shuffled=False,
+    dataset_type="plate_holdout",
+)
+shuffled_plate_ho_cm_df = generate_confusion_matrix(
+    model=shuffled_best_model,
+    X=X_plate_holdout,
+    y=y_plate_holdout,
+    shuffled=True,
+    dataset_type="plate_holdout",
+)
+
+# creating confusing matrix with treatment holdout (shuffled and not snuffled)
+treatment_ho_cm_df = generate_confusion_matrix(
+    model=best_model,
+    X=X_treatment_holdout,
+    y=y_treatment_holdout,
+    shuffled=False,
+    dataset_type="treatment_holdout",
+)
+shuffled_treatment_ho_cm_df = generate_confusion_matrix(
+    model=shuffled_best_model,
+    X=X_treatment_holdout,
+    y=y_treatment_holdout,
+    shuffled=True,
+    dataset_type="treatment_holdout",
+)
+
+# creating confusing matrix with plate_hold (shuffled and not snuffled)
+well_ho_cm_df = generate_confusion_matrix(
+    model=best_model,
+    X=X_well_holdout,
+    y=y_well_holdout,
+    shuffled=False,
+    dataset_type="well_holdout",
+)
+shuffled_well_ho_cm_df = generate_confusion_matrix(
+    model=shuffled_best_model,
+    X=X_well_holdout,
+    y=y_well_holdout,
     shuffled=True,
     dataset_type="well_holdout",
 )
@@ -304,7 +384,7 @@ well_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
 
 # Storing all f1 and pr scores
 
-# In[13]:
+# In[16]:
 
 
 # storing all f1 scores
@@ -329,7 +409,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[14]:
+# In[17]:
 
 
 # storing pr scores
@@ -351,4 +431,28 @@ all_pr_scores = pd.concat(
 # saving pr scores
 all_pr_scores.to_csv(
     modeling_dir / "precision_recall_scores.csv.gz", index=False, compression="gzip"
+)
+
+
+# In[ ]:
+
+
+all_cm_dfs = pd.concat(
+    [
+        cm_train_df,
+        cm_test_df,
+        shuffled_cm_train_df,
+        shuffled_cm_test_df,
+        well_ho_cm_df,
+        shuffled_well_ho_cm_df,
+        treatment_ho_cm_df,
+        shuffled_treatment_ho_cm_df,
+        well_ho_cm_df,
+        shuffled_well_ho_cm_df,
+    ]
+)
+
+# saving pr scores
+all_cm_dfs.to_csv(
+    modeling_dir / "confusion_matrix.csv.gz", index=False, compression="gzip"
 )

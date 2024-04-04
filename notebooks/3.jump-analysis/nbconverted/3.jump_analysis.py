@@ -219,7 +219,7 @@ shuffled_pred_proba_df.columns = [
 shuffled_pred_proba_df.insert(0, "shuffled_model", True)
 
 
-# Saving all probabilities from both shuffle and regular models
+# ## Saving all probabilities from both shuffle and regular models
 
 # In[11]:
 
@@ -227,9 +227,22 @@ shuffled_pred_proba_df.insert(0, "shuffled_model", True)
 # concat both shuffled
 all_probas = pd.concat([pred_proba_df, shuffled_pred_proba_df]).reset_index(drop=True)
 
-# save the mode
-all_probas.to_csv(jump_analysis_dir / "JUMP_injury_proba.csv.gz")
+# find the predicted injury by selected injury type with highest probability
+pred_injury = all_probas[all_probas.columns[1:]].apply(lambda row: row.idxmax(), axis=1)
+all_probas.insert(1, "pred_injury", pred_injury)
+
+# # converting the dataframe to be tidy long
+all_probas = pd.melt(
+    all_probas,
+    id_vars=["shuffled_model", "pred_injury"],
+    value_vars=all_probas.columns[2:],
+    var_name="injury_type",
+    value_name="proba",
+)
+
+# save the probabilities
+all_probas.to_csv(jump_analysis_dir / "JUMP_injury_proba.csv.gz", index=False)
 
 print("Shape of the probabilities", all_probas.shape)
 print("Unique Models", list(all_probas["shuffled_model"].unique()))
-all_probas.head()
+all_probas.head(30)
