@@ -411,6 +411,9 @@ def generate_confusion_matrix(
     # insert shuffled label
     cm_df.insert(1, "shuffled_model", shuffled)
 
+    # insert predicted labels column
+    cm_df.insert(2, "predicted_labels", cm_df.columns[2:])
+
     return cm_df
 
 
