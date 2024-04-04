@@ -356,7 +356,7 @@ def calculate_multi_class_f1score(
     return scores
 
 
-def generate_confusion_matrix(
+def generate_confusion_matrix_tl(
     model: BaseEstimator,
     X: np.ndarray,
     y: np.ndarray,
@@ -365,19 +365,28 @@ def generate_confusion_matrix(
 ) -> pd.DataFrame:
     """Generates a multi-class confusion matrix with given predicted and true labels
 
+    This also provides additional metadata: recall score, dataset type, and shuffled
+    label.
+
+    Format of this confusion matrix is tidy long.
+
     Parameters
     ----------
     mode : BaseEstimator
         model to measure performance
     X : np.ndarray
-
+        features
     y : np.ndarray
         true labels
+    shuffled : str
+        label in dicating weather the data split shuffled or not
+    dataset_type : str
+        label indicating
 
     Returns
     -------
     pd.DataFrame
-        confusion matrix
+        confusion matrix with recall score
     """
 
     # extracting all classes the models has learned from
@@ -397,6 +406,15 @@ def generate_confusion_matrix(
         data=confusion_matrix(y_true=y, y_pred=predictions, labels=class_labels)
     )
 
+    # calculate recall score
+    recall_per_all_classes = []
+    for i in range(len(class_labels)):
+        for j in range(len(class_labels)):
+            true_pos = cm_df.iloc[i, j]
+            false_neg = sum(cm_df.iloc[i, :]) - true_pos
+            recall = true_pos / (true_pos + false_neg)
+            recall_per_all_classes.append(recall)
+
     # update the data frame by replace injury codes with injury name
     cm_df.columns = [
         injury_codes[str(injury_code)] for injury_code in cm_df.columns.tolist()
@@ -413,6 +431,17 @@ def generate_confusion_matrix(
 
     # insert predicted labels column
     cm_df.insert(2, "predicted_labels", cm_df.columns[2:])
+
+    # make the confusion matrix tidy long format
+    cm_df = pd.melt(
+        cm_df,
+        id_vars=["dataset_type", "shuffled_model", "predicted_labels"],
+        var_name="true_label",
+        value_name="count",
+    )
+
+    # insert recall data
+    cm_df["recall"] = recall_per_all_classes
 
     return cm_df
 

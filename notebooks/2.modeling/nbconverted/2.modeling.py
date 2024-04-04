@@ -17,7 +17,7 @@ sys.path.append("../../")
 from src.utils import (
     calculate_multi_class_f1score,
     calculate_multi_class_pr_curve,
-    generate_confusion_matrix,
+    generate_confusion_matrix_tl,
     load_json_file,
     shuffle_features,
     train_multiclass,
@@ -141,10 +141,10 @@ test_f1_score_df = calculate_multi_class_f1score(
 
 
 # creating confusing matrix for both train and test set on non-shuffled model
-cm_train_df = generate_confusion_matrix(
+cm_train_df = generate_confusion_matrix_tl(
     model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="train"
 )
-cm_test_df = generate_confusion_matrix(
+cm_test_df = generate_confusion_matrix_tl(
     model=best_model, X=X_test, y=y_test, shuffled=False, dataset_type="test"
 )
 
@@ -199,14 +199,14 @@ shuffle_test_f1_score_df = calculate_multi_class_f1score(
 # In[12]:
 
 
-shuffled_cm_train_df = generate_confusion_matrix(
+shuffled_cm_train_df = generate_confusion_matrix_tl(
     model=shuffled_best_model,
     X=shuffled_X_train,
     y=y_train,
     shuffled=True,
     dataset_type="train",
 )
-shuffled_cm_test_df = generate_confusion_matrix(
+shuffled_cm_test_df = generate_confusion_matrix_tl(
     model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="test"
 )
 
@@ -334,14 +334,14 @@ well_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
 
 
 # creating confusing matrix with plate holdout (shuffled and not snuffled)
-plate_ho_cm_df = generate_confusion_matrix(
+plate_ho_cm_df = generate_confusion_matrix_tl(
     model=best_model,
     X=X_plate_holdout,
     y=y_plate_holdout,
     shuffled=False,
     dataset_type="plate_holdout",
 )
-shuffled_plate_ho_cm_df = generate_confusion_matrix(
+shuffled_plate_ho_cm_df = generate_confusion_matrix_tl(
     model=shuffled_best_model,
     X=X_plate_holdout,
     y=y_plate_holdout,
@@ -350,14 +350,14 @@ shuffled_plate_ho_cm_df = generate_confusion_matrix(
 )
 
 # creating confusing matrix with treatment holdout (shuffled and not snuffled)
-treatment_ho_cm_df = generate_confusion_matrix(
+treatment_ho_cm_df = generate_confusion_matrix_tl(
     model=best_model,
     X=X_treatment_holdout,
     y=y_treatment_holdout,
     shuffled=False,
     dataset_type="treatment_holdout",
 )
-shuffled_treatment_ho_cm_df = generate_confusion_matrix(
+shuffled_treatment_ho_cm_df = generate_confusion_matrix_tl(
     model=shuffled_best_model,
     X=X_treatment_holdout,
     y=y_treatment_holdout,
@@ -366,14 +366,14 @@ shuffled_treatment_ho_cm_df = generate_confusion_matrix(
 )
 
 # creating confusing matrix with plate_hold (shuffled and not snuffled)
-well_ho_cm_df = generate_confusion_matrix(
+well_ho_cm_df = generate_confusion_matrix_tl(
     model=best_model,
     X=X_well_holdout,
     y=y_well_holdout,
     shuffled=False,
     dataset_type="well_holdout",
 )
-shuffled_well_ho_cm_df = generate_confusion_matrix(
+shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
     model=shuffled_best_model,
     X=X_well_holdout,
     y=y_well_holdout,
@@ -434,7 +434,7 @@ all_pr_scores.to_csv(
 )
 
 
-# In[ ]:
+# In[18]:
 
 
 all_cm_dfs = pd.concat(
@@ -452,7 +452,14 @@ all_cm_dfs = pd.concat(
     ]
 )
 
+
 # saving pr scores
 all_cm_dfs.to_csv(
     modeling_dir / "confusion_matrix.csv.gz", index=False, compression="gzip"
 )
+
+
+# In[19]:
+
+
+all_cm_dfs
