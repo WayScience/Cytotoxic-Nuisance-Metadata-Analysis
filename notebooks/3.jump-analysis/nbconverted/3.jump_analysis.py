@@ -157,8 +157,8 @@ assert check_feature_order(
 # In[7]:
 
 
-# save the aligned_jump features in the data folder
-aligned_jump_feats_df.to_csv(
+# save the augment aligned features with metadata and save
+pd.concat([jump_df[meta_features], aligned_jump_feats_df], axis=0).to_csv(
     jump_data_dir / "JUMP_aligned_all_plates_normalized_negcon.csv.gz",
     index=False,
     compression="gzip",
