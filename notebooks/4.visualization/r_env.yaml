@@ -4,3 +4,4 @@ channels:
   - anaconda
 dependencies:
   - conda-forge::r-essentials
+  - conda-forge::r-dplyr

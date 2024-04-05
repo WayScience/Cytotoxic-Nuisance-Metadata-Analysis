@@ -275,7 +275,7 @@ treatment_ho_precision_recall_df = calculate_multi_class_pr_curve(
     X=X_treatment_holdout,
     y=y_treatment_holdout,
     shuffled=False,
-    dataset_type="treatment_holout",
+    dataset_type="treatment_holdout",
 )
 treatment_ho_f1_score_df = calculate_multi_class_f1score(
     model=best_model,
@@ -415,6 +415,8 @@ all_f1_scores.to_csv(
 # storing pr scores
 all_pr_scores = pd.concat(
     [
+        test_precision_recall_df,
+        train_precision_recall_df,
         shuffle_test_precision_recall_df,
         shuffle_train_precision_recall_df,
         shuffle_test_precision_recall_df,
