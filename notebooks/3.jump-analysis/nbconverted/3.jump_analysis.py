@@ -154,18 +154,29 @@ assert check_feature_order(
 ), "feature space do not follow the same order"
 
 
+# In[7]:
+
+
+# save the aligned_jump features in the data folder
+aligned_jump_feats_df.to_csv(
+    jump_data_dir / "JUMP_aligned_all_plates_normalized_negcon.csv.gz",
+    index=False,
+    compression="gzip",
+)
+
+
 # ## Applying to our Multi-Class trained model
 #
 # We applying the aligned JUMP dataset to our trained multi-class model and measure the probabiltiies of which cell injury each well possessed.
 
-# In[7]:
+# In[8]:
 
 
 # loading in mutliclass model
 multi_class_cell_injury_model = joblib.load(multi_class_model_path)
 
 
-# In[8]:
+# In[9]:
 
 
 # apply
@@ -191,14 +202,14 @@ pred_proba_df.head()
 #
 # We applying the aligned JUMP dataset to our trained multi-class model and measure the probabiltiies of which cell injury each well possessed.
 
-# In[9]:
+# In[10]:
 
 
 # loading shuffled model
 shuffled_multi_class_cell_injury_model = joblib.load(shuffled_multi_class_model_path)
 
 
-# In[10]:
+# In[11]:
 
 
 # apply
@@ -221,7 +232,7 @@ shuffled_pred_proba_df.insert(0, "shuffled_model", True)
 
 # ## Saving all probabilities from both shuffle and regular models
 
-# In[11]:
+# In[12]:
 
 
 # concat both shuffled
