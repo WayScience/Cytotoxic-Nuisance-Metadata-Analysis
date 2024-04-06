@@ -158,7 +158,9 @@ assert check_feature_order(
 
 
 # save the augment aligned features with metadata and save
-pd.concat([jump_df[meta_features], aligned_jump_feats_df], axis=0).to_csv(
+jump_df[meta_features].merge(
+    aligned_jump_feats_df, left_index=True, right_index=True
+).to_csv(
     jump_data_dir / "JUMP_aligned_all_plates_normalized_negcon.csv.gz",
     index=False,
     compression="gzip",
