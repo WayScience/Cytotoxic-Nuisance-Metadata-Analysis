@@ -470,3 +470,17 @@ all_feature_col_names = {
 # save as a json file
 with open(data_split_dir / "feature_cols.json", mode="w") as f:
     json.dump(all_feature_col_names, f)
+
+
+# In[20]:
+
+
+# save metadata after holdout
+cell_injury_metadata = fs_profile_df[fs_profile_df.columns[:33]]
+cell_injury_metadata.to_csv(
+    data_split_dir / "cell_injury_metadata_after_holdout.csv.gz", compression="gzip"
+)
+
+# display
+print("Metadata shape", cell_injury_metadata.shape)
+cell_injury_metadata.head()

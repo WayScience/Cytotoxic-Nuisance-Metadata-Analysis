@@ -8,6 +8,9 @@ proba_path <- file.path("../../../results/3.jump_analysis/JUMP_injury_proba.csv.
 # loading in probability file path
 proba_df <- read.table(proba_path, head = TRUE, sep=",")
 
+# replacing True and False to shuffled to non shuffled
+proba_df$shuffled_model <- ifelse(proba_df$shuffled_model == "False", "Not Shuffled",
+                                      ifelse(proba_df$shuffled_model == "True", "Shuffled", proba_df$shuffled_model))
 # displaying
 print(dim(proba_df))
 head(proba_df)
@@ -16,11 +19,10 @@ head(proba_df)
 unique(proba_df$injury_type)
 
 # image size
-
 img_height <- 10
 img_width <- 15
 
-options(repr.plot.width = width, repr.plot.height = height)
+options(repr.plot.width = img_width, repr.plot.height = img_height)
 ridge_plot <- (
     ggplot(proba_df, aes(x = proba, y = pred_injury)) +
     geom_density_ridges() +
@@ -28,11 +30,9 @@ ridge_plot <- (
     geom_vline(xintercept = 1, linetype = "dashed", color = "black") +
     scale_x_continuous(breaks = seq(0, 1, 0.5)) +
     labs(title = "JUMP Injury Prediction Probability", y = "Injury Types", x = "Probability") +
-    # + labs()
     theme_bw() +
 
     # no legend
-    # + theme(legend.position = "none")
     theme(plot.title = element_text(size = 20, hjust = 0.5)) +
 
     # remove x axis label
