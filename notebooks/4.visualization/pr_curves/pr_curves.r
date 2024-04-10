@@ -69,4 +69,4 @@ ggplot(filtered_pr_df, aes(x = recall, y = precision)) +
         axis.text.y = element_text(size = 12),
         axis.title = element_text(size = 14))
 
-ggsave("only_test_train_pr_curve.png", width = width, height = height)
+ggsave("only_test_train_pr_curve.png", width = width, height = height, dpi=600)
