@@ -520,3 +520,43 @@ def split_meta_and_features(
             meta_col.append(column)
 
     return (meta_col, feature_col)
+
+
+def evaluate_model_performance(
+    model: BaseEstimator,
+    X: np.ndarray,
+    y: np.ndarray,
+    shuffled: bool,
+    dataset_type: str,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Wrapper function that evaluates the performance of the model by
+    calculating precision, recall, and F1 scores per class.
+
+    Parameters
+    ----------
+    model : BaseEstimator
+        The model to evaluate.
+    X : np.ndarray
+        The feature array.
+    y : np.ndarray
+        The labels array.
+    shuffled : bool
+        Indicates whether the model is shuffled or not.
+    dataset_type : str
+        Flag indicating the data split being used.
+
+    Returns
+    -------
+    Tuple[pd.DataFrame, pd.DataFrame]
+        A tuple of DataFrames containing the precision-recall and F1 scores
+        respectively.
+    """
+
+    return (
+        calculate_multi_class_pr_curve(
+            model=model, X=X, y=y, shuffled=shuffled, dataset_type=dataset_type
+        ),
+        calculate_multi_class_f1score(
+            model=model, X=X, y=y, shuffled=shuffled, dataset_type=dataset_type
+        ),
+    )

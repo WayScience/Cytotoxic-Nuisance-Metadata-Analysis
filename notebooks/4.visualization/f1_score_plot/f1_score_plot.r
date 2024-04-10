@@ -28,5 +28,5 @@ f1_plot <- ggplot(f1_df, aes(x = shuffled, y = f1_score, fill = factor(dataset_t
     facet_wrap(~injury_type) +
     labs(y = "F1 Score", x = "Data Split", fill = "Datasets")
 
-ggsave(filename = "f1_score_barplots.png", height = img_height, width = img_width)
+ggsave(filename = "f1_score_barplots.png", height = img_height, width = img_width, dpi=600)
 f1_plot

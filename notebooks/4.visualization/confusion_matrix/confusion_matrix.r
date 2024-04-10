@@ -69,6 +69,6 @@ overlapping_confusion_matrix_plot <- (
 )
 
 # saving file
-ggsave(filename = "overlapping_confusion_matrix.png", height = height, width = width)
+ggsave(filename = "overlapping_confusion_matrix.png", height = height, width = width, dpi=600)
 
 overlapping_confusion_matrix_plot

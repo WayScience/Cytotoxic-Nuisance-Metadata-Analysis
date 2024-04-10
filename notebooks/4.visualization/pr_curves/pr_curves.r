@@ -29,7 +29,7 @@ theme_bw() +
 theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
 
 
-ggsave("full_pr_curves.png", width = width, height = height)
+ggsave("full_pr_curves.png", width = width, height = height, dpi=600)
 
 # Filter the dataframe to select only "test", "train", and "plate_holdout" datasets
 filtered_pr_df <- pr_df %>%
