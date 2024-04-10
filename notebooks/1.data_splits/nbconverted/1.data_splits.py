@@ -9,10 +9,14 @@
 
 import json
 import pathlib
+import sys
 import warnings
 
 import numpy as np
 import pandas as pd
+
+sys.path.append("../../")  # noqa
+from src.utils import split_meta_and_features  # noqa
 
 # ignoring warnings
 warnings.catch_warnings(action="ignore")
@@ -28,6 +32,7 @@ warnings.catch_warnings(action="ignore")
 # setting seed constants
 seed = 0
 np.random.seed(seed)
+compartments = ["Cells", "Cytoplasm", "Nuclei"]
 
 # directory to get all the inputs for this notebook
 data_dir = pathlib.Path("../../data").resolve(strict=True)
@@ -47,6 +52,9 @@ fs_profile_path = (fs_dir / "cell_injury_profile_fs.csv.gz").resolve(strict=True
 
 # load data
 fs_profile_df = pd.read_csv(fs_profile_path)
+
+# splitting meta and feature column names
+fs_meta, fs_feats = split_meta_and_features(fs_profile_df, compartments=compartments)
 
 # display
 print("fs profile with control: ", fs_profile_df.shape)
@@ -462,9 +470,12 @@ fs_profile_df.to_csv(
 
 
 # saving feature names
+meta_colnames, feat_colnames = split_meta_and_features(
+    fs_profile_df, compartments=compartments
+)
 all_feature_col_names = {
-    "meta_cols": fs_profile_df.columns[:33].tolist(),
-    "feature_cols": fs_profile_df.columns[33:].tolist(),
+    "meta_cols": meta_colnames,
+    "feature_cols": feat_colnames,
 }
 
 # save as a json file
@@ -476,7 +487,7 @@ with open(data_split_dir / "feature_cols.json", mode="w") as f:
 
 
 # save metadata after holdout
-cell_injury_metadata = fs_profile_df[fs_profile_df.columns[:33]]
+cell_injury_metadata = fs_profile_df[fs_meta]
 cell_injury_metadata.to_csv(
     data_split_dir / "cell_injury_metadata_after_holdout.csv.gz", compression="gzip"
 )
@@ -484,3 +495,6 @@ cell_injury_metadata.to_csv(
 # display
 print("Metadata shape", cell_injury_metadata.shape)
 cell_injury_metadata.head()
+
+
+# In[ ]:

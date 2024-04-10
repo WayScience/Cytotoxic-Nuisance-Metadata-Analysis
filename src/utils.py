@@ -5,7 +5,7 @@ This module contains utility functions for the analysis notebook.
 import json
 import pathlib
 import warnings
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -480,3 +480,43 @@ def check_feature_order(ref_feat_order: list[str], input_feat_order: list[str]) 
 
     # Return True if the order is identical
     return True
+
+
+def split_meta_and_features(
+    profile_df: pd.DataFrame, compartments
+) -> Tuple[list, list]:
+    """Separates metadata and feature column names
+
+    Parameters
+    ----------
+    profile_df : pd.DataFrame
+        profile
+
+    compartments : list[str]
+        Compartments you want to extract features from.
+
+    Return
+    ------
+    Tuple(pd.DataFrame, pd.DataFrame)
+        Two dataframes inside a tuple (metadata, features)
+
+    Raises
+    ------
+    TypeError
+        Raised when profile_df is not a dataframe
+    """
+    # type checking
+    if not isinstance(profile_df, pd.DataFrame):
+        raise TypeError("'profile_df' must be a pandas dataframe")
+
+    # separating meta and feature column names
+    meta_col = []
+    feature_col = []
+    for column in profile_df.columns.tolist():
+        check = any([True if name in column else False for name in compartments])
+        if check:
+            feature_col.append(column)
+        elif check is False:
+            meta_col.append(column)
+
+    return (meta_col, feature_col)
