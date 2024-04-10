@@ -29,7 +29,7 @@ from src.utils import generate_confusion_matrix_tl
 # In[2]:
 
 
-# setting seed =
+# setting seed
 seed = 0
 
 # setting paths
