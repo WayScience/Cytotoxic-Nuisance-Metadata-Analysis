@@ -42,6 +42,8 @@ confusion_matrix_plot <- (
     + xlab("Predicted class")
     + theme(strip.text = element_text(size = 12))
     + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    + ggplot2::coord_fixed()
+
 )
 
 # saving file
@@ -66,6 +68,7 @@ overlapping_confusion_matrix_plot <- (
     + xlab("Predicted class")
     + theme(strip.text = element_text(size = 12))
     + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    + ggplot2::coord_fixed()
 )
 
 # saving file
