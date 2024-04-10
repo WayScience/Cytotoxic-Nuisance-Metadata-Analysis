@@ -62,7 +62,7 @@ overlapping_confusion_matrix_plot <- (
     + geom_text(aes(label = count), size = 4)
     + scale_color_gradient("Recall", low = "white", high = "red",limits = c(0, 1))
     + theme_bw()
-    + ylab("True Class")
+    + ylab("True class")
     + xlab("Predicted Class")
     + theme(strip.text = element_text(size = 12))
     + theme(axis.text.x = element_text(angle = 90, hjust = 1))
