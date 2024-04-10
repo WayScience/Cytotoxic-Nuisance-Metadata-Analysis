@@ -39,7 +39,7 @@ confusion_matrix_plot <- (
     + scale_color_gradient("Recall", low = "white", high = "red",limits = c(0, 1))
     + theme_bw()
     + ylab("True Class")
-    + xlab("Predicted Class")
+    + xlab("Predicted class")
     + theme(strip.text = element_text(size = 12))
     + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 )
