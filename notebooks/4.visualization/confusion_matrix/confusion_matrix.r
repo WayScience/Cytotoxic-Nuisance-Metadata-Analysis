@@ -45,7 +45,7 @@ confusion_matrix_plot <- (
 )
 
 # saving file
-ggsave(filename = "confusion_matrix.png", height = height, width = width)
+ggsave(filename = "confusion_matrix.png", height = height, width = width, dpi=600)
 
 confusion_matrix_plot
 
