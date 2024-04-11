@@ -15,8 +15,7 @@ from sklearn.model_selection import train_test_split
 # import local modules
 sys.path.append("../../")
 from src.utils import (
-    calculate_multi_class_f1score,
-    calculate_multi_class_pr_curve,
+    evaluate_model_performance,
     generate_confusion_matrix_tl,
     load_json_file,
     shuffle_features,
@@ -55,7 +54,7 @@ modeling_dir.mkdir(exist_ok=True)
 # - **C**: Inverse of regularization strength; smaller values specify stronger regularization. Controls the trade-off between fitting the training data and preventing overfitting.
 # - **max_iter**: Maximum number of iterations for the optimization algorithm to converge.
 # - **tol**: Tolerance for the stopping criterion during optimization. It represents the minimum change in coefficients between iterations that indicates convergence.
-# - **l1_ratio**: The mixing parameter for elastic net regularization. It determines the balance between L1 and L2 penalties in the regularization term. A value of 1 corresponds
+# - **l1_ratio**: The mixing parameter for elastic net regularization. It determines the balance between L1 and L2 penalties in the regularization term. A value of 1 corresponds to pure L1 (Lasso) penalty, while a value of 0 corresponds to pure L2 (Ridge) penalty
 # - **solver**: Optimization algorithms to be explored during hyperparameter tuning for logistic regression
 
 # In[3]:
@@ -120,19 +119,13 @@ joblib.dump(best_model, modeling_dir / "multi_class_model.joblib")
 # In[7]:
 
 
-# evaluating mode on train dataset
-train_precision_recall_df = calculate_multi_class_pr_curve(
-    model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="train"
-)
-train_f1_score_df = calculate_multi_class_f1score(
+# evaluating model on train dataset
+train_precision_recall_df, train_f1_score_df = evaluate_model_performance(
     model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="train"
 )
 
-# evaluating mode on test dataset
-test_precision_recall_df = calculate_multi_class_pr_curve(
-    model=best_model, X=X_test, y=y_test, shuffled=False, dataset_type="test"
-)
-test_f1_score_df = calculate_multi_class_f1score(
+# evaluating model on test dataset
+test_precision_recall_df, test_f1_score_df = evaluate_model_performance(
     model=best_model, X=X_test, y=y_test, shuffled=False, dataset_type="test"
 )
 
@@ -168,35 +161,27 @@ shuffled_best_model = train_multiclass(
 joblib.dump(shuffled_best_model, modeling_dir / "shuffled_multi_class_model.joblib")
 
 
-# In[11]:
+# In[ ]:
 
 
-# evaluating model on train dataset
-shuffle_train_precision_recall_df = calculate_multi_class_pr_curve(
-    model=shuffled_best_model,
-    X=shuffled_X_train,
-    y=y_train,
-    shuffled=True,
-    dataset_type="train",
-)
-shuffle_train_f1_score_df = calculate_multi_class_f1score(
-    model=shuffled_best_model,
-    X=shuffled_X_train,
-    y=y_train,
-    shuffled=True,
-    dataset_type="train",
+# evaluating shuffled model on train dataset
+shuffle_train_precision_recall_df, shuffle_train_f1_score_df = (
+    evaluate_model_performance(
+        model=shuffled_best_model,
+        X=shuffled_X_train,
+        y=y_train,
+        shuffled=True,
+        dataset_type="train",
+    )
 )
 
-# evaluating model on train dataset
-shuffle_test_precision_recall_df = calculate_multi_class_pr_curve(
-    model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="test"
-)
-shuffle_test_f1_score_df = calculate_multi_class_f1score(
+# valuating shuffled model on test dataset
+shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate_model_performance(
     model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="test"
 )
 
 
-# In[12]:
+# In[ ]:
 
 
 shuffled_cm_train_df = generate_confusion_matrix_tl(
@@ -215,7 +200,7 @@ shuffled_cm_test_df = generate_confusion_matrix_tl(
 
 # Loading in all the hold out data
 
-# In[13]:
+# In[ ]:
 
 
 # loading all holdouts
@@ -236,101 +221,70 @@ y_well_holdout = well_holdout_df["injury_code"]
 
 # ### Evaluating Multi-class model trained with original split with holdout data
 
-# In[14]:
+# In[ ]:
 
 
 # evaluating plate holdout data with both trained original and shuffled model
-plate_ho_precision_recall_df = calculate_multi_class_pr_curve(
+plate_ho_precision_recall_df, plate_ho_f1_score_df = evaluate_model_performance(
     model=best_model,
     X=X_plate_holdout,
     y=y_plate_holdout,
     shuffled=False,
     dataset_type="plate_holdout",
 )
-plate_ho_f1_score_df = calculate_multi_class_f1score(
-    model=best_model,
-    X=X_plate_holdout,
-    y=y_plate_holdout,
-    shuffled=False,
-    dataset_type="plate_holdout",
+
+plate_ho_shuffle_precision_recall_df, plate_ho_shuffle_f1_score_df = (
+    evaluate_model_performance(
+        model=shuffled_best_model,
+        X=X_plate_holdout,
+        y=y_plate_holdout,
+        shuffled=True,
+        dataset_type="plate_holdout",
+    )
 )
-plate_ho_shuffle_precision_recall_df = calculate_multi_class_pr_curve(
-    model=shuffled_best_model,
-    X=X_plate_holdout,
-    y=y_plate_holdout,
-    shuffled=True,
-    dataset_type="plate_holdout",
-)
-plate_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
-    model=shuffled_best_model,
-    X=X_plate_holdout,
-    y=y_plate_holdout,
-    shuffled=True,
-    dataset_type="plate_holdout",
-)
+
 
 # evaluating treatment holdout data with both trained original and shuffled model
-treatment_ho_precision_recall_df = calculate_multi_class_pr_curve(
+treatment_ho_precision_recall_df, treatment_ho_f1_score_df = evaluate_model_performance(
     model=best_model,
     X=X_treatment_holdout,
     y=y_treatment_holdout,
     shuffled=False,
     dataset_type="treatment_holdout",
 )
-treatment_ho_f1_score_df = calculate_multi_class_f1score(
-    model=best_model,
-    X=X_treatment_holdout,
-    y=y_treatment_holdout,
-    shuffled=False,
-    dataset_type="treatment_holdout",
+
+treatment_ho_shuffle_precision_recall_df, treatment_ho_shuffle_f1_score_df = (
+    evaluate_model_performance(
+        model=shuffled_best_model,
+        X=X_treatment_holdout,
+        y=y_treatment_holdout,
+        shuffled=True,
+        dataset_type="treatment_holdout",
+    )
 )
-treatment_ho_shuffle_precision_recall_df = calculate_multi_class_pr_curve(
-    model=shuffled_best_model,
-    X=X_treatment_holdout,
-    y=y_treatment_holdout,
-    shuffled=True,
-    dataset_type="treatment_holdout",
-)
-treatment_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
-    model=shuffled_best_model,
-    X=X_treatment_holdout,
-    y=y_treatment_holdout,
-    shuffled=True,
-    dataset_type="treatment_holdout",
-)
+
 
 # evaluating well holdout data with both trained original and shuffled model
-well_ho_precision_recall_df = calculate_multi_class_pr_curve(
+well_ho_precision_recall_df, well_ho_f1_score_df = evaluate_model_performance(
     model=best_model,
     X=X_well_holdout,
     y=y_well_holdout,
     shuffled=False,
     dataset_type="well_holdout",
 )
-well_ho_f1_score_df = calculate_multi_class_f1score(
-    model=best_model,
-    X=X_well_holdout,
-    y=y_well_holdout,
-    shuffled=False,
-    dataset_type="well_holdout",
-)
-well_ho_shuffle_precision_recall_df = calculate_multi_class_pr_curve(
-    model=shuffled_best_model,
-    X=X_well_holdout,
-    y=y_well_holdout,
-    shuffled=True,
-    dataset_type="well_holdout",
-)
-well_ho_shuffle_f1_score_df = calculate_multi_class_f1score(
-    model=shuffled_best_model,
-    X=X_well_holdout,
-    y=y_well_holdout,
-    shuffled=True,
-    dataset_type="well_holdout",
+
+well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
+    evaluate_model_performance(
+        model=shuffled_best_model,
+        X=X_well_holdout,
+        y=y_well_holdout,
+        shuffled=True,
+        dataset_type="well_holdout",
+    )
 )
 
 
-# In[15]:
+# In[ ]:
 
 
 # creating confusing matrix with plate holdout (shuffled and not snuffled)
@@ -384,7 +338,7 @@ shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
 
 # Storing all f1 and pr scores
 
-# In[16]:
+# In[ ]:
 
 
 # storing all f1 scores
@@ -409,7 +363,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[17]:
+# In[ ]:
 
 
 # storing pr scores
@@ -436,7 +390,7 @@ all_pr_scores.to_csv(
 )
 
 
-# In[18]:
+# In[ ]:
 
 
 all_cm_dfs = pd.concat(
@@ -461,7 +415,7 @@ all_cm_dfs.to_csv(
 )
 
 
-# In[19]:
+# In[ ]:
 
 
 all_cm_dfs

@@ -38,7 +38,7 @@ shuffled_multi_class_model_path = (
     modeling_dir / "shuffled_multi_class_model.joblib"
 ).resolve(strict=True)
 feature_col_names = (data_split_dir / "feature_cols.json").resolve(strict=True)
-
+injury_codes_path = (data_split_dir / "injury_codes.json").resolve(strict=True)
 
 # output paths
 jump_analysis_dir = (results_dir / "3.jump_analysis").resolve()
@@ -58,8 +58,11 @@ with open(feature_col_names, mode="r") as infile:
     cell_injury_cp_feature_cols = json.load(infile)
 
 # loading json file that contains the coder and decoder injury labels
-with open(data_split_dir / "injury_codes.json") as infile:
+with open(injury_codes_path) as infile:
     injury_codes = json.load(infile)
+
+injury_decoder = injury_codes["decoder"]
+injury_encoder = injury_codes["encoder"]
 
 # display dataframe and size
 print("JUMP dataset size:", jump_df.shape)
@@ -237,6 +240,12 @@ shuffled_pred_proba_df.insert(0, "shuffled_model", True)
 # In[12]:
 
 
+# classes
+injury_classes = [
+    injury_decoder[str(code)]
+    for code in multi_class_cell_injury_model.classes_.tolist()
+]
+
 # concat both shuffled
 all_probas = pd.concat([pred_proba_df, shuffled_pred_proba_df]).reset_index(drop=True)
 
@@ -244,11 +253,11 @@ all_probas = pd.concat([pred_proba_df, shuffled_pred_proba_df]).reset_index(drop
 pred_injury = all_probas[all_probas.columns[1:]].apply(lambda row: row.idxmax(), axis=1)
 all_probas.insert(1, "pred_injury", pred_injury)
 
-# # converting the dataframe to be tidy long
+# converting the dataframe to be tidy long
 all_probas = pd.melt(
     all_probas,
     id_vars=["shuffled_model", "pred_injury"],
-    value_vars=all_probas.columns[2:],
+    value_vars=injury_classes,
     var_name="injury_type",
     value_name="proba",
 )

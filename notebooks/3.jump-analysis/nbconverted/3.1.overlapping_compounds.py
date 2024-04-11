@@ -29,7 +29,7 @@ from src.utils import generate_confusion_matrix_tl
 # In[2]:
 
 
-# setting seed
+# setting seed =
 seed = 0
 
 # setting paths
@@ -64,7 +64,10 @@ cell_injury_df = pd.read_csv(cell_injury_metadata_path)
 
 # loading json file containing selected feature names
 with open(injury_codes_path, mode="r") as infile:
-    injury_codes_decoder = json.load(infile)["decoder"]
+    injury_codes = json.load(infile)
+
+injury_codes_decoder = injury_codes["decoder"]
+injury_codes_encoder = injury_codes["encoder"]
 
 
 # ## Identifying Overlapping Compounds
@@ -87,8 +90,20 @@ common_compounds_inchikey = list(
 overlapping_compounds_df = cell_injury_df.loc[
     cell_injury_df["Compound InChIKey"].isin(common_compounds_inchikey)
 ]
+
+# inserting injury code
+overlapping_compounds_df.insert(
+    0,
+    "injury_code",
+    overlapping_compounds_df["injury_type"].apply(
+        lambda name: injury_codes_encoder[name]
+    ),
+)
+
+
 unique_compound_names = overlapping_compounds_df["Compound Name"].unique().tolist()
 print("Identified overlapping compounds:", ", ".join(unique_compound_names))
+
 
 # now create a dataframe where it contains
 overlapping_compounds_df = (
@@ -101,9 +116,15 @@ overlapping_compounds_df = (
 overlapping_compounds_df
 
 
+# In[5]:
+
+
+overlapping_compounds_df
+
+
 # Once the common compounds and their associated cell injury types are identified, the next step involves filtering out the JUMP dataset to select only wells that possess the common InChI keys.
 
-# In[5]:
+# In[6]:
 
 
 overlapping_jump_df = jump_df.loc[
@@ -122,7 +143,7 @@ print("shape: ", overlapping_jump_df.shape)
 overlapping_jump_df.head()
 
 
-# In[6]:
+# In[7]:
 
 
 # count number of wells and agument with injury_code injury_yype and compound name
@@ -150,7 +171,7 @@ well_counts_df.columns = [
 well_counts_df
 
 
-# In[7]:
+# In[8]:
 
 
 # now lets look at the amount of wells have treatments and controls per plate
@@ -181,7 +202,7 @@ plate_treatments.columns = [
 plate_treatments
 
 
-# In[8]:
+# In[9]:
 
 
 # save the dataset
@@ -195,7 +216,7 @@ overlapping_jump_df.to_csv(
 # Before applying the pretrained model, we must create a downsampled version of the dataset. We saw that there are 3044 wells treated with DMSO, we decided to downsample the DMSO wells. However, instead of randomly selecting DMSO wells, we choose to randomly select only 2 wells per plate. Given that we are working with 24 plates, this approach yields a total of 48 wells. By doing so, we minimize the impact of plate-based variability.
 #
 
-# In[9]:
+# In[10]:
 
 
 # select only DMSO wells
@@ -207,6 +228,7 @@ for plate, df in dmso_wells_df.groupby("Metadata_Plate"):
     dmso_wells_per_plate.append(dmso_df)
 
 dmso_wells_df = pd.concat(dmso_wells_per_plate)
+print("dmso_wells_df shape", dmso_wells_df.shape)
 
 # now concat balanced DMSO wells with original dataset
 overlapping_jump_df = overlapping_jump_df.loc[
@@ -218,7 +240,7 @@ print("DMSO downsampled data:", overlapping_jump_df.shape)
 overlapping_jump_df.head()
 
 
-# In[10]:
+# In[11]:
 
 
 # now lets look at the amount of wells have treatments and controls per plate
@@ -251,7 +273,7 @@ plate_treatments
 
 # Now that the dataset has been downsampled, next we need to find the common features that are shared between the cell injury dataset and JUMP
 
-# In[11]:
+# In[12]:
 
 
 # spliting the data into X and y
@@ -262,7 +284,7 @@ X = overlapping_jump_df[cp_features].values
 y = overlapping_jump_df[y_var].values
 
 
-# In[12]:
+# In[13]:
 
 
 # loading in both Shuffled and Not shuffled models
@@ -270,7 +292,7 @@ model = joblib.load(model_path)
 shuffled_model = joblib.load(shuffled_model_path)
 
 
-# In[13]:
+# In[14]:
 
 
 # generated a confusion matrix in tidy long format
@@ -282,7 +304,7 @@ shuffled_jump_overlap_cm = generate_confusion_matrix_tl(
 ).fillna(0)
 
 
-# In[14]:
+# In[15]:
 
 
 pd.concat([jump_overlap_cm, shuffled_jump_overlap_cm]).to_csv(
