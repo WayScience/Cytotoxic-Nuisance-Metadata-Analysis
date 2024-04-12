@@ -410,9 +410,14 @@ def generate_confusion_matrix_tl(
     recall_per_all_classes = []
     for i in range(len(class_labels)):
         for j in range(len(class_labels)):
-            true_pos = cm_df.iloc[i, j]
-            false_neg = sum(cm_df.iloc[i, :]) - true_pos
-            recall = true_pos / (true_pos + false_neg)
+            count = cm_df.iloc[j, i]
+            total_count = sum(cm_df.iloc[:, i])
+            recall = count / total_count
+
+            # some treatments were not found in the holdout sets
+            if np.isnan(recall):
+                recall = 0.0
+
             recall_per_all_classes.append(recall)
 
     # update the data frame by replace injury codes with injury name
@@ -423,20 +428,20 @@ def generate_confusion_matrix_tl(
         injury_codes[str(injury_code)] for injury_code in cm_df.index.tolist()
     ]
 
+    cm_df = cm_df.reset_index()
+    cm_df = cm_df.rename(columns={"index": "true_labels"})
+
     # insert data type name in the matrix
     cm_df.insert(0, "dataset_type", dataset_type)
 
     # insert shuffled label
     cm_df.insert(1, "shuffled_model", shuffled)
 
-    # insert predicted labels column
-    cm_df.insert(2, "predicted_labels", cm_df.columns[2:])
-
     # make the confusion matrix tidy long format
     cm_df = pd.melt(
         cm_df,
-        id_vars=["dataset_type", "shuffled_model", "predicted_labels"],
-        var_name="true_label",
+        id_vars=["dataset_type", "shuffled_model", "true_labels"],
+        var_name="predicted_labels",
         value_name="count",
     )
 

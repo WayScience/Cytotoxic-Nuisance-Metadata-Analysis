@@ -32,19 +32,18 @@ options(repr.plot.width = width, repr.plot.height = height)
 
 # create a confusion matrix plot
 confusion_matrix_plot <- (
-    ggplot(cm_df, aes(x = true_label, y = predicted_labels))
+    ggplot(cm_df, aes(x = true_labels, y = predicted_labels))
     + facet_grid(dataset_type~shuffled_model)
     + geom_point(aes(color = recall), size = 3, shape = 15)
     + geom_text(aes(label = count), size = 2)
     + scale_color_gradient("Recall", low = "white", high = "red",limits = c(0, 1))
     + theme_bw()
-    + ylab("True Class")
-    + xlab("Predicted Class")
+    + ylab("Predicted Class")
+    + xlab("True Class")
     + theme(strip.text = element_text(size = 12))
-    + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-    + ggplot2::coord_fixed()
+    + theme(axis.text.x = element_text(angle = 90, hjust = 1)))
 
-)
+
 
 # saving file
 ggsave(filename = "confusion_matrix.png", height = height, width = width, dpi=600)
@@ -58,7 +57,7 @@ options(repr.plot.width = width, repr.plot.height = height)
 
 # create a confusion matrix plot
 overlapping_confusion_matrix_plot <- (
-    ggplot(overlapping_cm_df, aes(x = true_label, y = predicted_labels))
+    ggplot(overlapping_cm_df, aes(x = true_labels, y = predicted_labels))
     + facet_grid(dataset_type~shuffled_model)
     + geom_point(aes(color = recall), size = 6, shape = 15)
     + geom_text(aes(label = count), size = 4)

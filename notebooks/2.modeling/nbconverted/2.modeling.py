@@ -121,12 +121,12 @@ joblib.dump(best_model, modeling_dir / "multi_class_model.joblib")
 
 # evaluating model on train dataset
 train_precision_recall_df, train_f1_score_df = evaluate_model_performance(
-    model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="train"
+    model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="Train"
 )
 
 # evaluating model on test dataset
 test_precision_recall_df, test_f1_score_df = evaluate_model_performance(
-    model=best_model, X=X_test, y=y_test, shuffled=False, dataset_type="test"
+    model=best_model, X=X_test, y=y_test, shuffled=False, dataset_type="Test"
 )
 
 
@@ -135,10 +135,10 @@ test_precision_recall_df, test_f1_score_df = evaluate_model_performance(
 
 # creating confusing matrix for both train and test set on non-shuffled model
 cm_train_df = generate_confusion_matrix_tl(
-    model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="train"
+    model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="Train"
 )
 cm_test_df = generate_confusion_matrix_tl(
-    model=best_model, X=X_test, y=y_test, shuffled=False, dataset_type="test"
+    model=best_model, X=X_test, y=y_test, shuffled=False, dataset_type="Test"
 )
 
 
@@ -161,7 +161,7 @@ shuffled_best_model = train_multiclass(
 joblib.dump(shuffled_best_model, modeling_dir / "shuffled_multi_class_model.joblib")
 
 
-# In[ ]:
+# In[11]:
 
 
 # evaluating shuffled model on train dataset
@@ -171,7 +171,7 @@ shuffle_train_precision_recall_df, shuffle_train_f1_score_df = (
         X=shuffled_X_train,
         y=y_train,
         shuffled=True,
-        dataset_type="train",
+        dataset_type="Train",
     )
 )
 
@@ -181,7 +181,7 @@ shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate_model_perf
 )
 
 
-# In[ ]:
+# In[12]:
 
 
 shuffled_cm_train_df = generate_confusion_matrix_tl(
@@ -189,10 +189,10 @@ shuffled_cm_train_df = generate_confusion_matrix_tl(
     X=shuffled_X_train,
     y=y_train,
     shuffled=True,
-    dataset_type="train",
+    dataset_type="Train",
 )
 shuffled_cm_test_df = generate_confusion_matrix_tl(
-    model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="test"
+    model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="Test"
 )
 
 
@@ -200,7 +200,7 @@ shuffled_cm_test_df = generate_confusion_matrix_tl(
 
 # Loading in all the hold out data
 
-# In[ ]:
+# In[13]:
 
 
 # loading all holdouts
@@ -221,7 +221,7 @@ y_well_holdout = well_holdout_df["injury_code"]
 
 # ### Evaluating Multi-class model trained with original split with holdout data
 
-# In[ ]:
+# In[14]:
 
 
 # evaluating plate holdout data with both trained original and shuffled model
@@ -230,7 +230,7 @@ plate_ho_precision_recall_df, plate_ho_f1_score_df = evaluate_model_performance(
     X=X_plate_holdout,
     y=y_plate_holdout,
     shuffled=False,
-    dataset_type="plate_holdout",
+    dataset_type="Plate Holdout",
 )
 
 plate_ho_shuffle_precision_recall_df, plate_ho_shuffle_f1_score_df = (
@@ -239,7 +239,7 @@ plate_ho_shuffle_precision_recall_df, plate_ho_shuffle_f1_score_df = (
         X=X_plate_holdout,
         y=y_plate_holdout,
         shuffled=True,
-        dataset_type="plate_holdout",
+        dataset_type="Plate Holdout",
     )
 )
 
@@ -250,7 +250,7 @@ treatment_ho_precision_recall_df, treatment_ho_f1_score_df = evaluate_model_perf
     X=X_treatment_holdout,
     y=y_treatment_holdout,
     shuffled=False,
-    dataset_type="treatment_holdout",
+    dataset_type="Treatment Holdout",
 )
 
 treatment_ho_shuffle_precision_recall_df, treatment_ho_shuffle_f1_score_df = (
@@ -259,7 +259,7 @@ treatment_ho_shuffle_precision_recall_df, treatment_ho_shuffle_f1_score_df = (
         X=X_treatment_holdout,
         y=y_treatment_holdout,
         shuffled=True,
-        dataset_type="treatment_holdout",
+        dataset_type="Treatment Holdout",
     )
 )
 
@@ -270,7 +270,7 @@ well_ho_precision_recall_df, well_ho_f1_score_df = evaluate_model_performance(
     X=X_well_holdout,
     y=y_well_holdout,
     shuffled=False,
-    dataset_type="well_holdout",
+    dataset_type="Well Holdout",
 )
 
 well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
@@ -279,12 +279,12 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
         X=X_well_holdout,
         y=y_well_holdout,
         shuffled=True,
-        dataset_type="well_holdout",
+        dataset_type="Well Holdout",
     )
 )
 
 
-# In[ ]:
+# In[15]:
 
 
 # creating confusing matrix with plate holdout (shuffled and not snuffled)
@@ -293,14 +293,14 @@ plate_ho_cm_df = generate_confusion_matrix_tl(
     X=X_plate_holdout,
     y=y_plate_holdout,
     shuffled=False,
-    dataset_type="plate_holdout",
+    dataset_type="Plate Holdout",
 )
 shuffled_plate_ho_cm_df = generate_confusion_matrix_tl(
     model=shuffled_best_model,
     X=X_plate_holdout,
     y=y_plate_holdout,
     shuffled=True,
-    dataset_type="plate_holdout",
+    dataset_type="Plate Holdout",
 )
 
 # creating confusing matrix with treatment holdout (shuffled and not snuffled)
@@ -309,14 +309,14 @@ treatment_ho_cm_df = generate_confusion_matrix_tl(
     X=X_treatment_holdout,
     y=y_treatment_holdout,
     shuffled=False,
-    dataset_type="treatment_holdout",
+    dataset_type="Treatment Holdout",
 )
 shuffled_treatment_ho_cm_df = generate_confusion_matrix_tl(
     model=shuffled_best_model,
     X=X_treatment_holdout,
     y=y_treatment_holdout,
     shuffled=True,
-    dataset_type="treatment_holdout",
+    dataset_type="Treatment Holdout",
 )
 
 # creating confusing matrix with plate_hold (shuffled and not snuffled)
@@ -325,33 +325,38 @@ well_ho_cm_df = generate_confusion_matrix_tl(
     X=X_well_holdout,
     y=y_well_holdout,
     shuffled=False,
-    dataset_type="well_holdout",
+    dataset_type="Well Holdout",
 )
 shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
     model=shuffled_best_model,
     X=X_well_holdout,
     y=y_well_holdout,
     shuffled=True,
-    dataset_type="well_holdout",
+    dataset_type="Well Holdout",
 )
 
 
 # Storing all f1 and pr scores
 
-# In[ ]:
+# In[16]:
 
 
 # storing all f1 scores
 all_f1_scores = pd.concat(
     [
+        # original split
         test_f1_score_df,
         train_f1_score_df,
+        # shuffle split
         shuffle_test_f1_score_df,
         shuffle_train_f1_score_df,
+        # plate holdout
         plate_ho_f1_score_df,
         plate_ho_shuffle_f1_score_df,
+        # treatment holdout
         treatment_ho_f1_score_df,
         treatment_ho_shuffle_f1_score_df,
+        # well holdout
         well_ho_f1_score_df,
         well_ho_shuffle_f1_score_df,
     ]
@@ -363,22 +368,25 @@ all_f1_scores.to_csv(
 )
 
 
-# In[ ]:
+# In[17]:
 
 
 # storing pr scores
 all_pr_scores = pd.concat(
     [
+        # original split
         test_precision_recall_df,
         train_precision_recall_df,
+        # shuffled split
         shuffle_test_precision_recall_df,
         shuffle_train_precision_recall_df,
-        shuffle_test_precision_recall_df,
-        shuffle_train_precision_recall_df,
+        # plate holdout
         plate_ho_precision_recall_df,
         plate_ho_shuffle_precision_recall_df,
+        # treatment holdout
         treatment_ho_precision_recall_df,
         treatment_ho_shuffle_precision_recall_df,
+        # well holdout
         well_ho_precision_recall_df,
         well_ho_shuffle_precision_recall_df,
     ]
@@ -390,19 +398,24 @@ all_pr_scores.to_csv(
 )
 
 
-# In[ ]:
+# In[18]:
 
 
 all_cm_dfs = pd.concat(
     [
+        # original split
         cm_train_df,
         cm_test_df,
+        # shuffled split
         shuffled_cm_train_df,
         shuffled_cm_test_df,
-        well_ho_cm_df,
-        shuffled_well_ho_cm_df,
+        # plate holdout
+        plate_ho_cm_df,
+        shuffled_plate_ho_cm_df,
+        # treatment holdout
         treatment_ho_cm_df,
         shuffled_treatment_ho_cm_df,
+        # well holdout
         well_ho_cm_df,
         shuffled_well_ho_cm_df,
     ]
@@ -413,9 +426,3 @@ all_cm_dfs = pd.concat(
 all_cm_dfs.to_csv(
     modeling_dir / "confusion_matrix.csv.gz", index=False, compression="gzip"
 )
-
-
-# In[ ]:
-
-
-all_cm_dfs

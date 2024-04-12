@@ -469,6 +469,18 @@ fs_profile_df.to_csv(
 # In[19]:
 
 
+fs_profile_df
+
+
+# In[20]:
+
+
+plate_holdout_df["injury_code"].value_counts()
+
+
+# In[21]:
+
+
 # saving feature names
 meta_colnames, feat_colnames = split_meta_and_features(
     fs_profile_df, compartments=compartments
@@ -483,7 +495,7 @@ with open(data_split_dir / "feature_cols.json", mode="w") as f:
     json.dump(all_feature_col_names, f)
 
 
-# In[20]:
+# In[22]:
 
 
 # save metadata after holdout
@@ -495,6 +507,3 @@ cell_injury_metadata.to_csv(
 # display
 print("Metadata shape", cell_injury_metadata.shape)
 cell_injury_metadata.head()
-
-
-# In[ ]:

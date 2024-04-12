@@ -34,7 +34,7 @@ seed = 0
 
 # setting paths
 data_path = pathlib.Path("../../data").resolve(strict=True)
-jump_data_path = (data_path / "JUMP_data").resolve(strict=True)
+jump_data_dir = (data_path / "JUMP_data").resolve(strict=True)
 results_dir_path = pathlib.Path("../../results").resolve(strict=True)
 data_split_dir = (results_dir_path / "1.data_splits").resolve(strict=True)
 modeling_dir = (results_dir_path / "2.modeling").resolve(strict=True)
@@ -207,7 +207,7 @@ plate_treatments
 
 # save the dataset
 overlapping_jump_df.to_csv(
-    "overlapping_jump_data.csv.gz", compression="gzip", index=False
+    jump_data_dir / "overlapping_jump_data.csv.gz", compression="gzip", index=False
 )
 
 
