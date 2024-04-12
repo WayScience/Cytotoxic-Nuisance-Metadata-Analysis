@@ -25,30 +25,32 @@ overlapping_cm_df$shuffled_model <- ifelse(overlapping_cm_df$shuffled_model == "
 # Display the updated DataFrame
 head(overlapping_cm_df)
 
-# set image dim
+# Define the desired order of facet levels
+facet_order <- c("Train", "Test", "Plate Holdout", "Treatment Holdout", "Well Holdout")
+cm_df$dataset_type <- factor(cm_df$dataset_type, levels = facet_order)
+
 width <- 10
 height <- 10
 options(repr.plot.width = width, repr.plot.height = height)
 
-# create a confusion matrix plot
 confusion_matrix_plot <- (
     ggplot(cm_df, aes(x = true_labels, y = predicted_labels))
-    + facet_grid(dataset_type~shuffled_model)
+    + facet_grid(dataset_type ~ shuffled_model)
     + geom_point(aes(color = recall), size = 3, shape = 15)
     + geom_text(aes(label = count), size = 2)
-    + scale_color_gradient("Recall", low = "white", high = "red",limits = c(0, 1))
+    + scale_color_gradient("Recall", low = "white", high = "red", limits = c(0, 1))
     + theme_bw()
     + ylab("Predicted Class")
     + xlab("True Class")
     + theme(strip.text = element_text(size = 12))
-    + theme(axis.text.x = element_text(angle = 90, hjust = 1)))
-
-
+    + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+)
 
 # saving file
-ggsave(filename = "confusion_matrix.png", height = height, width = width, dpi=600)
+ggsave(filename = "confusion_matrix.png", height = height, width = width, dpi = 600)
 
 confusion_matrix_plot
+
 
 # set image dim
 width <- 10
