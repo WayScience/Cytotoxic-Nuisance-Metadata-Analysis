@@ -297,10 +297,10 @@ shuffled_model = joblib.load(shuffled_model_path)
 
 # generated a confusion matrix in tidy long format
 jump_overlap_cm = generate_confusion_matrix_tl(
-    model, X, y, shuffled=False, dataset_type="jump_overlap"
+    model, X, y, shuffled=False, dataset_type="JUMP Overlap"
 ).fillna(0)
 shuffled_jump_overlap_cm = generate_confusion_matrix_tl(
-    shuffled_model, X, y, shuffled=True, dataset_type="jump_overlap"
+    shuffled_model, X, y, shuffled=True, dataset_type="JUMP Overlap"
 ).fillna(0)
 
 
