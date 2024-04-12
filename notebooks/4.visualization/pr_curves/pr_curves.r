@@ -11,45 +11,49 @@ pr_df$shuffled <- ifelse(pr_df$shuffled == "False", "Not Shuffled",
 head(pr_df)
 
 
+unique(pr_df$dataset_type)
+
 # Define the desired order of dataset_type
-dataset_order <- c("test", "train", "plate_holdout", "treatment_holdout", "well_holdout")
+dataset_order <- c("Train", "Test", "Plate Holdout", "Treatment Holdout", "Well Holdout")
 pr_df$dataset_type <- factor(pr_df$dataset_type, levels = dataset_order)
 
-width <- 14
-height <- 11
+# Set plot dimensions
+width <- 23
+height <- 12
 options(repr.plot.width = width, repr.plot.height = height)
 
+# Create the plot
 ggplot(pr_df, aes(x = recall, y = precision, color = shuffled)) +
-geom_line() +
-facet_grid(dataset_type~injury_type) +
-labs(x = "Recall", y = "Precision", title = "Precision-Recall Curve") +
-theme_bw() +
+  geom_line() +
+  facet_grid(dataset_type ~ injury_type) +
+  labs(x = "Recall", y = "Precision", title = "Precision-Recall Curve") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
+        strip.text = element_text(size = 10))
 
-# rotating ticks by 90 degress
-theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+# Save the plot
+ggsave("full_pr_curves.png", width = width, height = height, dpi = 600)
 
-
-ggsave("full_pr_curves.png", width = width, height = height, dpi=600)
 
 # Filter the dataframe to select only "test", "train", and "plate_holdout" datasets
 filtered_pr_df <- pr_df %>%
-  filter(dataset_type %in% c("test", "train"))
+  filter(dataset_type %in% c("Test", "Train"))
 
 
 # Create line_id column
 filtered_pr_df <- filtered_pr_df %>%
   mutate(line_id = case_when(
-    dataset_type == "test" & shuffled == "Not Shuffled" ~ "Test + Not Shuffled",
-    dataset_type == "test" & shuffled == "Shuffled" ~ "Test + Shuffled",
-    dataset_type == "train" & shuffled == "Not Shuffled" ~ "Train + Not Shuffled",
-    dataset_type == "train" & shuffled == "Shuffled" ~ "Train + Shuffled",
+    dataset_type == "Test" & shuffled == "Not Shuffled" ~ "Test + Not Shuffled",
+    dataset_type == "Test" & shuffled == "Shuffled" ~ "Test + Shuffled",
+    dataset_type == "Train" & shuffled == "Not Shuffled" ~ "Train + Not Shuffled",
+    dataset_type == "Train" & shuffled == "Shuffled" ~ "Train + Shuffled",
   )) %>%
   mutate(is_train_test = if_else(dataset_type %in% c("test", "train"), "test_train", "plate_holdout"))
 
 head(filtered_pr_df)
 
-width <- 9
-height <- 9
+width <- 10
+height <- 10
 options(repr.plot.width = width, repr.plot.height = height)
 
 
