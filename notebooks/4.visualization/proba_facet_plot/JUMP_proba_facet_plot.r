@@ -41,7 +41,6 @@ ridge_plot <- (
 
         "Shuffled" = brewer.pal(2, "Dark2")[2],
         "Not Shuffled" = "#1E93FC"
-        # "Not Shuffled" = brewer.pal(2, "Dark2")[1]
     )) +
 
     # remove x axis label

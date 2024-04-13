@@ -1,3 +1,4 @@
+suppressPackageStartupMessages(suppressWarnings(library(RColorBrewer))) # color palettes
 suppressPackageStartupMessages(suppressWarnings(library(ggplot2)))
 suppressPackageStartupMessages(suppressWarnings(library(dplyr)))
 
@@ -24,12 +25,18 @@ options(repr.plot.width = width, repr.plot.height = height)
 
 # Create the plot
 ggplot(pr_df, aes(x = recall, y = precision, color = shuffled)) +
-  geom_line() +
+  geom_line(aes(linetype = shuffled)) +
   facet_grid(dataset_type ~ injury_type) +
-  labs(x = "Recall", y = "Precision", title = "Precision-Recall Curve") +
+  labs(x = "Recall", y = "Precision",) +
   theme_bw() +
+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
-        strip.text = element_text(size = 10))
+        strip.text = element_text(size = 10)) +
+ scale_color_manual(values = c(
+      "Shuffled" = "#f8766d",
+      "Not Shuffled" = "#03bfc4"
+    ))
+
 
 # Save the plot
 ggsave("full_pr_curves.png", width = width, height = height, dpi = 600)
