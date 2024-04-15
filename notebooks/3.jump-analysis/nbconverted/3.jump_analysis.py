@@ -265,6 +265,6 @@ all_probas = pd.melt(
 # save the probabilities
 all_probas.to_csv(jump_analysis_dir / "JUMP_injury_proba.csv.gz", index=False)
 
-print("Shape of the probabilities", all_probas.shape)
+print("Shape of the probabilities in tidy long format", all_probas.shape)
 print("Unique Models", list(all_probas["shuffled_model"].unique()))
 all_probas.head(30)

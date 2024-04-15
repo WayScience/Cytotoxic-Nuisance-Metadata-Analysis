@@ -42,8 +42,14 @@ confusion_matrix_plot <- (
     + theme_bw()
     + ylab("Predicted Class")
     + xlab("True Class")
-    + theme(strip.text = element_text(size = 12))
-    + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    + theme(
+        legend.title =  element_text(size = 14, margin = margin(b = 10)),
+        legend.text = element_text(size = 10),
+        strip.text = element_text(size = 12),
+        axis.text.x = element_text(angle = 90, hjust = 1, size = 11),
+        axis.title.x.bottom = element_text(size = 14),
+        axis.title.y.left = element_text(size = 14)
+        )
 )
 
 # saving file

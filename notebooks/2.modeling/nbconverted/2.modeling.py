@@ -103,20 +103,32 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 
-# ## Training and Evaluating Multi-class Logistic Model with original dataset split
-#
-
 # In[6]:
 
 
-# train and get the best_model
-best_model = train_multiclass(X_train, y_train, param_grid=param_grid, seed=seed)
+print(X_train.shape, X_test.shape)
 
-# save model
-joblib.dump(best_model, modeling_dir / "multi_class_model.joblib")
 
+# ## Training and Evaluating Multi-class Logistic Model with original dataset split
+#
 
 # In[7]:
+
+
+# setting model path
+model_path = modeling_dir / "multi_class_model.joblib"
+
+# if trained model exists, skip training
+if model_path.exists():
+    best_model = joblib.load(model_path)
+
+# train model and save
+else:
+    best_model = train_multiclass(X_train, y_train, param_grid=param_grid, seed=seed)
+    joblib.dump(best_model, model_path)
+
+
+# In[8]:
 
 
 # evaluating model on train dataset
@@ -130,7 +142,7 @@ test_precision_recall_df, test_f1_score_df = evaluate_model_performance(
 )
 
 
-# In[8]:
+# In[9]:
 
 
 # creating confusing matrix for both train and test set on non-shuffled model
@@ -145,23 +157,32 @@ cm_test_df = generate_confusion_matrix_tl(
 # ## Training and Evaluating Multi-class Logistic Model with shuffled dataset split
 #
 
-# In[9]:
+# In[10]:
 
 
 # shuffle feature space
 shuffled_X_train = shuffle_features(X_train, seed=seed)
 
 
-# In[10]:
-
-
-shuffled_best_model = train_multiclass(
-    shuffled_X_train, y_train, param_grid=param_grid, seed=seed
-)
-joblib.dump(shuffled_best_model, modeling_dir / "shuffled_multi_class_model.joblib")
-
-
 # In[11]:
+
+
+# setting model path
+shuffled_model_path = modeling_dir / "shuffled_multi_class_model.joblib"
+
+# if trained model exists, skip training
+if model_path.exists():
+    shuffled_best_model = joblib.load(shuffled_model_path)
+
+# train model and save
+else:
+    shuffled_best_model = train_multiclass(
+        shuffled_X_train, y_train, param_grid=param_grid, seed=seed
+    )
+    joblib.dump(shuffled_best_model, shuffled_model_path)
+
+
+# In[12]:
 
 
 # evaluating shuffled model on train dataset
@@ -177,11 +198,11 @@ shuffle_train_precision_recall_df, shuffle_train_f1_score_df = (
 
 # valuating shuffled model on test dataset
 shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate_model_performance(
-    model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="test"
+    model=shuffled_best_model, X=X_test, y=y_test, shuffled=True, dataset_type="Test"
 )
 
 
-# In[12]:
+# In[13]:
 
 
 shuffled_cm_train_df = generate_confusion_matrix_tl(
@@ -200,7 +221,7 @@ shuffled_cm_test_df = generate_confusion_matrix_tl(
 
 # Loading in all the hold out data
 
-# In[13]:
+# In[14]:
 
 
 # loading all holdouts
@@ -221,7 +242,7 @@ y_well_holdout = well_holdout_df["injury_code"]
 
 # ### Evaluating Multi-class model trained with original split with holdout data
 
-# In[14]:
+# In[15]:
 
 
 # evaluating plate holdout data with both trained original and shuffled model
@@ -284,7 +305,7 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
 )
 
 
-# In[15]:
+# In[16]:
 
 
 # creating confusing matrix with plate holdout (shuffled and not snuffled)
@@ -338,7 +359,7 @@ shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
 
 # Storing all f1 and pr scores
 
-# In[16]:
+# In[17]:
 
 
 # storing all f1 scores
@@ -368,7 +389,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[17]:
+# In[18]:
 
 
 # storing pr scores
@@ -398,7 +419,13 @@ all_pr_scores.to_csv(
 )
 
 
-# In[18]:
+# In[19]:
+
+
+all_pr_scores["dataset_type"].unique()
+
+
+# In[20]:
 
 
 all_cm_dfs = pd.concat(

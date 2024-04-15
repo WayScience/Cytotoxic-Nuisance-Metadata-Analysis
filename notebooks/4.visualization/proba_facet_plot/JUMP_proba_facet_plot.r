@@ -27,25 +27,35 @@ options(repr.plot.width = img_width, repr.plot.height = img_height)
 ridge_plot <- (
     ggplot(proba_df, aes(x = proba, y = pred_injury, fill = shuffled_model)) +
     geom_density_ridges() +
-    # facet_grid(shuffled_model~injury_type, scales = "free_y") +
     facet_wrap(~injury_type) +
-    geom_vline(xintercept = 0.5, linetype = "dashed", color = "black") +
     scale_x_continuous(breaks = seq(0, 1, 0.5)) +
-    labs(title = "JUMP Injury Prediction Probability", y = "Injury Types", x = "Probability", fill = "Model Type") +
     theme_bw() +
 
     # no legend
     theme(plot.title = element_text(size = 20, hjust = 0.5)) +
 
     scale_fill_manual(values = c(
-
-        "Shuffled" = brewer.pal(2, "Dark2")[2],
-        "Not Shuffled" = "#1E93FC"
+    "Shuffled" = brewer.pal(2, "Dark2")[2],
+    "Not Shuffled" = "#1E93FC"
     )) +
 
-    # remove x axis label
-    theme(axis.title.x = element_blank())
-    )
+    theme(
+        axis.title.x = element_blank(),
+        legend.spacing.y = unit(0.1, "cm"),
+        legend.box.spacing = unit(0.1, "cm"),
+        legend.key.size = unit(0.7, "lines"),
+        legend.key.width = unit(1, "lines"),
+        strip.text = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        axis.title.x.bottom = element_text(margin = margin(t = 15)),
+        axis.title.y.left = element_text(margin = margin(t = 15)),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12)
+        )) +
+
+    labs(y = "Injury Types", x = "Probability", fill = "Model Type")
+
 ridge_plot
 
 ggsave(filename = "JUMP_cell_injury_facet_proba.png", height = img_height, width = img_width, dpi=600)
