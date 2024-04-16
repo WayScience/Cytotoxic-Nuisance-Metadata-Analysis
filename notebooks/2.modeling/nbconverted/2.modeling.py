@@ -145,7 +145,7 @@ test_precision_recall_df, test_f1_score_df = evaluate_model_performance(
 # In[9]:
 
 
-# creating confusing matrix for both train and test set on non-shuffled model
+# creating confusion matrix for both train and test set on non-shuffled model
 cm_train_df = generate_confusion_matrix_tl(
     model=best_model, X=X_train, y=y_train, shuffled=False, dataset_type="Train"
 )
@@ -205,6 +205,7 @@ shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate_model_perf
 # In[13]:
 
 
+# creating confusion matrix for shuffled model
 shuffled_cm_train_df = generate_confusion_matrix_tl(
     model=shuffled_best_model,
     X=shuffled_X_train,
@@ -308,7 +309,7 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
 # In[16]:
 
 
-# creating confusing matrix with plate holdout (shuffled and not snuffled)
+# creating confusion matrix with plate holdout (shuffled and not shuffled)
 plate_ho_cm_df = generate_confusion_matrix_tl(
     model=best_model,
     X=X_plate_holdout,
@@ -324,7 +325,7 @@ shuffled_plate_ho_cm_df = generate_confusion_matrix_tl(
     dataset_type="Plate Holdout",
 )
 
-# creating confusing matrix with treatment holdout (shuffled and not snuffled)
+# creating confusion matrix with treatment holdout (shuffled and not shuffled)
 treatment_ho_cm_df = generate_confusion_matrix_tl(
     model=best_model,
     X=X_treatment_holdout,
@@ -340,7 +341,7 @@ shuffled_treatment_ho_cm_df = generate_confusion_matrix_tl(
     dataset_type="Treatment Holdout",
 )
 
-# creating confusing matrix with plate_hold (shuffled and not snuffled)
+# creating confusion matrix with plate_hold (shuffled and not shuffled)
 well_ho_cm_df = generate_confusion_matrix_tl(
     model=best_model,
     X=X_well_holdout,

@@ -9,6 +9,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from pycytominer.cyto_utils import infer_cp_features
 from sklearn.base import BaseEstimator
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
@@ -488,43 +489,43 @@ def check_feature_order(ref_feat_order: list[str], input_feat_order: list[str]) 
 
 
 def split_meta_and_features(
-    profile_df: pd.DataFrame, compartments
-) -> Tuple[list, list]:
-    """Separates metadata and feature column names
+    profile: pd.DataFrame,
+    compartments=["Nuclei", "Cells", "Cytoplasm"],
+    metadata_tag: Optional[bool] = False,
+) -> Tuple[list[str], list[str]]:
+    """Splits metadata and feature column names
 
     Parameters
     ----------
-    profile_df : pd.DataFrame
-        profile
+    profile : pd.DataFrame
+        image-based profile
+    compartments : list, optional
+        compartments used to generated image-based profiles, by default
+        ["Nuclei", "Cells", "Cytoplasm"]
+    metadata_tag : Optional[bool], optional
+        indicating if the profiles have metadata columns tagged with 'Metadata_'
+        , by default False
 
-    compartments : list[str]
-        Compartments you want to extract features from.
-
-    Return
-    ------
-    Tuple(pd.DataFrame, pd.DataFrame)
-        Two dataframes inside a tuple (metadata, features)
-
-    Raises
-    ------
-    TypeError
-        Raised when profile_df is not a dataframe
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        Tuple containing metadata and feature column names
     """
-    # type checking
-    if not isinstance(profile_df, pd.DataFrame):
-        raise TypeError("'profile_df' must be a pandas dataframe")
 
-    # separating meta and feature column names
-    meta_col = []
-    feature_col = []
-    for column in profile_df.columns.tolist():
-        check = any([True if name in column else False for name in compartments])
-        if check:
-            feature_col.append(column)
-        elif check is False:
-            meta_col.append(column)
+    # identify features names
+    features_cols = infer_cp_features(profile, compartments=compartments)
 
-    return (meta_col, feature_col)
+    # iteratively search metadata features and retain order if the Metadata tag is not added
+    if metadata_tag is False:
+        meta_cols = [
+            colname
+            for colname in profile.columns.tolist()
+            if colname not in features_cols
+        ]
+    else:
+        meta_cols = infer_cp_features(profile, metadata=metadata_tag)
+
+    return (meta_cols, features_cols)
 
 
 def evaluate_model_performance(
