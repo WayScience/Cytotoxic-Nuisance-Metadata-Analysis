@@ -10,7 +10,6 @@ import sys
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 # import local modules
 sys.path.append("../../")
@@ -19,6 +18,7 @@ from src.utils import (
     generate_confusion_matrix_tl,
     load_json_file,
     shuffle_features,
+    split_meta_and_features,
     train_multiclass,
 )
 
@@ -35,6 +35,12 @@ data_splits_dir = (results_dir / "1.data_splits").resolve(strict=True)
 
 # setting path for training dataset
 training_dataset_path = (data_splits_dir / "training_data.csv.gz").resolve(strict=True)
+
+# test and train data paths
+X_train_path = (data_splits_dir / "X_train.csv.gz").resolve(strict=True)
+X_test_path = (data_splits_dir / "X_test.csv.gz").resolve(strict=True)
+y_train_path = (data_splits_dir / "y_train.csv.gz").resolve(strict=True)
+y_test_path = (data_splits_dir / "y_test.csv.gz").resolve(strict=True)
 
 # holdout paths
 plate_holdout_path = (data_splits_dir / "plate_holdout.csv.gz").resolve(strict=True)
@@ -71,48 +77,34 @@ param_grid = {
 }
 
 
+# Loading training data splits
+
 # In[4]:
 
 
 # loading injury codes
 injury_codes = load_json_file(data_splits_dir / "injury_codes.json")
 
-# loading in the dataset
-training_df = pd.read_csv(training_dataset_path)
+# loading training data splits
+X_train = pd.read_csv(X_train_path)
+X_test = pd.read_csv(X_test_path)
+y_train = pd.read_csv(y_train_path)
+y_test = pd.read_csv(y_test_path)
 
-# display data
-print("Shape: ", training_df.shape)
-training_df.head()
+# spliting meta and feature column names
+_, feat_cols = split_meta_and_features(X_train)
 
-
-# Splitting the dataset into training and testing subsets involves getting 80% of the data to the training set and 20% to the test set.
-
-# In[5]:
-
-
-# splitting between meta and feature columns
-meta_cols = training_df.columns[:33]
-feat_cols = training_df.columns[33:]
-
-# Splitting the data where y = injury_types and X = morphology features
-X = training_df[feat_cols].values
-y = training_df["injury_code"]
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, train_size=0.80, random_state=seed, stratify=y
-)
-
-
-# In[6]:
-
-
-print(X_train.shape, X_test.shape)
+# display data split sizes
+print("X training size", X_train.shape)
+print("X testing size", X_test.shape)
+print("y training size", y_train.shape)
+print("y testing size", y_test.shape)  #
 
 
 # ## Training and Evaluating Multi-class Logistic Model with original dataset split
 #
 
-# In[7]:
+# In[5]:
 
 
 # setting model path
@@ -128,7 +120,7 @@ else:
     joblib.dump(best_model, model_path)
 
 
-# In[8]:
+# In[6]:
 
 
 # evaluating model on train dataset
@@ -142,7 +134,7 @@ test_precision_recall_df, test_f1_score_df = evaluate_model_performance(
 )
 
 
-# In[9]:
+# In[7]:
 
 
 # creating confusion matrix for both train and test set on non-shuffled model
@@ -157,14 +149,14 @@ cm_test_df = generate_confusion_matrix_tl(
 # ## Training and Evaluating Multi-class Logistic Model with shuffled dataset split
 #
 
-# In[10]:
+# In[8]:
 
 
 # shuffle feature space
-shuffled_X_train = shuffle_features(X_train, seed=seed)
+shuffled_X_train = shuffle_features(X_train.values, seed=seed)
 
 
-# In[11]:
+# In[9]:
 
 
 # setting model path
@@ -182,7 +174,7 @@ else:
     joblib.dump(shuffled_best_model, shuffled_model_path)
 
 
-# In[12]:
+# In[10]:
 
 
 # evaluating shuffled model on train dataset
@@ -202,7 +194,7 @@ shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate_model_perf
 )
 
 
-# In[13]:
+# In[11]:
 
 
 # creating confusion matrix for shuffled model
@@ -222,7 +214,7 @@ shuffled_cm_test_df = generate_confusion_matrix_tl(
 
 # Loading in all the hold out data
 
-# In[14]:
+# In[12]:
 
 
 # loading all holdouts
@@ -243,7 +235,7 @@ y_well_holdout = well_holdout_df["injury_code"]
 
 # ### Evaluating Multi-class model trained with original split with holdout data
 
-# In[15]:
+# In[13]:
 
 
 # evaluating plate holdout data with both trained original and shuffled model
@@ -306,7 +298,7 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
 )
 
 
-# In[16]:
+# In[14]:
 
 
 # creating confusion matrix with plate holdout (shuffled and not shuffled)
@@ -360,7 +352,7 @@ shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
 
 # Storing all f1 and pr scores
 
-# In[17]:
+# In[15]:
 
 
 # storing all f1 scores
@@ -390,7 +382,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[18]:
+# In[16]:
 
 
 # storing pr scores
@@ -420,13 +412,13 @@ all_pr_scores.to_csv(
 )
 
 
-# In[19]:
+# In[17]:
 
 
 all_pr_scores["dataset_type"].unique()
 
 
-# In[20]:
+# In[18]:
 
 
 all_cm_dfs = pd.concat(
