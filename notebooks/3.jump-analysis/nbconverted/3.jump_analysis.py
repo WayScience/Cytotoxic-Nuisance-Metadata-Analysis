@@ -69,6 +69,8 @@ print("JUMP dataset size:", jump_df.shape)
 jump_df.head()
 
 
+# ## Finding Overlapping Treatments
+
 # ## Feature alignment
 # In this section, we are identifying the shared features present in both the cell injury and JUMP datasets.
 # Once these features are identified, we update the JUMP dataset to include only those features that are shared between both profiles for our machine learning application.
