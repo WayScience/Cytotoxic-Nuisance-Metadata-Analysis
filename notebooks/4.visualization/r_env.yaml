@@ -5,3 +5,4 @@ channels:
 dependencies:
   - conda-forge::r-essentials
   - conda-forge::r-dplyr
+  - conda-forge::r-patchwork
