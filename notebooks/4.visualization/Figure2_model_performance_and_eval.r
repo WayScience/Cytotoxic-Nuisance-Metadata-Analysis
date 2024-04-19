@@ -273,3 +273,33 @@ probabilities_ridge_plot <- (
 
 ggsave(filename = "figures/JUMP_cell_injury_facet_proba.png", height = img_height, width = img_width, dpi=600)
 probabilities_ridge_plot
+
+# plot dims
+height = 17
+width = 17
+
+options(repr.plot.width=width, repr.plot.height=height, units = "cm", dpi = 600)
+
+# Combine plots using patchwork
+top_plot<- (
+  pr_curve_plot_train_test |
+  f1_bar_plot
+) + plot_layout(widths = c(2, 2))
+
+bottom_plot <- (
+  confusion_matrix_plot |
+  probabilities_ridge_plot
+)
+
+fig2 <- (
+  top_plot /
+  bottom_plot
+) + plot_annotation(tag_levels = "A") + plot_layout(heights = c(3, 3))
+
+
+# Adjust layout and appearance (optional)
+combined_plot <- combined_plot +
+  plot_layout(ncol = 2, nrow = 2, byrow = TRUE)  # Adjust the grid layout as needed
+
+# Display the combined plot
+fig2
