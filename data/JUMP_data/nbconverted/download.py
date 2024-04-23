@@ -4,11 +4,16 @@
 # In[1]:
 
 
+import json
 import os
 import pathlib
+import sys
 
 import pandas as pd
 import requests
+
+sys.path.append("../../")
+from src.utils import split_meta_and_features
 
 # In[2]:
 
@@ -36,7 +41,7 @@ for plate_id in platemap_df["Assay_Plate_Barcode"]:
                 f.write(chunk)
 
 
-# In[ ]:
+# In[4]:
 
 
 # after downloading all dataset, concat into a single dataframe
@@ -52,3 +57,29 @@ main_df = pd.concat([pd.read_csv(file) for file in data_files])
 main_df.to_csv(
     "JUMP_all_plates_normalized_negcon.csv.gz", index=False, compression="gzip"
 )
+
+
+# In[5]:
+
+
+# saving feature space
+jump_meta, jump_feat = split_meta_and_features(main_df, metadata_tag=True)
+
+# saving info of feature space
+jump_feature_space = {
+    "name": "JUMP",
+    "n_plates": len(main_df["Metadata_Plate"].unique()),
+    "n_meta_features": len(jump_meta),
+    "n_features": len(jump_feat),
+    "meta_features": jump_meta,
+    "features": jump_feat,
+}
+
+# save json file
+with open("jump_feature_space.json", mode="w") as f:
+    json.dump(jump_feature_space, f)
+
+# display
+print("NUmber of plates", len(main_df["Metadata_Plate"].unique()))
+print("Number of meta features", len(jump_meta))
+print("Number of features", len(jump_feat))

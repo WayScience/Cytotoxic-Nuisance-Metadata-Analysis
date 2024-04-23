@@ -12,6 +12,7 @@
 # In[1]:
 
 
+import json
 import pathlib
 import sys
 from collections import defaultdict
@@ -169,6 +170,34 @@ fs_profile.to_csv(
 
 
 # In[12]:
+
+
+# saving feature space
+cell_injury_meta, cell_injury_feats = utils.split_meta_and_features(
+    fs_profile, metadata_tag=False
+)
+
+# saving info of feature space
+jump_feature_space = {
+    "name": "cell_injury",
+    "n_plates": len(fs_profile["Plate"].unique()),
+    "n_meta_features": len(cell_injury_meta),
+    "n_features": len(cell_injury_feats),
+    "meta_features": cell_injury_meta,
+    "features": cell_injury_feats,
+}
+
+# save json file
+with open(fs_dir / "jump_feature_space.json", mode="w") as f:
+    json.dump(jump_feature_space, f)
+
+# display
+print("NUmber of plates", len(fs_profile["Plate"].unique()))
+print("Number of meta features", len(cell_injury_meta))
+print("Number of features", len(cell_injury_feats))
+
+
+# In[13]:
 
 
 # setting which injr
