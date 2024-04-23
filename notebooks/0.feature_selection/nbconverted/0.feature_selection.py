@@ -188,7 +188,7 @@ jump_feature_space = {
 }
 
 # save json file
-with open(fs_dir / "jump_feature_space.json", mode="w") as f:
+with open(fs_dir / "cell_injury_feature_space.json", mode="w") as f:
     json.dump(jump_feature_space, f)
 
 # display
