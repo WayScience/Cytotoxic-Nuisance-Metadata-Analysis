@@ -4,7 +4,7 @@
 # # Spliting Data
 # Here, we utilize the feature-selected profiles generated in the preceding module notebook [here](../0.freature_selection/), focusing on dividing the data into training, testing, and holdout sets for machine learning training.
 
-# In[24]:
+# In[1]:
 
 
 import json
@@ -175,7 +175,7 @@ for plate_id, df in fs_profile_df.groupby("Plate"):
     plate_meta[plate_id] = treatment_counter
 
 # save dictionary into a json file
-with open(data_split_dir / "plate_info.json", mode="w") as stream:
+with open(data_split_dir / "cell_injury_plate_info.json", mode="w") as stream:
     json.dump(plate_meta, stream)
 
 
@@ -458,7 +458,7 @@ print("training shape after removing holdouts", fs_profile_df.shape)
 fs_profile_df.head()
 
 
-# In[29]:
+# In[18]:
 
 
 # split the data into trianing and testing sets
@@ -484,30 +484,15 @@ print("y training size", y_train.shape)
 print("y testing size", y_test.shape)
 
 
-# In[21]:
-
-
-# saving feature names
-meta_colnames, feat_colnames = split_meta_and_features(
-    fs_profile_df, compartments=compartments
-)
-all_feature_col_names = {
-    "meta_cols": meta_colnames,
-    "feature_cols": feat_colnames,
-}
-
-# save as a json file
-with open(data_split_dir / "feature_cols.json", mode="w") as f:
-    json.dump(all_feature_col_names, f)
-
-
-# In[22]:
+# In[19]:
 
 
 # save metadata after holdout
 cell_injury_metadata = fs_profile_df[fs_meta]
 cell_injury_metadata.to_csv(
-    data_split_dir / "cell_injury_metadata_after_holdout.csv.gz", compression="gzip"
+    data_split_dir / "cell_injury_metadata_after_holdout.csv.gz",
+    compression="gzip",
+    index=False,
 )
 
 # display
