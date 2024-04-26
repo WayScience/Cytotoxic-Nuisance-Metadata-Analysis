@@ -35,13 +35,13 @@ ggplot(pr_df, aes(x = recall, y = precision, color = shuffled)) +
     legend.key.size = unit(0.7, "lines"),
     legend.key.width = unit(1, "lines"),
     strip.text = element_text(size = 9.5),
-    axis.text.x = element_text(angle = 90, size = 12),
-    axis.text.y = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, size = 13),
+    axis.text.y = element_text(size = 13),
     axis.title = element_text(size = 14),
     axis.title.x.bottom = element_text(margin = margin(t = 15)),
     axis.title.y.left = element_text(margin = margin(t = 15)),
     legend.title = element_text(size = 14),
-    legend.text = element_text(size = 12)
+    legend.text = element_text(size = 13)
     ) +
 
  scale_color_manual(values = c(
@@ -91,19 +91,12 @@ ggplot(filtered_pr_df, aes(x = recall, y = precision)) +
         legend.box.spacing = unit(0.1, "cm"),
         legend.key.size = unit(0.7, "lines"),
         legend.key.width = unit(1, "lines"),
-        axis.text.x = element_text(angle = 90, size = 12),
-        strip.text = element_text(size = 12),
-        axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(angle = 90, size = 14),
+        axis.text.y = element_text(size = 14),
+        strip.text = element_text(size = 13),
         axis.title = element_text(size = 14),
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size = 12)) +
-
+        legend.title = element_text(size = 15),
+        legend.text = element_text(size = 14)) +
     labs(color = "Data Split", linetype = "Shuffled")
-
-
-    # scale_color_manual(values = c(
-    #   "Shuffled" = "#f8766d",
-    #   "Not Shuffled" = "#03bfc4"
-    # ))
 
 ggsave("only_test_train_pr_curve.png", width = width, height = height, dpi=600)

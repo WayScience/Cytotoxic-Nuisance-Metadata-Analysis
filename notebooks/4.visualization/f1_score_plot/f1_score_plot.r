@@ -32,7 +32,7 @@ ggplot(f1_df, aes(x = factor(dataset_type, levels = legend_order), y = f1_score,
         axis.text.y = element_text(hjust = 1, size = 14),
         legend.title = element_text(size = 15),
         legend.text = element_text(size = 14),
-        strip.text = element_text(size = 14),
+        strip.text = element_text(size = 13),
         axis.title.y = element_text(size = 14),
         axis.title.x = element_text(size = 14)
         ) +
