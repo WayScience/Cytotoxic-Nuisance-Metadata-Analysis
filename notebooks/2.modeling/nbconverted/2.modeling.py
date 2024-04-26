@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# # Module 2: Modeling
+#
+# In this notebook, we focus on developing and training a Multi-class logistic regression model, employing Randomized Cross-Validation (CV) for hyperparameter tuning to address our classification task. The dataset is split into an 80% training set and a 20% testing set. To evaluate the performance of our model during training, we used performance evaluation metrics such as precision, recall, and F1 scores. Additionally, we extend our evaluation by testing our model on a holdout dataset, which includes plate, treatment, and well information, providing a comprehensive assessment of its real-world performance.
+
 # In[1]:
 
 
@@ -14,6 +18,7 @@ import pandas as pd
 # import local modules
 sys.path.append("../../")
 from src.utils import (
+    check_feature_order,
     evaluate_model_performance,
     generate_confusion_matrix_tl,
     load_json_file,
@@ -31,16 +36,19 @@ np.random.seed(seed)
 
 # setting paths and parameters
 results_dir = pathlib.Path("../../results").resolve(strict=True)
+feature_dir = (results_dir / "0.feature_selection/").resolve(strict=True)
 data_splits_dir = (results_dir / "1.data_splits").resolve(strict=True)
-
-# setting path for training dataset
-training_dataset_path = (data_splits_dir / "training_data.csv.gz").resolve(strict=True)
 
 # test and train data paths
 X_train_path = (data_splits_dir / "X_train.csv.gz").resolve(strict=True)
 X_test_path = (data_splits_dir / "X_test.csv.gz").resolve(strict=True)
 y_train_path = (data_splits_dir / "y_train.csv.gz").resolve(strict=True)
 y_test_path = (data_splits_dir / "y_test.csv.gz").resolve(strict=True)
+
+# shared feature space path
+feature_space_path = (feature_dir / "cell_injury_shared_feature_space.json").resolve(
+    strict=True
+)
 
 # holdout paths
 plate_holdout_path = (data_splits_dir / "plate_holdout.csv.gz").resolve(strict=True)
@@ -62,6 +70,7 @@ modeling_dir.mkdir(exist_ok=True)
 # - **tol**: Tolerance for the stopping criterion during optimization. It represents the minimum change in coefficients between iterations that indicates convergence.
 # - **l1_ratio**: The mixing parameter for elastic net regularization. It determines the balance between L1 and L2 penalties in the regularization term. A value of 1 corresponds to pure L1 (Lasso) penalty, while a value of 0 corresponds to pure L2 (Ridge) penalty
 # - **solver**: Optimization algorithms to be explored during hyperparameter tuning for logistic regression
+#
 
 # In[3]:
 
@@ -78,12 +87,17 @@ param_grid = {
 
 
 # Loading training data splits
+#
 
 # In[4]:
 
 
 # loading injury codes
-injury_codes = load_json_file(data_splits_dir / "injury_codes.json")
+injury_codes = load_json_file(feature_dir / "injury_codes.json")
+
+# load share feature space data
+feature_space = load_json_file(feature_space_path)
+shared_features = feature_space["features"]
 
 # loading training data splits
 X_train = pd.read_csv(X_train_path)
@@ -91,8 +105,14 @@ X_test = pd.read_csv(X_test_path)
 y_train = pd.read_csv(y_train_path)
 y_test = pd.read_csv(y_test_path)
 
+
 # spliting meta and feature column names
 _, feat_cols = split_meta_and_features(X_train)
+
+# checking if the feature space are identical (also looks for feature space order)
+assert check_feature_order(
+    ref_feat_order=shared_features, input_feat_order=X_test.columns.tolist()
+), "Feature space are not identical"
 
 # display data split sizes
 print("X training size", X_train.shape)
@@ -163,7 +183,7 @@ shuffled_X_train = shuffle_features(X_train.values, seed=seed)
 shuffled_model_path = modeling_dir / "shuffled_multi_class_model.joblib"
 
 # if trained model exists, skip training
-if model_path.exists():
+if shuffled_model_path.exists():
     shuffled_best_model = joblib.load(shuffled_model_path)
 
 # train model and save
@@ -211,8 +231,10 @@ shuffled_cm_test_df = generate_confusion_matrix_tl(
 
 
 # ## Evaluating Multi-class model with holdout data
+#
 
 # Loading in all the hold out data
+#
 
 # In[12]:
 
@@ -234,6 +256,7 @@ y_well_holdout = well_holdout_df["injury_code"]
 
 
 # ### Evaluating Multi-class model trained with original split with holdout data
+#
 
 # In[13]:
 
@@ -351,6 +374,7 @@ shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
 
 
 # Storing all f1 and pr scores
+#
 
 # In[15]:
 
@@ -413,12 +437,6 @@ all_pr_scores.to_csv(
 
 
 # In[17]:
-
-
-all_pr_scores["dataset_type"].unique()
-
-
-# In[18]:
 
 
 all_cm_dfs = pd.concat(
