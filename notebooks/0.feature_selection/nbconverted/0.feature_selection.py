@@ -45,7 +45,11 @@ screen_anno_path = (data_dir / "idr0133-screenA-annotation.csv.gz").resolve(stri
 
 # load data
 image_profile_df = pd.read_csv(screen_anno_path)
-meta_df = image_profile_df[image_profile_df.columns[:31]]
+
+# spit columns and only get metadata dataframe
+meta, feature = utils.split_meta_and_features(image_profile_df)
+meta_df = image_profile_df[meta]
+
 compounds_df = meta_df[["Compound Name", "Compound Class"]]
 
 suppl_meta_df = pd.read_csv(suppl_meta_path)
@@ -127,8 +131,8 @@ jump_feats = set(jump_feature_space["features"])
 # find shared features and create data frame
 shared_features = list(jump_feats.intersection(set(injury_feats)))
 shared_features_df = pd.concat(
-    [injured_df[injury_meta], injured_df[shared_features]], axis=1
-).fillna(0)
+    [injured_df[injury_meta], injured_df[shared_features].fillna(0)], axis=1
+)
 
 # split meta and feature column
 shared_meta, shared_feats = utils.split_meta_and_features(shared_features_df)
@@ -204,7 +208,7 @@ fs_injury_df.to_csv(
 
 # Save feature space information while maintaining feature space order
 
-# In[8]:
+# In[ ]:
 
 
 # split meta and feature column names
