@@ -268,7 +268,7 @@ def calculate_multi_class_pr_curve(
 
     # loading in injury_codes
     injury_code_path = (
-        PROJECT_DIR_PATH / "results/1.data_splits/injury_codes.json"
+        PROJECT_DIR_PATH / "results/0.feature_selection/injury_codes.json"
     ).resolve(strict=True)
     injury_codes = load_json_file(injury_code_path)["decoder"]
 
@@ -326,7 +326,7 @@ def calculate_multi_class_f1score(
 
     # loading injury codes
     injury_code_path = (
-        PROJECT_DIR_PATH / "results/1.data_splits/injury_codes.json"
+        PROJECT_DIR_PATH / "results/0.feature_selection/injury_codes.json"
     ).resolve(strict=True)
     injury_codes = load_json_file(injury_code_path)["decoder"]
 
@@ -395,7 +395,7 @@ def generate_confusion_matrix_tl(
 
     # loading in injury_codes
     injury_code_path = (
-        PROJECT_DIR_PATH / "results/1.data_splits/injury_codes.json"
+        PROJECT_DIR_PATH / "results/0.feature_selection/injury_codes.json"
     ).resolve(strict=True)
     injury_codes = load_json_file(injury_code_path)["decoder"]
 
