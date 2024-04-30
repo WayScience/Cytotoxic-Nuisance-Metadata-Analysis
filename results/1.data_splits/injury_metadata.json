@@ -547,7 +547,7 @@
     },
     "Miscellaneous": {
         "n_plates": 52,
-        "n_wells": 1302,
+        "n_wells": 1304,
         "n_treatments": 39,
         "associated_plates": [
             "BR00110367",
@@ -622,7 +622,7 @@
             "DZNep": 24,
             "Emetine": 24,
             "Fisetin": 24,
-            "Gliotoxin": 23,
+            "Gliotoxin": 24,
             "Kenpaullone": 24,
             "L-Buthionine-(S,R)-sulfoximine": 48,
             "MIM1": 24,
@@ -632,7 +632,7 @@
             "Perifosine": 48,
             "Piceatannol": 24,
             "Pristimerin": 48,
-            "Puromycin": 103,
+            "Puromycin": 104,
             "Pyrogallol": 24,
             "Quercetin": 24,
             "RRx-001": 24,

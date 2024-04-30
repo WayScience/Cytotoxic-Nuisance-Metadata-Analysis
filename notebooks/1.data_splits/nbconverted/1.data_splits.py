@@ -2,9 +2,9 @@
 # coding: utf-8
 
 # # Spliting Data
-# Here, we utilize the feature-selected profiles generated in the preceding module notebook [here](../0.freature_selection/), focusing on dividing the data into training, testing, and holdout sets for machine learning training.
+# Here, we utilize the feature-selected profiles generated in the preceding module notebook [here](../0.feature_selection/0.feature_selection.ipynb), focusing on dividing the data into training, testing, and holdout sets for machine learning training.
 
-# In[24]:
+# In[1]:
 
 
 import json
@@ -33,7 +33,6 @@ warnings.catch_warnings(action="ignore")
 # setting seed constants
 seed = 0
 np.random.seed(seed)
-compartments = ["Cells", "Cytoplasm", "Nuclei"]
 
 # directory to get all the inputs for this notebook
 data_dir = pathlib.Path("../../data").resolve(strict=True)
@@ -55,7 +54,7 @@ fs_profile_path = (fs_dir / "cell_injury_profile_fs.csv.gz").resolve(strict=True
 fs_profile_df = pd.read_csv(fs_profile_path)
 
 # splitting meta and feature column names
-fs_meta, fs_feats = split_meta_and_features(fs_profile_df, compartments=compartments)
+fs_meta, fs_feats = split_meta_and_features(fs_profile_df)
 
 # display
 print("fs profile with control: ", fs_profile_df.shape)
@@ -118,8 +117,6 @@ print("shape:", injury_meta_df.shape)
 injury_meta_df
 
 
-# > Barchart showing the number of wells that are labeled with a given injury
-
 # Next, we construct the profile metadata. This provides a structured overview of how the treatments assicoated with injuries were applied, detailing the treatments administered to each plate.
 #
 # This will be saved in the `results/0.data_splits` directory
@@ -175,51 +172,8 @@ for plate_id, df in fs_profile_df.groupby("Plate"):
     plate_meta[plate_id] = treatment_counter
 
 # save dictionary into a json file
-with open(data_split_dir / "plate_info.json", mode="w") as stream:
+with open(data_split_dir / "cell_injury_plate_info.json", mode="w") as stream:
     json.dump(plate_meta, stream)
-
-
-# Set numerical labels for the treatment
-
-# In[9]:
-
-
-# creating a dictionary that contains the numeric-encoded labels and write out as json file
-main_labeler = {}
-injury_labels_encoder = {
-    name: idx for idx, name in enumerate(fs_profile_df["injury_type"].unique().tolist())
-}
-injury_labels_decoder = {
-    idx: name for idx, name in enumerate(fs_profile_df["injury_type"].unique().tolist())
-}
-main_labeler["encoder"] = injury_labels_encoder
-main_labeler["decoder"] = injury_labels_decoder
-
-# write out as json file
-with open(data_split_dir / "injury_codes.json", mode="w") as file_buffer:
-    json.dump(main_labeler, file_buffer)
-
-# display main_labeler
-main_labeler
-
-
-# Now that we have assigned numerical labels to each type of cell injury, we can replace the corresponding injury names with these numerical values to meet the requirements of machine learning algorithms.
-
-# In[10]:
-
-
-# updating main dataframe with numerical labels that represents cell injury
-# this will be saved as an "injury_code"
-injury_code = fs_profile_df["injury_type"].apply(
-    lambda injury: injury_labels_encoder[injury]
-)
-
-# add the injury code into the main data set
-fs_profile_df.insert(0, "injury_code", injury_code)
-
-# # display new injury column
-print(fs_profile_df["injury_type"].unique())
-print(fs_profile_df["injury_code"].unique())
 
 
 # ## Data Splitting
@@ -241,7 +195,7 @@ print(fs_profile_df["injury_code"].unique())
 #
 # Plates are randomly selected based on their Plate ID and save them as our `plate_holdout` data.
 
-# In[11]:
+# In[9]:
 
 
 # plate
@@ -288,7 +242,7 @@ plate_holdout_df.head()
 #
 # Once the cell injuries are identified for treatment holdout, we select our holdout treatment by grouping each injury type and choosing the treatment with the fewest wells. This becomes our treatment holdout dataset.
 
-# In[12]:
+# In[10]:
 
 
 injury_treatment_metadata = (
@@ -299,7 +253,7 @@ injury_treatment_metadata = (
 injury_treatment_metadata
 
 
-# In[13]:
+# In[11]:
 
 
 # setting random seed
@@ -333,7 +287,7 @@ print("Below are the accepted cell injuries and treatments to be held out")
 selected_treatments_to_holdout
 
 
-# In[14]:
+# In[12]:
 
 
 # select all wells that have the treatments to be heldout
@@ -367,7 +321,7 @@ treatment_holdout_df.head()
 #
 # To generate the well hold out data, each plate was iterated and random wells were selected. However, an additional step was condcuting which was to seperate the control wells and the treated wells, due to the large label imbalance with the controls. Therefore, 5 wells were randomly selected and 10 wells were randomly selected from each individual plate
 
-# In[15]:
+# In[13]:
 
 
 # parameters
@@ -423,7 +377,7 @@ wells_heldout_df.head()
 
 # Once the data holdout has been generated, the next step is to save the training dataset that will serve as the basis for training the multi-class logistic regression model.
 
-# In[16]:
+# In[14]:
 
 
 # Showing the amount of data we have after removing the holdout data
@@ -450,7 +404,7 @@ injury_meta_df = pd.DataFrame(
 injury_meta_df
 
 
-# In[17]:
+# In[15]:
 
 
 # shape of the update training and testing dataset after removing holdout
@@ -458,7 +412,7 @@ print("training shape after removing holdouts", fs_profile_df.shape)
 fs_profile_df.head()
 
 
-# In[29]:
+# In[16]:
 
 
 # split the data into trianing and testing sets
@@ -484,30 +438,15 @@ print("y training size", y_train.shape)
 print("y testing size", y_test.shape)
 
 
-# In[21]:
-
-
-# saving feature names
-meta_colnames, feat_colnames = split_meta_and_features(
-    fs_profile_df, compartments=compartments
-)
-all_feature_col_names = {
-    "meta_cols": meta_colnames,
-    "feature_cols": feat_colnames,
-}
-
-# save as a json file
-with open(data_split_dir / "feature_cols.json", mode="w") as f:
-    json.dump(all_feature_col_names, f)
-
-
-# In[22]:
+# In[17]:
 
 
 # save metadata after holdout
 cell_injury_metadata = fs_profile_df[fs_meta]
 cell_injury_metadata.to_csv(
-    data_split_dir / "cell_injury_metadata_after_holdout.csv.gz", compression="gzip"
+    data_split_dir / "cell_injury_metadata_after_holdout.csv.gz",
+    compression="gzip",
+    index=False,
 )
 
 # display
