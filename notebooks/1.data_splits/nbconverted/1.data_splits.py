@@ -117,8 +117,6 @@ print("shape:", injury_meta_df.shape)
 injury_meta_df
 
 
-# > Barchart showing the number of wells that are labeled with a given injury
-
 # Next, we construct the profile metadata. This provides a structured overview of how the treatments assicoated with injuries were applied, detailing the treatments administered to each plate.
 #
 # This will be saved in the `results/0.data_splits` directory
