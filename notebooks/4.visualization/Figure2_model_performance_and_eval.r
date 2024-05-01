@@ -276,7 +276,7 @@ probabilities_ridge_plot
 
 # plot dims
 height = 17
-width = 17
+width = 25
 
 options(repr.plot.width=width, repr.plot.height=height, units = "cm", dpi = 600)
 
@@ -297,9 +297,9 @@ fig2 <- (
 ) + plot_annotation(tag_levels = "A") + plot_layout(heights = c(3, 3))
 
 
-# Adjust layout and appearance (optional)
-combined_plot <- combined_plot +
-  plot_layout(ncol = 2, nrow = 2, byrow = TRUE)  # Adjust the grid layout as needed
+# # Adjust layout and appearance (optional)
+# combined_plot <- combined_plot +
+#   plot_layout(ncol = 2, nrow = 2, byrow = TRUE)  # Adjust the grid layout as needed
 
 # Display the combined plot
 fig2
