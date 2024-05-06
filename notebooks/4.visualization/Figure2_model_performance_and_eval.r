@@ -79,7 +79,7 @@ confusion_matrix_plot <- (
     + theme(
         legend.title =  element_text(size = 14, margin = margin(b = 10)),
         legend.text = element_text(size = 10),
-        strip.text = element_text(size = 12),
+        strip.text = element_text(size = 11.5),
         axis.text.x = element_text(angle = 90, hjust = 1, size = 11),
         axis.title.x.bottom = element_text(size = 14),
         axis.title.y.left = element_text(size = 14)
@@ -108,7 +108,9 @@ overlapping_confusion_matrix_plot <- (
     + ylab("True Class")
     + xlab("Predicted Class")
     + theme(strip.text = element_text(size = 12))
-    + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    + theme(axis.text.x = element_text(size = 14, angle = 90, hjust = 1),
+            axis.text.y = element_text(size = 14),
+    )
     + ggplot2::coord_fixed()
 )
 
@@ -154,8 +156,8 @@ dataset_order <- c("Train", "Test", "Plate Holdout", "Treatment Holdout", "Well 
 pr_df$dataset_type <- factor(pr_df$dataset_type, levels = dataset_order)
 
 # Set plot dimensions
-width <- 23
-height <- 12
+width <- 15
+height <- 5
 options(repr.plot.width = width, repr.plot.height = height)
 
 # Create the plot
@@ -169,12 +171,12 @@ pr_curve_plot_all <- ggplot(pr_df, aes(x = recall, y = precision, color = shuffl
     legend.box.spacing = unit(0.1, "cm"),
     legend.key.size = unit(0.7, "lines"),
     legend.key.width = unit(1, "lines"),
-    strip.text = element_text(size = 9.5),
-    axis.text.x = element_text(angle = 90, size = 13),
-    axis.text.y = element_text(size = 13),
+    strip.text = element_text(size = 8),
+    axis.text.x = element_text(angle = 90, size = 12),
+    axis.text.y = element_text(size = 12),
     axis.title = element_text(size = 14),
     axis.title.x.bottom = element_text(margin = margin(t = 15)),
-    axis.title.y.left = element_text(margin = margin(t = 15)),
+    axis.title.y.left = element_text(margin = margin(l = 15)),
     legend.title = element_text(size = 14),
     legend.text = element_text(size = 13)
     ) +
@@ -184,7 +186,10 @@ pr_curve_plot_all <- ggplot(pr_df, aes(x = recall, y = precision, color = shuffl
       "Not Shuffled" = "#03bfc4"
     )) +
 
-labs(x = "Recall", y = "Precision", linetype = "Shuffled", color = "Shuffled")
+
+labs(x = "Recall", y = "Precision", linetype = "Shuffled", color = "Shuffled") +
+
+coord_fixed()
 
 # Save the plot
 ggsave("figures/full_pr_curves.png", width = width, height = height, dpi = 600)
@@ -234,7 +239,7 @@ ggsave("figures/only_test_train_pr_curve.png", width = width, height = height, d
 pr_curve_plot_train_test
 
 # image size
-img_height <- 10
+img_height <- 15
 img_width <- 15
 
 options(repr.plot.width = img_width, repr.plot.height = img_height)
@@ -274,14 +279,14 @@ probabilities_ridge_plot <- (
 ggsave(filename = "figures/JUMP_cell_injury_facet_proba.png", height = img_height, width = img_width, dpi=600)
 probabilities_ridge_plot
 
-# plot dims
+# Define plot dimensions
 height = 20
 width = 25
 
 options(repr.plot.width=width, repr.plot.height=height, units = "cm", dpi = 600)
 
 # Combine plots using patchwork
-top_plot<- (
+top_plot <- (
   wrap_elements(full = pr_curve_plot_train_test) |
   f1_bar_plot
 ) + plot_layout(widths = c(2, 2))
@@ -291,13 +296,23 @@ bottom_plot <- (
   probabilities_ridge_plot
 )
 
+# Combine top and bottom plots
 fig2 <- (
   top_plot /
   bottom_plot
-) + plot_annotation(tag_levels = "A") + plot_layout(heights = c(3, 3))
+) + plot_annotation(tag_levels = "A") + plot_layout(heights = c(4, 4))
 
+# Adjust the margins of the bottom right plot (probabilities_ridge_plot)
+fig2 <- fig2 + plot_annotation( tag_levels = "A")
 
 # Display the combined plot
 fig2
 
-ggsave(plot = fig2, filename = "Figure2_model_performance_and_JUMP.png", height = height, width = width, dpi=600)
+# Save the plot
+ggsave(
+  plot = fig2,
+  filename = "Figure2_model_performance_and_JUMP.png",
+  height = height,
+  width = width,
+  dpi = 600
+)
