@@ -282,7 +282,7 @@ options(repr.plot.width=width, repr.plot.height=height, units = "cm", dpi = 600)
 
 # Combine plots using patchwork
 top_plot<- (
-  pr_curve_plot_train_test |
+  wrap_elements(full = pr_curve_plot_train_test) |
   f1_bar_plot
 ) + plot_layout(widths = c(2, 2))
 
