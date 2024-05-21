@@ -339,14 +339,14 @@ def calculate_multi_class_f1score(
 
     # calculate f1 score per injust and weighted scores across all injuries
     scores = f1_score(y, y_pred, average=None, labels=injury_labels, zero_division=0)
-    weighted_score = f1_score(
-        y, y_pred, average="weighted", labels=injury_labels, zero_division=0
-    )
+    # weighted_score = f1_score(
+    #     y, y_pred, average="weighted", labels=injury_labels, zero_division=0
+    # )
 
     # add scores into a data frame
     scores = pd.DataFrame(scores).transpose()
     scores.columns = injury_types
-    scores["weighted"] = weighted_score
+    # scores["weighted"] = weighted_score
     scores = scores.transpose().reset_index()
     scores.columns = ["injury_type", "f1_score"]
 
