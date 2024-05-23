@@ -1,0 +1,16 @@
+injury_type,injury_code,n_wells,n_compounds,compound_list
+Control,0,9855,1,['DMSO']
+Cytoskeletal,1,1472,15,"['Nocodazole', 'Colchicine', 'Paclitaxel', 'Vinblastine', 'Ispinesib', 'ARQ 621', 'SB-743921', 'Epothilone B', 'Cytochalasin B', 'Monastrol', 'Cytochalasin D', 'Latrunculin B', 'Citrinin', 'Podophyllotoxin', 'Citreoviridin']"
+Miscellaneous,5,1304,39,"['L-Buthionine-(S,R)-sulfoximine', 'CDDO Im', 'Cinobufagin', 'Puromycin', 'Brefeldin A', 'Tetrandrine', 'Pristimerin', 'Perifosine', 'Chloroquine', 'Niclosamide', 'Withaferin A', 'Bay 11-7821', 'Chelerythrine', 'UMI-77', 'MIM1', 'Chaetocin', 'Fisetin', 'Emetine', 'DZNep', 'BSI-201', 'Quercetin', 'Bruceine A', 'trans-Resveratrol', 'Aloisine RP106', 'Cycloheximide', 'Kenpaullone', 'Aurintricarboxylic acid', 'Gliotoxin', 'MitoPQ', 'Streptozotocin', 'cis-Resveratrol', 'Piceatannol', 'Tert-butylhydroquinone', 'Pyrogallol', 'RRx-001', 'Beauvericin', 'Ochratoxin A', 'Cantharidin', 'Cercosporin']"
+Kinase,3,1104,13,"['Wortmannin', 'Staurosporine', 'PI-103', 'BEZ-235', 'AZD 1152-HQPA', 'Saracatinib', 'PKC 412', 'Lestaurtinib', 'Dasatinib', 'LY294002', 'Sorafenib', 'KW 2449', 'Sunitinib']"
+Genotoxin,4,944,22,"['Camptothecin', 'CX-5461', 'Doxorubicin', 'Cladribine', 'Etoposide', 'Aphidicolin', 'Gemcitabine', 'Cisplatin', 'Oxaliplatin', 'Carboplatin', 'Dacarbazine', 'Lomustine', 'SN-38', 'Decitabine', 'Busulfan', 'Irinotecan', 'Chlorambucil', 'Thio-TEPA', 'Carmustine', 'Melphalan', 'Cyclophosphamide', 'β-Amanitin']"
+Hsp90,2,552,3,"['Radicicol', 'Geldanamycin', '17-AAG']"
+Redox,6,312,12,"['Menadione', 'PKF118-310', '4-Amino-1-naphthol (HCl)', 'Dunnione', 'MGR2', 'SIN-1 (chloride)', 'AAPH', 'MGR1', 'Phenazine (methosulfate)', 'DA-3003-2', 'IT-901', 'DMNQ']"
+Saponin,10,288,11,"['Digitonin', 'Saikosaponin A', 'Polygalasaponin F', 'Bacopasaponin C', 'Pulsatilla Saponin D', 'Hederacoside C', 'Glycyrrhizic acid', 'Platycodin D', 'Onjisaponin B', 'Ginsenoside Ro', 'Protodioscin']"
+HDAC,7,168,5,"['AR-42', 'SAHA', 'ITF 2357', 'Panobinostat', 'Apicidin']"
+Mitochondria,11,144,4,"['Antimycin A', 'CCCP', 'Rotenone', 'Oligomycin A']"
+Proteasome,9,144,4,"['Carfilzomib', 'Bortezomib', '(S)-MG132', '(R)-MG132']"
+Nonspecific reactive,14,128,6,"[nan, 'Ebselen', 'IPA-3', '2-Tert-butyl-1,4-benzoquinone', '2-Chloro-1,4-naphthoquinone', 'Ebselen oxide']"
+Ferroptosis,12,96,4,"['ML-162', 'ML-210', '(1S,3R)-RSL3', 'Erastin']"
+Tannin,13,96,4,"['Gallotannin', 'Corilagin', 'Chebulagic acid', 'Punicalagin']"
+mTOR,8,96,2,"['Torin 1', 'Rapamycin']"

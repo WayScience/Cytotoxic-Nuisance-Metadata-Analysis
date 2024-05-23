@@ -566,3 +566,43 @@ def evaluate_model_performance(
             model=model, X=X, y=y, shuffled=shuffled, dataset_type=dataset_type
         ),
     )
+
+
+# this needs to be a function
+def get_injury_treatment_info(profile: pd.DataFrame, groupby_key: str):
+    # checking
+    if not isinstance(profile, pd.DataFrame):
+        raise TypeError("'profile' must be a pandas data frame object")
+    if not isinstance(groupby_key, str):
+        raise TypeError("'groupby_key' ust be a string")
+    if groupby_key not in profile.columns.tolist():
+        raise ValueError("'grouby_key' column does not in data frame column")
+
+    # Showing the amount of data we have after removing the holdout data
+    meta_injury = []
+    for injury_type, df in profile.groupby("injury_type"):
+        # extract n_wells, n_compounds and unique compounds per injury_type
+        n_wells = df.shape[0]
+        injury_code = df["injury_code"].unique()[0]
+        unique_compounds = list(df["Compound Name"].unique())
+        n_compounds = len(unique_compounds)
+
+        # store information
+        meta_injury.append(
+            [injury_type, injury_code, n_wells, n_compounds, unique_compounds]
+        )
+
+    # creating data frame
+    injury_meta_df = pd.DataFrame(
+        meta_injury,
+        columns=[
+            "injury_type",
+            "injury_code",
+            "n_wells",
+            "n_compounds",
+            "compound_list",
+        ],
+    ).sort_values("n_wells", ascending=False)
+
+    # display
+    return injury_meta_df

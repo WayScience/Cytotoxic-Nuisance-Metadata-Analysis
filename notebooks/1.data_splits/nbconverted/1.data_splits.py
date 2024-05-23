@@ -17,7 +17,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 sys.path.append("../../")  # noqa
-from src.utils import split_meta_and_features  # noqa
+from src.utils import get_injury_treatment_info, split_meta_and_features  # noqa
 
 # ignoring warnings
 warnings.catch_warnings(action="ignore")
@@ -97,24 +97,17 @@ cell_injury_well_counts
 # In[6]:
 
 
-meta_injury = []
-for injury_type, df in fs_profile_df.groupby("injury_type"):
-    # extract n_wells, n_compounds and unique compounds per injury_type
-    n_wells = df.shape[0]
-    unique_compounds = list(df["Compound Name"].unique())
-    n_compounds = len(unique_compounds)
-
-    # store information
-    meta_injury.append([injury_type, n_wells, n_compounds, unique_compounds])
-
-injury_meta_df = pd.DataFrame(
-    meta_injury, columns=["injury_type", "n_wells", "n_compounds", "compound_list"]
-).sort_values("n_wells", ascending=False)
-injury_meta_df.to_csv(data_split_dir / "injury_well_counts_table.csv", index=False)
+# get summary information and save it
+injury_before_holdout_info_df = get_injury_treatment_info(
+    profile=fs_profile_df, groupby_key="injury_type"
+).reset_index(drop=True)
+injury_before_holdout_info_df.to_csv(
+    data_split_dir / "injury_data_summary_before_holdout.csv", index=False
+)
 
 # display
-print("shape:", injury_meta_df.shape)
-injury_meta_df
+print("Shape:", injury_before_holdout_info_df.shape)
+injury_before_holdout_info_df
 
 
 # Next, we construct the profile metadata. This provides a structured overview of how the treatments assicoated with injuries were applied, detailing the treatments administered to each plate.
@@ -380,28 +373,17 @@ wells_heldout_df.head()
 # In[14]:
 
 
-# Showing the amount of data we have after removing the holdout data
-meta_injury = []
-for injury_type, df in fs_profile_df.groupby("injury_type"):
-    # extract n_wells, n_compounds and unique compounds per injury_type
-    n_wells = df.shape[0]
-    injury_code = df["injury_code"].unique()[0]
-    unique_compounds = list(df["Compound Name"].unique())
-    n_compounds = len(unique_compounds)
-
-    # store information
-    meta_injury.append(
-        [injury_type, injury_code, n_wells, n_compounds, unique_compounds]
-    )
-
-# creating data frame
-injury_meta_df = pd.DataFrame(
-    meta_injury,
-    columns=["injury_type", "injury_code", "n_wells", "n_compounds", "compound_list"],
-).sort_values("n_wells", ascending=False)
+# get summary cell injury dataset treatment and well info after holdouts
+injury_after_holdout_info_df = get_injury_treatment_info(
+    profile=fs_profile_df, groupby_key="injury_type"
+)
+injury_after_holdout_info_df.to_csv(
+    data_split_dir / "injury_data_summary_after_holdout.csv", index=False
+)
 
 # display
-injury_meta_df
+print("shape:", injury_after_holdout_info_df.shape)
+injury_after_holdout_info_df
 
 
 # In[15]:
@@ -452,3 +434,54 @@ cell_injury_metadata.to_csv(
 # display
 print("Metadata shape", cell_injury_metadata.shape)
 cell_injury_metadata.head()
+
+
+# In[18]:
+
+
+get_injury_treatment_info(profile=fs_profile_df, groupby_key="injury_type")
+
+
+# In[19]:
+
+
+fs_profile_df[meta_cols]
+
+
+# In[20]:
+
+
+injury_train_info_df = get_injury_treatment_info(
+    profile=X_train.merge(
+        fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
+    )[meta_cols + feat_cols],
+    groupby_key="injury_type",
+)
+injury_test_info_df = get_injury_treatment_info(
+    profile=X_test.merge(
+        fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
+    )[meta_cols + feat_cols],
+    groupby_key="injury_type",
+)
+
+# save both files
+injury_train_info_df.to_csv(
+    data_split_dir / "injury_data_summary_train_split.csv", index=False
+)
+injury_test_info_df.to_csv(
+    data_split_dir / "injury_data_summary_test_split.csv", index=False
+)
+
+
+# In[21]:
+
+
+print("Showing summary data of train split")
+injury_train_info_df
+
+
+# In[22]:
+
+
+print("Showing summary data of test split")
+injury_test_info_df

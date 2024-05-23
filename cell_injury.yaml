@@ -9,4 +9,5 @@ dependencies:
   - pre-commit
   - ipykernel
   - requests
+  - dataframe_image
   - conda-forge::pycytominer==1.1.0
