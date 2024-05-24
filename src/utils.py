@@ -135,43 +135,52 @@ def drop_na_samples(
     return profile
 
 
-def shuffle_features(feature_vals: np.array, seed: Optional[int] = 0) -> np.array:
-    """Shuffles all values within feature space
+def shuffle_features(
+    profile: pd.DataFrame, features: list[str], seed: Optional[int] = 0
+) -> pd.DataFrame:
+    """Shuffles the feature space of the given profile. The shuffling process is done by independently
+    taking each feature, shuffling the values within the feature space, and updating the provided profile.
+    As a result, a DataFrame with a shuffled feature space is returned.
 
     Parameters
     ----------
-    feature_vals : np.array
-        Values to be shuffled.
+    profile : pd.DataFrame
+        DataFrame to be shuffled.
+
+    features : list[str]
+        List of features to select for shuffling
 
     seed : Optional[int]
         setting random seed
 
     Returns
     -------
-    np.array
-        Returns shuffled values within the feature space
+    pd.DataFrame
+        Returns shuffled values within the selected feature space
 
     Raises
     ------
     TypeError
-        Raised if a numpy array is not provided
+        Raised if a pandas DataFrame is not provded
+        Raised if a non-int value is provided for 'seed'
     """
-    # setting seed
-    np.random.seed(seed)
 
     # shuffle given array
-    if not isinstance(feature_vals, np.ndarray):
-        raise TypeError("'feature_vals' must be a numpy array")
-    if feature_vals.ndim != 2:
-        raise TypeError("'feature_vals' must be a 2x2 matrix")
+    if not isinstance(profile, pd.DataFrame):
+        raise TypeError("'feature_vals' must be a pandas DataFrame")
+    if not isinstance(seed, int):
+        raise TypeError("'seed' must be an int")
 
-    # shuffling feature space
-    n_cols = feature_vals.shape[1]
-    for col_idx in range(0, n_cols):
-        # selecting column, shuffle, and update:
-        feature_vals[:, col_idx] = np.random.permutation(feature_vals[:, col_idx])
+    # make a copy of the DataFrame to prevent over writing the original DataFrame
+    profile = profile.copy(deep=True)[features]
 
-    return feature_vals
+    # how shuffle everything per row
+    for col in profile.columns:
+        profile[col] = (
+            profile[col].sample(frac=1, random_state=seed).reset_index(drop=True)
+        )
+
+    return profile
 
 
 def train_multiclass(

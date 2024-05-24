@@ -173,7 +173,10 @@ cm_test_df = generate_confusion_matrix_tl(
 
 
 # shuffle feature space
-shuffled_X_train = shuffle_features(X_train.values, seed=seed)
+shuffled_X_train = shuffle_features(X_train, features=shared_features, seed=seed)
+
+# checking if the shuffled and original feature space are the same
+assert not X_train.equals(shuffled_X_train), "DataFrames are the same!"
 
 
 # In[9]:

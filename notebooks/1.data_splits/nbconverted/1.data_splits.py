@@ -439,18 +439,6 @@ cell_injury_metadata.head()
 # In[18]:
 
 
-get_injury_treatment_info(profile=fs_profile_df, groupby_key="injury_type")
-
-
-# In[19]:
-
-
-fs_profile_df[meta_cols]
-
-
-# In[20]:
-
-
 injury_train_info_df = get_injury_treatment_info(
     profile=X_train.merge(
         fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
@@ -473,14 +461,14 @@ injury_test_info_df.to_csv(
 )
 
 
-# In[21]:
+# In[19]:
 
 
 print("Showing summary data of train split")
 injury_train_info_df
 
 
-# In[22]:
+# In[20]:
 
 
 print("Showing summary data of test split")
