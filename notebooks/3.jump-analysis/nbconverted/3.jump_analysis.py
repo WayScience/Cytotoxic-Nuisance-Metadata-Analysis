@@ -115,10 +115,10 @@ jump_df.head()
 shared_jump_df = jump_df[shared_features]
 shared_jump_df = pd.concat([jump_df[jump_meta], shared_jump_df], axis=1)
 
-# split the features
+# # split the features
 shared_meta, shared_feats = split_meta_and_features(shared_jump_df, metadata_tag=True)
 
-# checking if the feature space are identical (also looks for feature space order)
+# # checking if the feature space are identical (also looks for feature space order)
 assert check_feature_order(
     ref_feat_order=shared_features, input_feat_order=shared_feats
 ), "Feature space are not identical"
@@ -161,19 +161,19 @@ shared_jump_df.to_csv(
 cell_injury_InChI_keys = cell_injury_meta_df["Compound InChIKey"].unique().tolist()
 jump_InChI_keys = shared_jump_df["Metadata_InChIKey"].unique().tolist()
 
-# identify common InChI Keys
+# # identify common InChI Keys
 common_compounds_inchikey = list(
     set(cell_injury_InChI_keys).intersection(jump_InChI_keys)
 )
 
-# identify the compounds and display
+# # identify the compounds and display in cell injury data
 overlapping_compounds_df = cell_injury_meta_df.loc[
     cell_injury_meta_df["Compound InChIKey"].isin(common_compounds_inchikey)
 ]
 unique_compound_names = overlapping_compounds_df["Compound Name"].unique().tolist()
 print("Identified overlapping compounds:", ", ".join(unique_compound_names))
 
-# now create a dataframe where it contains
+# now create a dataframe where it contains the injury code, name and injury type
 overlapping_compounds_df = (
     overlapping_compounds_df[
         ["injury_code", "injury_type", "Compound Name", "Compound InChIKey"]
@@ -208,7 +208,7 @@ shared_treat_jump_df = pd.merge(
 )
 
 # shared treatment jump df
-print("shape: ", shared_jump_df.shape)
+print("shape: ", shared_treat_jump_df.shape)
 shared_treat_jump_df.head()
 
 
@@ -245,47 +245,9 @@ well_counts_df.columns = [
 well_counts_df
 
 
-# Next, we wanted to examine the distribution of treatments across plates.
-
-# In[9]:
-
-
-# now lets look at the amount of wells have treatments and controls per plate
-n_well_treatments = {}
-for plate, df in shared_treat_jump_df.groupby("Metadata_Plate"):
-    treatment_counts = {}
-    for treatment, df2 in df.groupby("Metadata_InChIKey"):
-        counts = df2.shape[0]
-        treatment_counts[df2["Compound Name"].unique()[0]] = counts
-
-    n_well_treatments[plate] = treatment_counts
-
-# looking treatment distribution across each plate
-plate_treatments = (
-    pd.DataFrame.from_dict(n_well_treatments, orient="columns")
-    .T[["DMSO", "Colchicine", "Menadione", "Cycloheximide"]]
-    .fillna(0)
-    .astype(int)
-    .reset_index()
-)
-plate_treatments.columns = [
-    "plate_id",
-    "DMSO",
-    "Colchicine",
-    "Menadione",
-    "Cycloheximide",
-]
-
-# display
-print(
-    "Number of Plates that contain overlapping treatments:", plate_treatments.shape[0]
-)
-plate_treatments
-
-
 # Finally we save the shared_treaments_df as a csv.gz file.
 
-# In[10]:
+# In[9]:
 
 
 # save overlapping files
@@ -298,7 +260,7 @@ shared_treat_jump_df.to_csv(
 
 # ## Applying JUMP dataset to Multi-Class Logistics Regression Model
 
-# In[11]:
+# In[10]:
 
 
 # split the data
@@ -313,7 +275,7 @@ assert check_feature_order(
 ), "Feature space are not identical"
 
 
-# In[12]:
+# In[11]:
 
 
 # Loading in model
@@ -323,7 +285,7 @@ shuffled_model = joblib.load(modeling_dir / "shuffled_multi_class_model.joblib")
 
 # Here, we apply the JUMP dataset to the model to calculate the probabilities of each injury being present per well. These probabilities are then saved in a tidy long format suitable for plotting in R.
 
-# In[13]:
+# In[12]:
 
 
 # get all injury classes
@@ -337,7 +299,7 @@ shuffled_y_proba = shuffled_model.predict_proba(X)
 y_proba_df = pd.DataFrame(y_proba)
 shuffled_y_proba_df = pd.DataFrame(shuffled_y_proba)
 
-# update column names with injury type names
+# # update column names with injury type names
 y_proba_df.columns = [
     injury_codes["decoder"][str(colname)] for colname in y_proba_df.columns.tolist()
 ]
@@ -347,54 +309,40 @@ shuffled_y_proba_df.columns = [
     for colname in shuffled_y_proba_df.columns.tolist()
 ]
 
-# adding column if labels indicating if the prediction was done with a shuffled model
+# # # adding column if labels indicating if the prediction was done with a shuffled model
 y_proba_df.insert(0, "shuffled_model", False)
 shuffled_y_proba_df.insert(0, "shuffled_model", True)
 
-# merge InChIKey based on index, since order is retained
-# jump_df[aligned_meta_cols].merge(y_proba_df)
-y_proba_df = pd.merge(
-    shared_jump_df[aligned_meta_cols]["Metadata_InChIKey"].to_frame(),
-    y_proba_df,
-    left_index=True,
-    right_index=True,
-)
-shuffled_y_proba_df = pd.merge(
-    shared_jump_df[aligned_meta_cols]["Metadata_InChIKey"].to_frame(),
-    shuffled_y_proba_df,
-    left_index=True,
-    right_index=True,
-)
 
-# concat all probabilities into one dataframe
+# # # concat all probabilities into one dataframe
 all_probas_df = pd.concat([y_proba_df, shuffled_y_proba_df]).reset_index(drop=True)
 
-# Add a column to indicate the most probable injury
-# This is achieved by selecting the injury with the highest probability
+# # # Add a column to indicate the most probable injury
+# # This is achieved by selecting the injury with the highest probability
 all_probas_df.insert(
-    2,
+    0,
     "pred_injury",
     all_probas_df[injury_classes].apply(lambda row: row.idxmax(), axis=1),
 )
 
-# next is to convert the probabilities dataframe into tidy long
+# # # next is to convert the probabilities dataframe into tidy long
 all_probas_df_tl = pd.melt(
     all_probas_df,
-    id_vars=["Metadata_InChIKey", "shuffled_model", "pred_injury"],
+    id_vars=["shuffled_model", "pred_injury"],
     value_vars=injury_classes,
     var_name="injury_type",
     value_name="proba",
 )
 
-# save probabilities in tidy long format
+# # save probabilities in tidy long format
 all_probas_df_tl.to_csv(jump_analysis_dir / "JUMP_injury_proba.csv.gz", index=False)
-
 print("tidy long format probability shape", all_probas_df_tl.shape)
+all_probas_df_tl.head()
 
 
 # ## Generating Confusion Matrix
 
-# In[14]:
+# In[13]:
 
 
 shared_treat_meta, shared_treat_feats = split_meta_and_features(shared_treat_jump_df)
@@ -402,7 +350,7 @@ shared_X = shared_treat_jump_df[shared_treat_feats]
 shared_y = shared_treat_jump_df["injury_code"]
 
 
-# In[15]:
+# In[14]:
 
 
 jump_overlap_cm = generate_confusion_matrix_tl(
@@ -413,7 +361,7 @@ shuffled_jump_overlap_cm = generate_confusion_matrix_tl(
 ).fillna(0)
 
 
-# In[16]:
+# In[15]:
 
 
 # save confusion matrix
