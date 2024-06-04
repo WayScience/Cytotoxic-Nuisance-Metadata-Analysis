@@ -197,7 +197,7 @@ else:
     joblib.dump(shuffled_best_model, shuffled_model_path)
 
 
-# In[ ]:
+# In[10]:
 
 
 # evaluating shuffled model on train dataset
@@ -217,7 +217,7 @@ shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate_model_perf
 )
 
 
-# In[ ]:
+# In[11]:
 
 
 # creating confusion matrix for shuffled model
@@ -239,7 +239,7 @@ shuffled_cm_test_df = generate_confusion_matrix_tl(
 # Loading in all the hold out data
 #
 
-# In[ ]:
+# In[12]:
 
 
 # loading all holdouts
@@ -261,7 +261,7 @@ y_well_holdout = well_holdout_df["injury_code"]
 # ### Evaluating Multi-class model trained with original split with holdout data
 #
 
-# In[ ]:
+# In[13]:
 
 
 # evaluating plate holdout data with both trained original and shuffled model
@@ -324,7 +324,7 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
 )
 
 
-# In[ ]:
+# In[14]:
 
 
 # creating confusion matrix with plate holdout (shuffled and not shuffled)
@@ -379,7 +379,7 @@ shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
 # Storing all f1 and pr scores
 #
 
-# In[ ]:
+# In[15]:
 
 
 # storing all f1 scores
@@ -409,7 +409,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[ ]:
+# In[16]:
 
 
 # storing pr scores
@@ -439,7 +439,7 @@ all_pr_scores.to_csv(
 )
 
 
-# In[ ]:
+# In[17]:
 
 
 all_cm_dfs = pd.concat(
