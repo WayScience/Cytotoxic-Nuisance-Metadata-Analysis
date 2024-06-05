@@ -125,7 +125,7 @@ f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
 
 # Create the new column f1_label and add default values to x and y columns
 f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
-  mutate(f1_label = paste("F1 Score:\nTest:", test_f1_score, "\nTrain:", train_f1_score),
+  mutate(f1_label = paste("F1 score:\nTest:", test_f1_score, "\nTrain:", train_f1_score),
          x = 0.23,
          y = 0.78)
 
@@ -135,6 +135,10 @@ f1_scores_per_injury_df
 width <- 12
 height <- 12
 options(repr.plot.width = width, repr.plot.height = height)
+
+# Updating label names
+pr_f1_curve <- pr_f1_curve %>%
+  mutate(shuffled = ifelse(shuffled == "Not Shuffled", "Not shuffled", shuffled))
 
 # # original
 fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = precision)) +
@@ -148,13 +152,13 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
         legend.box.spacing = unit(0.1, "cm"),
         legend.key.size = unit(0.7, "lines"),
         legend.key.width = unit(1, "lines"),
-        axis.text.x = element_text(angle = 90, size = 16),
-        axis.text.y = element_text(size = 16),
+        axis.text.x = element_text(angle = 90, size = 20),
+        axis.text.y = element_text(size = 20),
         strip.text = element_text(size = 17),
         strip.text.x = element_text(margin = margin(t=0.2, b=0.2, r=0, l=0, "cm")),
-        axis.title = element_text(size = 17),
-        legend.title = element_text(size = 17),
-        legend.text = element_text(size = 17)) +
+        axis.title = element_text(size = 22),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 18)) +
 
   # adding labels within the facet
   # fig2_B_pr_curve_plot_train_test +
@@ -176,19 +180,24 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
       show.legend = FALSE  # Hide legend for this layer
     ) +
 
-    ggplot2::coord_fixed()
+    labs(linetype = "Model type", color = "Dataset split")
+
+    # ggplot2::coord_fixed()
 ggsave("figures/fig2_B_only_test_train_pr_curve.png", width = width, height = height, dpi=600)
 fig2_B_pr_curve_plot_train_test
 
 # creating final model confusion matrix with Non-shuffled data
 final_model_cm <- cm_df %>%
-  filter(shuffled_model == "Not Shuffled" & dataset_type %in% c("Train", "Test", "Plate Holdout", "Well Holdout"))
+  filter(shuffled_model == "Not Shuffled" & dataset_type %in% c("Train", "Test", "Plate Holdout", "Well Holdout")) %>%
+  mutate(
+    dataset_type = case_when(
+      dataset_type == "Plate Holdout" ~ "Plate holdout",
+      dataset_type == "Well Holdout" ~ "Well holdout",
+      TRUE ~ dataset_type
+    )
+  )
 
-# image size
-img_height <- 15
-img_width <- 15
-
-options(repr.plot.width = img_width, repr.plot.height = img_height)
+final_model_cm$dataset_type <- factor(final_model_cm$dataset_type, levels = c("Train", "Test", "Plate holdout", "Well holdout"))
 
 # Define the desired order of x-axis labels
 x_label_order <- c('Control', 'Cytoskeletal', 'Hsp90', 'Kinase', 'Genotoxin', 'Miscellaneous', 'Redox', 'HDAC', 'mTOR', 'Proteasome', 'Saponin', 'Mitochondria', 'Ferroptosis', 'Tannin', 'Nonspecific reactive')
@@ -197,16 +206,25 @@ x_label_order <- c('Control', 'Cytoskeletal', 'Hsp90', 'Kinase', 'Genotoxin', 'M
 final_model_cm$true_labels <- factor(final_model_cm$true_labels, levels = rev(unique(final_model_cm$true_labels)))
 final_model_cm$predicted_labels <- factor(final_model_cm$predicted_labels, levels = x_label_order)
 
+
+
+# image size
+img_height <- 15
+img_width <- 15
+
+options(repr.plot.width = img_width, repr.plot.height = img_height)
+
+
 # Now proceed with plotting
 fig2_C_final_model_cm <- (
     ggplot(final_model_cm, aes(x = predicted_labels, y = true_labels))
     + facet_wrap(~dataset_type)
     + geom_point(aes(color = recall), size = 10, shape = 15)
-    + geom_text(aes(label = count), size = 5)
+    + geom_text(aes(label = count), size = 6)
     + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1))
     + theme_bw()
-    + xlab("Predicted Class")
-    + ylab("True Class")
+    + xlab("Predicted class")
+    + ylab("True class")
     + theme(
         # legend settings
         legend.title =  element_text(size = 20, margin = margin(b = 20)),
@@ -218,7 +236,7 @@ fig2_C_final_model_cm <- (
         axis.title.x.bottom = element_text(size = 20),
         axis.title.y.left = element_text(size = 20)
         )
-    + ggplot2::coord_fixed()
+    # + ggplot2::coord_fixed()
 )
 
 # saving file
@@ -324,27 +342,30 @@ desired_order <- c("Other Injuries", "Cyto Injury", "Cyto JUMP Overlap")
 label_descriptions <- c(
   "Other Injuries" = "Cytoskeletal injury as not top\n predicted probability",
   "Cyto Injury" = "Cytoskeletal injury as top\n predicted probability",
-  "Cyto JUMP Overlap" = "Cytoskeletal Injury\n compound ground truth"
+  "Cyto JUMP Overlap" = "Cytoskeletal injury\n compound ground truth"
 )
 
 # Convert the 'injury' variable to factor with the desired order of levels
 cyto_proba_df$injury <- factor(cyto_proba_df$injury, levels = desired_order)
 
-img_height <- 10
-img_width <- 10
+# Updating label names
+cyto_proba_df <- cyto_proba_df %>%
+  mutate(shuffled = ifelse(shuffled == "Not Shuffled", "Not shuffled", shuffled))
+
+img_height <- 5
+img_width <- 12
 
 options(repr.plot.width = img_width, repr.plot.height = img_height)
 
 fig2_D_probabilities_ridge_plot <- (
   ggplot(cyto_proba_df, aes(x = Cytoskeletal, y = injury, fill = shuffled)) +
-  geom_density_ridges() +
-  coord_flip() +
+  geom_density_ridges(alpha = 0.6) +
+  # coord_flip() +
   theme_bw() +
   theme(
-    plot.title = element_text(size = 20, hjust = 0.5),
-    axis.text.x = element_text(size = 18, angle = 45, hjust = 1),
-    axis.text.y = element_text(size = 18),
-    axis.title = element_text(size = 20),
+    axis.text.x = element_text(size = 20, angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 20),
+    axis.title = element_text(size = 22),
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 20),
     legend.spacing.y = unit(0.1, "cm"),
@@ -354,12 +375,12 @@ fig2_D_probabilities_ridge_plot <- (
   ) +
   scale_fill_manual(values = c(
     "Shuffled" = "#f8766d",
-    "Not Shuffled" = "#03bfc4"
+    "Not shuffled" = "#03bfc4"
   )) +
   labs(
-    y = "Predicted Injuries",
-    x = "Cytoskeletal Injury Probability",
-    fill = "Model Type"
+    y = "Predicted injuries",
+    x = "Cytoskeletal injury probability",
+    fill = "Model type"
   ) +
    scale_y_discrete(labels = label_descriptions, expand = expansion(add = c(1, 0)))
 
@@ -369,23 +390,24 @@ ggsave(filename = "figures/fig2_D_JUMP_cyto_injury_probability_ridgeplot.png", h
 fig2_D_probabilities_ridge_plot
 
 # Define plot dimensions
-height = 25
+height = 35
 width = 35
 
 layout <- c(
     area(t=0, b=1, l=0, r=20), # A
-    area(t=2, b=3, l=0, r=8), # B
-    area(t=2, b=3, l=9, r=16), # C
-    area(t=2, b=3, l=17, r=20) # D
+    area(t=2, b=4, l=0, r=10), # B
+    area(t=2, b=4, l=11, r=20), # C
+    area(t=5, b=6, l=0, r=10), # D
+    area(t=5, b=6, l=11, r=20) # empty space
 )
 options(repr.plot.width=width, repr.plot.height=height, units = "in", dpi = 600)
 
 fig2 <- (
-    fig2_A_wf_image
-    # + wrap_elements(full = fig2_B_pr_curve_plot_train_test)
+    free(fig2_A_wf_image)
     + wrap_elements( full = fig2_B_pr_curve_plot_train_test)
-    + wrap_elements(full = fig2_C_final_model_cm)
-    + wrap_elements(full = fig2_D_probabilities_ridge_plot)
+    + free(fig2_C_final_model_cm)
+    + wrap_elements(fig2_D_probabilities_ridge_plot)
+    + plot_spacer()
 
     # plot layouts
     + plot_layout(design = layout, heights = c(1, 1, 0.1))
