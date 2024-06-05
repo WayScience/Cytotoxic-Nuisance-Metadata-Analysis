@@ -1,3 +1,5 @@
+suppressPackageStartupMessages(suppressWarnings(library(ggplotify))) # gg
+suppressPackageStartupMessages(suppressWarnings(library(cowplot))) # cowplot
 suppressPackageStartupMessages(suppressWarnings(library(lintr))) # linting
 suppressPackageStartupMessages(suppressWarnings(library(ggplot2))) # plotting
 suppressPackageStartupMessages(suppressWarnings(library(dplyr))) # data manipulation
@@ -35,6 +37,9 @@ pr_file_path <- file.path("../../results/2.modeling/precision_recall_scores.csv.
 # probability plot
 cyto_proba_path <- file.path("../../results/3.jump_analysis/cytoskeletal_proba_scores.csv.gz")
 
+# injiury porbabilities
+injury_proba_path = file.path("../../results/3.jump_analysis/all_injury_proba.csv.gz")
+
 # path to workflow image
 wf_image <- file.path("./figures/workflow_fig.png")
 
@@ -54,6 +59,8 @@ pr_df <- read.csv(pr_file_path)
 
 # loading probabilities
 cyto_proba_df <- read.csv(cyto_proba_path)
+
+all_injury_proba_df <- read.csv(injury_proba_path)
 
 # loading workflow image
 fig2_A_wf_image <- load_image(wf_image)
@@ -87,6 +94,12 @@ cyto_proba_df <- cyto_proba_df %>%
 ## Update the 'injury' column based on 'datatype' condition
 cyto_proba_df <- cyto_proba_df %>%
   mutate(injury = ifelse(datatype == "JUMP Overlap", "Cyto JUMP Overlap", injury))
+
+
+# Update injury proba columns
+all_injury_proba_df <- all_injury_proba_df %>%
+  mutate(shuffled = replace(shuffled, shuffled == "False", "Not shuffled"),
+         shuffled = replace(shuffled, shuffled == "True", "Shuffled"))
 
 fig2_A_wf_image
 
@@ -363,35 +376,163 @@ options(repr.plot.width = img_width, repr.plot.height = img_height)
 
 fig2_D_probabilities_ridge_plot <- (
   ggplot(cyto_proba_df, aes(x = Cytoskeletal, y = injury, fill = shuffled)) +
-  geom_density_ridges(alpha = 0.6) +
-  # coord_flip() +
-  theme_bw() +
-  theme(
-    axis.text.x = element_text(size = 20, angle = 45, hjust = 1),
-    axis.text.y = element_text(size = 20),
-    axis.title = element_text(size = 22),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 20),
-    legend.spacing.y = unit(0.1, "cm"),
-    legend.box.spacing = unit(0.2, "cm"),
-    legend.key.size = unit(0.7, "lines"),
-    legend.key.width = unit(1, "lines")
-  ) +
-  scale_fill_manual(values = c(
-    "Shuffled" = "#f8766d",
-    "Not shuffled" = "#03bfc4"
-  )) +
-  labs(
-    y = "Predicted injuries",
-    x = "Cytoskeletal injury probability",
-    fill = "Model type"
-  ) +
-   scale_y_discrete(labels = label_descriptions, expand = expansion(add = c(1, 0)))
+    geom_density_ridges(alpha = 0.6) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(size = 20, angle = 45, hjust = 1),
+      axis.text.y = element_text(size = 20),
+      axis.title = element_text(size = 22),
+      legend.title = element_text(size = 20),
+      legend.text = element_text(size = 20),
+      legend.spacing.y = unit(0.1, "cm"),
+      legend.box.spacing = unit(0.2, "cm"),
+      legend.key.size = unit(0.7, "lines"),
+      legend.key.width = unit(1, "lines")
+    ) +
+    scale_fill_manual(values = c(
+      "Shuffled" = "#f8766d",
+      "Not shuffled" = "#03bfc4"
+    )) +
+    labs(
+      y = "Predicted injuries",
+      x = "Cytoskeletal injury probability",
+      fill = "Model type"
+    ) +
+    scale_y_discrete(labels = label_descriptions, expand = expansion(add = c(1, 0)))
 
 )
 ggsave(filename = "figures/fig2_D_JUMP_cyto_injury_probability_ridgeplot.png", height = height, width = width, dpi = 600)
 
 fig2_D_probabilities_ridge_plot
+
+
+# Subset the dataframe to drop rows where datatype equals "JUMP Overlap"
+jump_proba_no_cyto <- subset(all_injury_proba_df, datatype != "JUMP Overlap")
+head(jump_proba_no_cyto)
+
+# Load the required libraries
+library(patchwork)
+
+# Define image dimensions
+img_height <- 5
+img_width <- 12
+
+# setting class order
+class_order <-  c('Control', 'Cytoskeletal', 'Hsp90', 'Kinase', 'Genotoxin', 'Miscellaneous', 'Redox', 'HDAC', 'mTOR', 'Proteasome', 'Saponin', 'Mitochondria', 'Ferroptosis', 'Tannin', 'Nonspecific reactive')
+
+# storing legend object
+legend_plot <- list()
+# storing plots
+ridge_plots_list <- list()
+
+
+# Loop through each class
+for (i in 1:length(class_order)) {
+  class <- class_order[i]
+
+  # Skip if the class is "Cytoskeletal" since it's in the panel
+  if (class == "Cytoskeletal") {
+    next  # Skip to the next iteration of the loop
+  }
+
+  # Sub-dataframe for equal pred_injury and injury_compared_to
+  # Add a column indicating the rows are matched and rename it to "label"
+  equal_df <- jump_proba_no_cyto[jump_proba_no_cyto$pred_injury == class & jump_proba_no_cyto$injury_compared_to == class, ]
+  equal_df <- equal_df %>%
+    mutate(label = "Wells predicted\nas selected injury")
+
+  # Sub-dataframe for not equal pred_injury and injury_compared_to
+  # Add a column indicating the rows are not matched and rename it to "label"
+  not_equal_df <- jump_proba_no_cyto[jump_proba_no_cyto$injury_compared_to == class & jump_proba_no_cyto$pred_injury != class, ]
+  not_equal_df <- not_equal_df %>%
+    mutate(label = "Wells not predicted\nas selected injury")
+
+  # Concatenate the two dataframes after rearranging the rows
+  concatenated_class_df <- rbind(equal_df, not_equal_df)
+
+  # Count index per class
+  index_count <- sum(jump_proba_no_cyto$pred_injury == class & jump_proba_no_cyto$injury_compared_to == class) +
+                 sum(jump_proba_no_cyto$injury_compared_to == class & jump_proba_no_cyto$pred_injury != class)
+
+  # Create ridge plot for the concatenated dataframe
+  ridge_plot <- ggplot(concatenated_class_df, aes(x = proba, y = label, fill = shuffled)) +
+    geom_density_ridges(alpha = 0.6) +
+    theme_bw() +
+    labs(title= paste(class, "injury probability"),  fill = "Model type: ") +
+    theme(
+      axis.title.x = element_blank(),
+      axis.text.x = element_text(size = 20),
+      # axis.text.x = element_text(size = 20, angle = 45, hjust = 1),
+      axis.text.y = element_text(size = 20),
+      axis.title = element_text(size = 22),
+      axis.title.y = element_blank(),
+      plot.title = element_text(size = 20, hjust = 0.5),
+      legend.title = element_text(size = 20),
+      legend.text = element_text(size = 20),
+      legend.spacing.y = unit(0.1, "cm"),
+      legend.box.spacing = unit(0.2, "cm"),
+      legend.key.size = unit(0.7, "lines"),
+      legend.key.width = unit(1, "lines"),
+      legend.position = "none"
+    ) +
+    scale_fill_manual(values = c(
+      "Shuffled" = "#f8766d",
+      "Not shuffled" = "#03bfc4"
+    )) +
+    scale_x_continuous(breaks = seq(0, 1, by = 0.25))
+
+  # add margin top of title except for the last two
+  if (i != 14 && i != 15) {
+    ridge_plot <- ridge_plot + theme(
+      plot.title = element_text(hjust = 0.5, margin = margin(t = 20))
+    )
+  }
+
+  # remove x label ticks of if not these indexes
+  if (!(i %in% c(13, 14, 15))) {
+    ridge_plot <- ridge_plot + theme(axis.text.x = element_blank())
+  }
+
+  # remove y label ticks if not these indexes
+  if (!(i %in% c(1, 5, 8, 11, 14))) {
+    ridge_plot <- ridge_plot + theme(axis.text.y = element_blank())
+  }
+
+  # add legend on the last subplot
+  if (i == 15) {
+    ridge_plot <- ridge_plot + theme(legend.position = "bottom",
+                                     legend.title = element_text(size = 30),
+                                     legend.text = element_text(size = 25),
+                                     legend.margin = margin(t = 25)
+                                     )
+  }
+
+  # storing plots
+  ridge_plots_list[[class]] <- ridge_plot
+}
+
+img_height <- 25
+img_width <- 20
+
+options(repr.plot.width = img_width, repr.plot.height = img_height)
+
+# # Create an empty plot for the last empty space
+# empty_plot <- ggplot() + theme_void()
+
+# Convert the list of ridge plots to a patchwork layout
+all_injury_probas_ridge_plot <- wrap_plots(ridge_plots_list[1:14], ncol = 3)
+
+# Print the combined ridge plots
+all_injury_probas_ridge_plot
+
+# Save the plot
+ggsave(
+  plot = all_injury_probas_ridge_plot,
+  filename = "figures/supplemental/sfig4_all_injury_probabilities.png",
+  height = height,
+  width = width,
+  dpi = 700
+)
 
 # Define plot dimensions
 height = 25

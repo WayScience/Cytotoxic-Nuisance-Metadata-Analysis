@@ -358,6 +358,7 @@ cytoskeletal_proba_scores.rename(columns={"Cytoskeletal": "Cytoskeletal Proba"})
 # In[14]:
 
 
+# Saving only cyr
 cytoskeletal_proba_scores.to_csv(
     jump_analysis_dir / "cytoskeletal_proba_scores.csv.gz",
     compression="gzip",
@@ -365,9 +366,26 @@ cytoskeletal_proba_scores.to_csv(
 )
 
 
+# In[15]:
+
+
+# making all probabilities tidy long
+all_injury_proba = all_proba_scores[col_to_sel + injury_classes].melt(
+    id_vars=["pred_injury", "datatype", "shuffled"],
+    var_name="injury_compared_to",
+    value_name="proba",
+)
+
+# save file
+all_injury_proba.to_csv(
+    jump_analysis_dir / "all_injury_proba.csv.gz", index=False, compression="gzip"
+)
+all_injury_proba.head()
+
+
 # ## Generating Confusion Matrix
 
-# In[15]:
+# In[16]:
 
 
 shared_treat_meta, shared_treat_feats = split_meta_and_features(shared_treat_jump_df)
@@ -375,7 +393,7 @@ shared_X = shared_treat_jump_df[shared_treat_feats]
 shared_y = shared_treat_jump_df["injury_code"]
 
 
-# In[16]:
+# In[17]:
 
 
 jump_overlap_cm = generate_confusion_matrix_tl(
@@ -386,7 +404,7 @@ shuffled_jump_overlap_cm = generate_confusion_matrix_tl(
 ).fillna(0)
 
 
-# In[17]:
+# In[18]:
 
 
 # save confusion matrix
@@ -399,13 +417,13 @@ pd.concat([jump_overlap_cm, shuffled_jump_overlap_cm]).to_csv(
 
 # ## Creating supplemental Table
 
-# In[18]:
+# In[19]:
 
 
 shared_jump_meta, shared_jump_feats = split_meta_and_features(shared_jump_df)
 
 
-# In[19]:
+# In[20]:
 
 
 jump_meta = shared_jump_df[["Metadata_Plate", "Metadata_Well", "Metadata_pert_iname"]]
@@ -415,7 +433,7 @@ jump_meta["pred_injury"] = [
 jump_meta["probability"] = y_proba.max(axis=1).tolist()
 
 
-# In[20]:
+# In[21]:
 
 
 # save supplemental figure
