@@ -123,12 +123,16 @@ f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
   rename(test_f1_score = f1_score) %>%
   select(-dataset_type)
 
-# Create the new column f1_label and add default values to x and y columns
+# These values manually move the F1 score box within each subplot.
+# The position of these values corresponds to the row of the table below.
+x_values <- c(0.50, 0.50, 0.35, 0.30, 0.50, 0.50, 0.40, 0.70, 0.40, 0.40, 0.79, 0.40, 0.79, 0.79, 0.79)
+y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.79, 0.50, 0.79, 0.79, 0.79)
+
+# Update the code to use these values
 f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
   mutate(f1_label = paste("F1 score:\nTest:", test_f1_score, "\nTrain:", train_f1_score),
-         x = 0.23,
-         y = 0.78)
-
+         x = x_values,
+         y = y_values)
 f1_scores_per_injury_df
 
 # plot data
@@ -183,7 +187,7 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
     labs(linetype = "Model type", color = "Dataset split")
 
     # ggplot2::coord_fixed()
-ggsave("figures/fig2_B_only_test_train_pr_curve.png", width = width, height = height, dpi=600)
+# ggsave("figures/fig2_B_only_test_train_pr_curve.png", width = width, height = height, dpi=600)
 fig2_B_pr_curve_plot_train_test
 
 # creating final model confusion matrix with Non-shuffled data
@@ -220,7 +224,7 @@ fig2_C_final_model_cm <- (
     ggplot(final_model_cm, aes(x = predicted_labels, y = true_labels))
     + facet_wrap(~dataset_type)
     + geom_point(aes(color = recall), size = 10, shape = 15)
-    + geom_text(aes(label = count), size = 6)
+    + geom_text(aes(label = count), size = 5)
     + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1))
     + theme_bw()
     + xlab("Predicted class")
@@ -390,8 +394,8 @@ ggsave(filename = "figures/fig2_D_JUMP_cyto_injury_probability_ridgeplot.png", h
 fig2_D_probabilities_ridge_plot
 
 # Define plot dimensions
-height = 35
-width = 35
+height = 25
+width = 28
 
 layout <- c(
     area(t=0, b=1, l=0, r=20), # A
@@ -411,17 +415,17 @@ fig2 <- (
 
     # plot layouts
     + plot_layout(design = layout, heights = c(1, 1, 0.1))
-    + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 30, face = "bold"))
+    + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 35, face = "bold"))
 )
 
 # Display the combined plot
 fig2
 
-# # Save the plot
-# ggsave(
-#   plot = fig2,
-#   filename = "figures/Final_Figure2.png",
-#   height = height,
-#   width = width,
-#   dpi = 700
-# )
+# Save the plot
+ggsave(
+  plot = fig2,
+  filename = "figures/Final_Figure2.png",
+  height = height,
+  width = width,
+  dpi = 700
+)
