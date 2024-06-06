@@ -7,6 +7,7 @@ suppressPackageStartupMessages(suppressWarnings(library(reshape2))) # data manip
 suppressPackageStartupMessages(suppressWarnings(library(ggridges))) # ridgeline plots
 suppressPackageStartupMessages(suppressWarnings(library(RColorBrewer))) # color palettes
 suppressPackageStartupMessages(suppressWarnings(library(patchwork))) # color palettes
+suppressPackageStartupMessages(suppressWarnings(library(stringr))) # color palettes
 suppressPackageStartupMessages(library(grid))
 suppressPackageStartupMessages(library(png))
 
@@ -266,7 +267,14 @@ options(repr.plot.width = width, repr.plot.height = height)
 
 # creating final model confusion matrix with Non-shuffled data
 final_model_cm <- cm_df %>%
-  filter(shuffled_model == "Shuffled" & dataset_type %in% c("Train", "Test", "Plate Holdout", "Treatment Holdout", "Well Holdout"))
+  filter(shuffled_model == "Shuffled" & dataset_type %in% c("Train", "Test", "Plate Holdout", "Treatment Holdout", "Well Holdout")) %>%
+  mutate(dataset_type = case_when(
+    dataset_type == "Train" ~ "Train",
+    dataset_type == "Test" ~ "Test",
+    dataset_type == "Plate Holdout" ~ "Plate holdout",
+    dataset_type == "Treatment Holdout" ~ "Treatment holdout",
+    dataset_type == "Well Holdout" ~ "Well holdout"
+  ))
 
 # Reorder the predicted_labels factor variable with the desired order
 x_label_order <- c('Control', 'Cytoskeletal', 'Hsp90', 'Kinase', 'Genotoxin', 'Miscellaneous', 'Redox', 'HDAC', 'mTOR', 'Proteasome', 'Saponin', 'Mitochondria', 'Ferroptosis', 'Tannin', 'Nonspecific reactive')
@@ -274,7 +282,7 @@ final_model_cm$true_labels <- factor(final_model_cm$true_labels, levels = rev(un
 final_model_cm$predicted_labels <- factor(final_model_cm$predicted_labels, levels = x_label_order)
 
 # Define the desired order of facet levels
-facet_order <- c("Train", "Test", "Plate Holdout", "Treatment Holdout", "Well Holdout")
+facet_order <- c("Train", "Test", "Plate holdout", "Treatment holdout", "Well holdout")
 final_model_cm$dataset_type <- factor(final_model_cm$dataset_type, levels = facet_order)
 
 sfig2_model_cm <- (
@@ -307,6 +315,9 @@ sfig2_model_cm
 # creating final model confusion matrix with Non-shuffled data
 treat_cm <- cm_df %>%
   filter(shuffled_model %in% c("Not Shuffled", "Shuffled") & dataset_type %in% "Treatment Holdout")
+
+# remove Title casing from "Not Shuffled" and edit it to "Not shuffled"
+treat_cm$shuffled_model <- ifelse(treat_cm$shuffled_model == "Not Shuffled", "Not shuffled", treat_cm$shuffled_model)
 
 # Define the desired order of x-axis labels
 x_label_order <- c('Control', 'Cytoskeletal', 'Hsp90', 'Kinase', 'Genotoxin', 'Miscellaneous', 'Redox', 'HDAC', 'mTOR', 'Proteasome', 'Saponin', 'Mitochondria', 'Ferroptosis', 'Tannin', 'Nonspecific reactive')
@@ -465,7 +476,7 @@ for (i in 1:length(class_order)) {
       axis.text.y = element_text(size = 20),
       axis.title = element_text(size = 22),
       axis.title.y = element_blank(),
-      plot.title = element_text(size = 20, hjust = 0.5),
+      plot.title = element_text(size = 23, hjust = 0.5, face = "bold"),
       legend.title = element_text(size = 20),
       legend.text = element_text(size = 20),
       legend.spacing.y = unit(0.1, "cm"),
