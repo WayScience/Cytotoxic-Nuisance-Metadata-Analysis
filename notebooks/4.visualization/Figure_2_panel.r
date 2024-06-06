@@ -37,7 +37,7 @@ pr_file_path <- file.path("../../results/2.modeling/precision_recall_scores.csv.
 # probability plot
 cyto_proba_path <- file.path("../../results/3.jump_analysis/cytoskeletal_proba_scores.csv.gz")
 
-# injiury porbabilities
+# injury probabilities
 injury_proba_path = file.path("../../results/3.jump_analysis/all_injury_proba.csv.gz")
 
 # path to workflow image
@@ -103,15 +103,15 @@ all_injury_proba_df <- all_injury_proba_df %>%
 
 fig2_A_wf_image
 
-# Selecting only the Test and Train datasplits PR curves
+# Selecting only the Test and Train data splits PR curves
 test_train_pr <- pr_df %>%
   filter(dataset_type %in% c("Test", "Train"))
 
-# Selecting only the F1 scores both both testing and trainign split in the Non-shuffled model
+# Selecting only the F1 scores both both testing and training split in the Non-shuffled model
 test_train_f1_df <- f1_df %>%
   filter(dataset_type %in% c("Test", "Train"), shuffled == "Not Shuffled")
 
-# Merging both dataframes; However, if the Model is shufled f1 score will be NaN
+# Merging both dataframes; However, if the Model is shuffled f1 score will be NaN
 pr_f1_curve <- merge(test_train_pr, test_train_f1_df, by = c("dataset_type", "shuffled", "injury_type"), all = TRUE)
 
 # Filtering to only get Test and Train Not shuffled f1 scores
@@ -141,9 +141,9 @@ f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
 x_values <- c(0.50, 0.50, 0.35, 0.30, 0.50, 0.50, 0.40, 0.70, 0.40, 0.40, 0.79, 0.40, 0.79, 0.79, 0.79)
 y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.79, 0.50, 0.79, 0.79, 0.79)
 
-# Update the code to use these values
+# generate dataframe responsible for placing the f1 boxes within the plot
 f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
-  mutate(f1_label = paste("F1 score:\nTest:", test_f1_score, "\nTrain:", train_f1_score),
+  mutate(f1_label = paste("F1 score:\nTrain:", train_f1_score, "\n", "Test:", test_f1_score),
          x = x_values,
          y = y_values)
 f1_scores_per_injury_df
@@ -199,8 +199,7 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
 
     labs(linetype = "Model type", color = "Dataset split")
 
-    # ggplot2::coord_fixed()
-# ggsave("figures/fig2_B_only_test_train_pr_curve.png", width = width, height = height, dpi=600)
+ggsave("figures/fig2_B_only_test_train_pr_curve.png", width = width, height = height, dpi=600)
 fig2_B_pr_curve_plot_train_test
 
 # creating final model confusion matrix with Non-shuffled data
