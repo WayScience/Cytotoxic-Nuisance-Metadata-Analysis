@@ -468,7 +468,6 @@ predicted_df["pred_injury"] = [
 predicted_df["probability"] = y_proba.max(axis=1).tolist()
 
 # Merge barcode information by using the Plate ID to indicate the type of treatments applied
-# and
 predicted_df = pd.merge(
     predicted_df, barcode_df, left_on="Metadata_Plate", right_on="Assay_Plate_Barcode"
 )
