@@ -39,7 +39,7 @@ pr_file_path <- file.path("../../results/2.modeling/precision_recall_scores.csv.
 cyto_proba_path <- file.path("../../results/3.jump_analysis/cytoskeletal_proba_scores.csv.gz")
 
 # injury probabilities
-injury_proba_path = file.path("../../results/3.jump_analysis/all_injury_proba.csv.gz")
+injury_proba_path <- file.path("../../results/3.jump_analysis/all_injury_proba.csv.gz")
 
 # path to workflow image
 wf_image <- file.path("./figures/workflow_fig.png")
