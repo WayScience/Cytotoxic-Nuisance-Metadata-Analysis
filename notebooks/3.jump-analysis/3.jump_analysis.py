@@ -31,7 +31,7 @@ from src.utils import (
 
 
 # setting up paths and output paths
-results_dir = pathlib.Path("../../results")
+results_dir = pathlib.Path("../../results").resolve()
 fs_results_dir = (results_dir / "0.feature_selection").resolve(strict=True)
 data_split_dir = (results_dir / "1.data_splits/").resolve(strict=True)
 jump_data_dir = pathlib.Path("../../data/JUMP_data").resolve(strict=True)
