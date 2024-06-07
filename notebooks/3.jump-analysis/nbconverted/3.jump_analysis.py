@@ -247,12 +247,13 @@ well_counts_df
 # In[9]:
 
 
-# this is our ground truth since this compound is also found in the cell-injury dataset
+# Here we select the the compound associated with the cytoskeletal injury
+# below we use the InChIKey to extract all wells that have been treated by the overlapping compound
 jump_cyto_injury_df = shared_jump_df.loc[
     shared_jump_df["Metadata_InChIKey"] == "IAKHMKGGTNLKSZ-INIZCTEOSA-N"
 ]
 
-# updating the shared_jump_df by removing the pseudo ground truth entries
+# updating the shared_jump_df by removing the ground truth entries
 shared_jump_df = shared_jump_df.drop(index=jump_cyto_injury_df.index, inplace=False)
 
 
@@ -417,28 +418,32 @@ pd.concat([jump_overlap_cm, shuffled_jump_overlap_cm]).to_csv(
 
 # ## Creating supplemental Table
 
+# Below we are creating a supplemental table showing the types of injury predicted associated with the compounds found in the JUMP-CP datat set
+
 # In[19]:
 
 
+# split meta and feature columns
 shared_jump_meta, shared_jump_feats = split_meta_and_features(shared_jump_df)
+
+# selecting the columns
+jump_meta = shared_jump_df[["Metadata_Plate", "Metadata_Well", "Metadata_pert_iname"]]
+
+# converting injury codes to injury names
+jump_meta["pred_injury"] = [
+    injury_decoder[str(injury_code)] for injury_code in y_pred.tolist()
+]
+
+# obtaining the probability score of the predicted injury
+jump_meta["probability"] = y_proba.max(axis=1).tolist()
 
 
 # In[20]:
 
 
-jump_meta = shared_jump_df[["Metadata_Plate", "Metadata_Well", "Metadata_pert_iname"]]
-jump_meta["pred_injury"] = [
-    injury_decoder[str(injury_code)] for injury_code in y_pred.tolist()
-]
-jump_meta["probability"] = y_proba.max(axis=1).tolist()
-
-
-# In[21]:
-
-
-# save supplemental figure
+# save supplemental table
 jump_meta.to_csv(
-    jump_analysis_dir / "predicted_jump_injury_table.csv.gz",
+    jump_analysis_dir / "stable2_predicted_jump_injury_table.csv.gz",
     compression="gzip",
     index=False,
 )
