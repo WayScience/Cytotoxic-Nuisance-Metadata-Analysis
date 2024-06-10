@@ -484,7 +484,7 @@ predicted_df = predicted_df.merge(
     sel_jump_exp_meta, left_on="Metadata_Plate", right_on="Assay_Plate_Barcode"
 ).drop(columns=["Assay_Plate_Barcode"])
 
-# Merge barcode information by using the Plate ID to indicate the type of treatments applied
+# Merge barcode information by using the Plate ID to indicate the type of assay conducted
 predicted_df = pd.merge(
     predicted_df, barcode_df, left_on="Metadata_Plate", right_on="Assay_Plate_Barcode"
 )
