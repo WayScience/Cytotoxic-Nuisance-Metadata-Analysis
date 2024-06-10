@@ -96,6 +96,13 @@ injury_decoder = injury_codes["decoder"]
 shared_feature_space = load_json_file(shared_feature_space_path)
 shared_features = shared_feature_space["features"]
 
+# Experimenmta metadata
+jump_exp_meta = pd.read_csv(
+    "https://raw.githubusercontent.com/WayScience/JUMP-single-cell/main/reference_plate_data/experiment-metadata.tsv",
+    delimiter="\t",
+)
+
+
 # Display data
 print("JUMP dataset shape", jump_df.shape)
 print("Number of Meta features", len(jump_meta))
@@ -431,7 +438,9 @@ col_arrangement = [
     "Metadata_Plate",
     "Plate_Map_Name",
     "Metadata_Well",
+    "Cell_type",
     "Metadata_pert_type",
+    "Time",
     "Metadata_gene",
     "Metadata_pert_iname",
     "Metadata_target_sequence",
@@ -469,6 +478,12 @@ predicted_df["pred_injury"] = [
 # obtaining the probability score of the predicted injury
 predicted_df["probability"] = y_proba.max(axis=1).tolist()
 
+# add experimental metadata
+sel_jump_exp_meta = jump_exp_meta[["Assay_Plate_Barcode", "Cell_type", "Time"]]
+predicted_df = predicted_df.merge(
+    sel_jump_exp_meta, left_on="Metadata_Plate", right_on="Assay_Plate_Barcode"
+).drop(columns=["Assay_Plate_Barcode"])
+
 # Merge barcode information by using the Plate ID to indicate the type of treatments applied
 predicted_df = pd.merge(
     predicted_df, barcode_df, left_on="Metadata_Plate", right_on="Assay_Plate_Barcode"
@@ -477,6 +492,7 @@ predicted_df = predicted_df.drop("Assay_Plate_Barcode", axis=1)
 predicted_df = predicted_df[col_arrangement].rename(
     columns={"Plate_Map_Name": "Assay_type"}
 )
+
 
 # updating column containign assay information
 predicted_df["Assay_type"] = predicted_df["Assay_type"].apply(
