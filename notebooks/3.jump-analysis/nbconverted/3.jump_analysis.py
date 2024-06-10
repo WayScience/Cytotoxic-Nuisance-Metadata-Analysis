@@ -508,6 +508,9 @@ predicted_df["Metadata_pert_type"] = predicted_df["Metadata_pert_type"].apply(
     lambda name: "treatment" if name == "trt" else name
 )
 
+# dropping duplicates
+predicted_df = predicted_df.drop_duplicates()
+
 # display
 print(predicted_df.shape)
 predicted_df.head()
