@@ -431,6 +431,7 @@ col_arrangement = [
     "Metadata_Plate",
     "Plate_Map_Name",
     "Metadata_Well",
+    "Metadata_pert_type",
     "Metadata_gene",
     "Metadata_pert_iname",
     "Metadata_target_sequence",
@@ -456,6 +457,7 @@ predicted_df = shared_jump_df[
         "Metadata_gene",
         "Metadata_pert_iname",
         "Metadata_target_sequence",
+        "Metadata_pert_type",
     ]
 ]
 
@@ -476,12 +478,23 @@ predicted_df = predicted_df[col_arrangement].rename(
     columns={"Plate_Map_Name": "Assay_type"}
 )
 
-
 # updating column containign assay information
 predicted_df["Assay_type"] = predicted_df["Assay_type"].apply(
     lambda assay_code: rename_assay_type[assay_code]
 )
-predicted_df.loc[predicted_df["Metadata_pert_iname"] == "DMSO"]
+
+# if 'Metadata_pert_type' is NaN this means that no sample was added
+# rational behind this is because the "Metadata_broad_sample" is empty indicating no sample was added
+predicted_df["Metadata_pert_type"] = predicted_df["Metadata_pert_type"].fillna("EMPTY")
+
+# update 'trt' value to "treatment" to improve readability
+predicted_df["Metadata_pert_type"] = predicted_df["Metadata_pert_type"].apply(
+    lambda name: "treatment" if name == "trt" else name
+)
+
+# display
+print(predicted_df.shape)
+predicted_df.head()
 
 
 # In[20]:
