@@ -96,9 +96,9 @@ injury_decoder = injury_codes["decoder"]
 shared_feature_space = load_json_file(shared_feature_space_path)
 shared_features = shared_feature_space["features"]
 
-# Experimenmta metadata
+# Experimental metadata
 jump_exp_meta = pd.read_csv(
-    "https://raw.githubusercontent.com/WayScience/JUMP-single-cell/main/reference_plate_data/experiment-metadata.tsv",
+    "https://raw.githubusercontent.com/WayScience/JUMP-single-cell/d00868cfdb18143db0469e3cc0700b35c03cf811/reference_plate_data/experiment-metadata.tsv",
     delimiter="\t",
 )
 
@@ -448,7 +448,7 @@ col_arrangement = [
     "probability",
 ]
 
-# creaeting a rename dict
+# creating a rename dict
 rename_assay_type = {
     "JUMP-Target-1_orf_platemap": "orf",
     "JUMP-Target-1_compound_platemap": "compound",
@@ -519,4 +519,6 @@ predicted_df.head()
 # In[20]:
 
 
-predicted_df.to_csv(jump_analysis_dir / "JUMP_predicted_injuries.csv", index=False)
+predicted_df.to_csv(
+    jump_analysis_dir / "JUMP_CP_Pilot_predicted_injuries.csv", index=False
+)
