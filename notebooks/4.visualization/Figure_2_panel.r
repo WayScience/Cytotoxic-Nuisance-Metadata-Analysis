@@ -1,15 +1,11 @@
-suppressPackageStartupMessages(suppressWarnings(library(ggplotify))) # gg
-suppressPackageStartupMessages(suppressWarnings(library(cowplot))) # cowplot
 suppressPackageStartupMessages(suppressWarnings(library(lintr))) # linting
 suppressPackageStartupMessages(suppressWarnings(library(ggplot2))) # plotting
 suppressPackageStartupMessages(suppressWarnings(library(dplyr))) # data manipulation
 suppressPackageStartupMessages(suppressWarnings(library(reshape2))) # data manipulation
 suppressPackageStartupMessages(suppressWarnings(library(ggridges))) # ridgeline plots
 suppressPackageStartupMessages(suppressWarnings(library(RColorBrewer))) # color palettes
-suppressPackageStartupMessages(suppressWarnings(library(patchwork))) # color palettes
-suppressPackageStartupMessages(suppressWarnings(library(stringr))) # color palettes
-suppressPackageStartupMessages(library(grid))
-suppressPackageStartupMessages(library(png))
+suppressPackageStartupMessages(suppressWarnings(library(patchwork))) # used to tieing multiple figures into one
+suppressPackageStartupMessages(library(png)) # allows to load in figures in memory
 
 # helper functions
 load_image <- function(path){
@@ -39,7 +35,7 @@ pr_file_path <- file.path("../../results/2.modeling/precision_recall_scores.csv.
 cyto_proba_path <- file.path("../../results/3.jump_analysis/cytoskeletal_proba_scores.csv.gz")
 
 # injury probabilities
-injury_proba_path <- file.path("../../results/3.jump_analysis/all_injury_proba.csv.gz")
+injury_proba_path = file.path("../../results/3.jump_analysis/all_injury_proba.csv.gz")
 
 # path to workflow image
 wf_image <- file.path("./figures/workflow_fig.png")
@@ -539,8 +535,8 @@ all_injury_probas_ridge_plot
 ggsave(
   plot = all_injury_probas_ridge_plot,
   filename = "figures/supplemental/sfig4_all_injury_probabilities.png",
-  height = height,
-  width = width,
+  height = img_height,
+  width = img_width,
   dpi = 700
 )
 
