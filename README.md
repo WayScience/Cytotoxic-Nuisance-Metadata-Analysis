@@ -45,30 +45,39 @@ Below are all the notebook modules used in our study.
 | [3.jump_analysis](./notebooks/3.jump_analysis/) | Applies our model to the JUMP dataset to predict cellular injuries |
 | [4.visualizations](./notebooks/4.visualizations/) | Contains a notebook responsible for generating our figures |
 
-## Installing Repo
+## Installing respoitory and dependencies
 
-This installation guide assums that you have conda installed.
-If you do not have conda installed, please follow the documentation [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
+This installation guide assumes that you have Conda installed. If you do not have Conda installed, please follow the documentation [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
-Clone the repositroy into local machine and change directory to repo.
+1. **Clone the repository**: Clone the repository into your local machine and change the directory to the repo.
 
-```bash
-git clone git@github.com:WayScience/Cytotoxic-Nuisance-Metadata-Analysis.git && cd Cytotoxic-Nuisance-Metadata-Analysis
-```
+    ```bash
+    git clone git@github.com:WayScience/Cytotoxic-Nuisance-Metadata-Analysis.git && cd Cytotoxic-Nuisance-Metadata-Analysis
+    ```
 
-Next is to install all the dependencies associated with this repo. Keep in mind that there are two enviroment files in this repo.
-One is in the root project folder, which will be containing all the necessary packages to conduct our analysis and the other is found within the `./notebooks/4.visualization` where we use R to generate our plots.
+2. **Install dependencies**: There are two environment files in this repository. One is in the root project folder, containing all the necessary packages to conduct our analysis. The other is within the `./notebooks/4.visualization` directory, which includes packages for generating plots with R.
 
-```bash
-# analysis env
-conda env create -f cell_injury.yaml && activate cell-injury
-```
+    - **Analysis environment**: Create and activate the environment for analysis.
 
-```bash
-# R visualization
-conda env create -f ./notebooks/4.visualization && activate cell-injury-r
-```
+        ```bash
+        conda env create -f cell_injury.yaml
+        conda activate cell-injury
+        ```
 
+    - **R visualization environment**: Create and activate the environment for R visualization.
+
+        ```bash
+        conda env create -f ./notebooks/4.visualization/visualization_env.yaml
+        conda activate visualization-env
+        ```
+
+3. **Verify the installation**: You can check if your environment is set up correctly by listing the installed packages.
+
+    ```bash
+    conda list
+    ```
+
+That's it! Your Conda environments should now be set up with the specified packages from the YAML files.
 
 ## Analysis summary
 
