@@ -4,12 +4,16 @@
 > Diagram protraying taken to conduct this study.
 
 The objective of this project was to utilize [Pycytominer](https://github.com/cytomining/pycytominer) for generating feature-selected profiles from image-based data, aiming to train a multi-class logistic regression model for predicting cellular injury.
+
 We obtained the cell-injury dataset from [IDR](https://idr.openmicroscopy.org/webclient/?show=screen-3151) and its corresponding [GitHub repository](https://github.com/IDR/idr0133-dahlin-cellpainting).
-Using Pycytominer, we processed these datasets to prepare them for subsequent model training.
+Using [Pycytominer](https://github.com/cytomining/pycytominer), we processed these datasets to prepare them for subsequent model training.
 We trained our model on the cell-injury dataset to predict 15 different types of injuries and our trained model to the JUMP dataset to predict cellular injuries.
 
 ## Data sources
 
+We obtained the cell-injury dataset from [IDR](https://idr.openmicroscopy.org/webclient/?show=screen-3151) and its corresponding [GitHub repository](https://github.com/IDR/idr0133-dahlin-cellpainting).
+Using Pycytominer, we processed these datasets to prepare them for subsequent model training.
+We trained our model on the cell-injury dataset to predict 15 different types of injuries and our trained model to the JUMP dataset to predict cellular injuries.
 | Data Source | Description |
 |-------------|-------------|
 | [IDR repository](https://github.com/IDR/idr0133-dahlin-cellpainting/tree/main/screenA) | Repository containing annotated screen data |
@@ -59,7 +63,7 @@ We split our data into training, testing, and holdout sets.
 First, we generated our holdout splits, which are reserved exclusively for evaluating the model's performance and are not used during the model's training or tuning.
 
 1. **Plate Holdout Set**: We randomly selected 10 plates.
-2. **Treatment Holdout Set**: We selected one treatment to hold out.
+2. **Treatment Holdout Set**: We selected one treatment per injury to hold out.
 However, given that some cellular injuries have very low diversity in treatments, we created a heuristic that only holds out treatments if the cell injuries have more than 10 different treatments.
 For cell injuries that didn't meet this criterion, no treatments were held out.
 3. **Well Holdout Set**: We randomly selected wells in each plate.
