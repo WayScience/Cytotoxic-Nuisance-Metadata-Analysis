@@ -47,7 +47,8 @@ Below are all the notebook modules used in our study.
 
 ## Installing respoitory and dependencies
 
-This installation guide assumes that you have Conda installed. If you do not have Conda installed, please follow the documentation [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
+This installation guide assumes that you have Conda installed. 
+If you do not have Conda installed, please follow the documentation [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
 1. **Clone the repository**: Clone the repository into your local machine and change the directory to the repo.
 
