@@ -7,3 +7,6 @@ dependencies:
   - conda-forge::r-dplyr
   - conda-forge::r-patchwork
   - conda-forge::r-cowplot
+  - conda-forge::r-lintr
+  - conda-forge::r-png
+  - conda-forge::r-ggridges

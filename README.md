@@ -1,4 +1,5 @@
 # Predicting cellular injury using Pyctominer
+
 [![DOI](https://zenodo.org/badge/744169074.svg)](https://zenodo.org/doi/10.5281/zenodo.12514972)
 
 ![workflow](./notebooks/4.visualization/figures/workflow_fig.png)
@@ -43,6 +44,31 @@ Below are all the notebook modules used in our study.
 | [2.modeling](./notebooks/2.modeling/) | Trains and evaluates a multi-class logistic regression model |
 | [3.jump_analysis](./notebooks/3.jump_analysis/) | Applies our model to the JUMP dataset to predict cellular injuries |
 | [4.visualizations](./notebooks/4.visualizations/) | Contains a notebook responsible for generating our figures |
+
+## Installing Repo
+
+This installation guide assums that you have conda installed.
+If you do not have conda installed, please follow the documentation [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
+
+Clone the repositroy into local machine and change directory to repo.
+
+```bash
+git clone git@github.com:WayScience/Cytotoxic-Nuisance-Metadata-Analysis.git && cd Cytotoxic-Nuisance-Metadata-Analysis
+```
+
+Next is to install all the dependencies associated with this repo. Keep in mind that there are two enviroment files in this repo.
+One is in the root project folder, which will be containing all the necessary packages to conduct our analysis and the other is found within the `./notebooks/4.visualization` where we use R to generate our plots.
+
+```bash
+# analysis env
+conda env create -f cell_injury.yaml && activate cell-injury
+```
+
+```bash
+# R visualization
+conda env create -f ./notebooks/4.visualization && activate cell-injury-r
+```
+
 
 ## Analysis summary
 
