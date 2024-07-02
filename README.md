@@ -47,7 +47,7 @@ Below are all the notebook modules used in our study.
 
 ## Installing respoitory and dependencies
 
-This installation guide assumes that you have Conda installed. 
+This installation guide assumes that you have Conda installed.
 If you do not have Conda installed, please follow the documentation [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
 1. **Clone the repository**: Clone the repository into your local machine and change the directory to the repo.
@@ -56,7 +56,9 @@ If you do not have Conda installed, please follow the documentation [here](https
     git clone git@github.com:WayScience/Cytotoxic-Nuisance-Metadata-Analysis.git && cd Cytotoxic-Nuisance-Metadata-Analysis
     ```
 
-2. **Install dependencies**: There are two environment files in this repository. One is in the root project folder, containing all the necessary packages to conduct our analysis. The other is within the `./notebooks/4.visualization` directory, which includes packages for generating plots with R.
+2. **Install dependencies**: There are two environment files in this repository.
+One is in the root project folder, containing all the necessary packages to conduct our analysis in Python.
+The other is within the `./notebooks/4.visualization` directory, which includes packages for generating plots with R.
 
     - **Analysis environment**: Create and activate the environment for analysis.
 
@@ -71,12 +73,6 @@ If you do not have Conda installed, please follow the documentation [here](https
         conda env create -f ./notebooks/4.visualization/visualization_env.yaml
         conda activate visualization-env
         ```
-
-3. **Verify the installation**: You can check if your environment is set up correctly by listing the installed packages.
-
-    ```bash
-    conda list
-    ```
 
 That's it! Your Conda environments should now be set up with the specified packages from the YAML files.
 
