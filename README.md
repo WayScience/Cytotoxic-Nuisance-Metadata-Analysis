@@ -1,4 +1,5 @@
 # Predicting cellular injury using Pyctominer
+[![DOI](https://zenodo.org/badge/744169074.svg)](https://zenodo.org/doi/10.5281/zenodo.12514972)
 
 ![workflow](./notebooks/4.visualization/figures/workflow_fig.png)
 > Diagram protraying taken to conduct this study.
