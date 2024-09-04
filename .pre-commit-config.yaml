@@ -14,23 +14,23 @@ repos:
         args: ["--profile", "black", "--filter-files"]
         language_version: python3.10
 
-  - repo: https://github.com/adamchainz/blacken-docs
-    rev: "1.16.0"  # replace with latest tag on GitHub
-    hooks:
-      - id: blacken-docs
-
+  # Ruff python linter and formatter
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
     rev: v0.3.1
     hooks:
-      # Run the linter.
       - id: ruff
-        types_or: [ python, pyi, jupyter ]
-        args: [ --fix, --config, pyproject.toml]
-      # Run the formatter.
+        types_or: [python, pyi, jupyter]
+        args: [--fix, --config, pyproject.toml]
       - id: ruff-format
-        types_or: [ python, pyi, jupyter ]
+        types_or: [python, pyi, jupyter]
 
+  # Formats python code in documentation blocks
+  - repo: https://github.com/adamchainz/blacken-docs
+    rev: "1.18.0"
+    hooks:
+      - id: blacken-docs
+        additional_dependencies:
+          - black==24.8.0
   # additional hooks found with in the pre-commit lib
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0

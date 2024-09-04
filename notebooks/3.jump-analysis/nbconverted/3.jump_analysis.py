@@ -227,10 +227,10 @@ shared_treat_jump_df.head()
 # In[8]:
 
 
-# count number of wells and agument with injury_code injury_yype and compound name
+# count number of wells and augment with injury_code injury_type and compound name
 well_counts_df = (
     shared_treat_jump_df.groupby("Metadata_InChIKey")
-    # counting the numbver of wells
+    # counting the number of wells
     .size()
     .to_frame()
     .reset_index()

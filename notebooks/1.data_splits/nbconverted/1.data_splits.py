@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Spliting Data
+# # Splitting Data
 #
 # Here, we utilize the feature-selected profiles generated in the preceding module notebook [here](../0.feature_selection/0.feature_selection.ipynb), focusing on dividing the data into training, testing, and holdout sets for machine learning training.
 #
@@ -19,13 +19,17 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 sys.path.append("../../")  # noqa
-from src.utils import get_injury_treatment_info, split_meta_and_features  # noqa
+from src.utils import (  # noqa
+    get_injury_treatment_info,
+    load_json_file,
+    split_meta_and_features,
+)
 
 # ignoring warnings
 warnings.catch_warnings(action="ignore")
 
 
-# ## Paramters
+# ## Parameters
 #
 # Below are the parameters defined that are used in this notebook
 #
@@ -53,11 +57,17 @@ data_split_dir.mkdir(exist_ok=True)
 # data paths
 fs_profile_path = (fs_dir / "cell_injury_profile_fs.csv.gz").resolve(strict=True)
 
+# load in feature space file
+fs_feature_space = load_json_file(
+    fpath=(fs_dir / "cell_injury_shared_feature_space.json").resolve(strict=True)
+)
+fs_feats = fs_feature_space["features"]
+
 # load data
 fs_profile_df = pd.read_csv(fs_profile_path)
 
 # splitting meta and feature column names
-fs_meta, fs_feats = split_meta_and_features(fs_profile_df)
+fs_meta, _ = split_meta_and_features(fs_profile_df)
 
 # display
 print("fs profile with control: ", fs_profile_df.shape)
@@ -75,7 +85,7 @@ fs_profile_df.head()
 # In[4]:
 
 
-# displying the amount of wells per treatments
+# displaying the amount of wells per treatments
 well_treatments_counts_df = (
     fs_profile_df["Compound Name"].value_counts().to_frame().reset_index()
 )
@@ -149,7 +159,7 @@ with open(data_split_dir / "injury_metadata.json", mode="w") as stream:
     json.dump(injury_meta_dict, stream)
 
 
-# Here we build a plate metadata infromations where we look at the type of treatments and amount of wells with the treatment that are present in the dataset
+# Here we build a plate metadata information where we look at the type of treatments and amount of wells with the treatment that are present in the dataset
 #
 # This will be saved in `results/0.data_splits`
 #
@@ -202,7 +212,6 @@ with open(data_split_dir / "cell_injury_plate_info.json", mode="w") as stream:
 
 
 # plate
-seed = 0
 n_plates = 10
 
 # setting random seed globally
@@ -323,14 +332,13 @@ treatment_holdout_df.head()
 
 # ### Well holdout
 #
-# To generate the well hold out data, each plate was iterated and random wells were selected. However, an additional step was condcuting which was to seperate the control wells and the treated wells, due to the large label imbalance with the controls. Therefore, 5 wells were randomly selected and 10 wells were randomly selected from each individual plate
+# To generate the well hold out data, each plate was iterated and random wells were selected. However, an additional step was conducting which was to separate the control wells and the treated wells, due to the large label imbalance with the controls. Therefore, 5 wells were randomly selected and 10 wells were randomly selected from each individual plate
 #
 
 # In[13]:
 
 
 # parameters
-seed = 0
 n_controls = 5
 n_samples = 10
 
@@ -409,11 +417,11 @@ fs_profile_df.head()
 
 
 # split the data into trianing and testing sets
-meta_cols, feat_cols = split_meta_and_features(fs_profile_df)
-X = fs_profile_df[feat_cols]
+meta_cols, _ = split_meta_and_features(fs_profile_df)
+X = fs_profile_df[fs_feats]
 y = fs_profile_df["injury_code"]
 
-# spliting dataset
+# splitting dataset
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, train_size=0.80, random_state=seed, stratify=y
 )
@@ -495,7 +503,7 @@ injury_before_holdout_info_df = injury_before_holdout_info_df.rename(
 injury_train_info_df = get_and_rename_injury_info(
     profile=X_train.merge(
         fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
-    )[meta_cols + feat_cols],
+    )[meta_cols + fs_feats],
     groupby_key="injury_type",
     column_name=data_col_name[1],
 )
@@ -503,7 +511,7 @@ injury_train_info_df = get_and_rename_injury_info(
 injury_test_info_df = get_and_rename_injury_info(
     profile=X_test.merge(
         fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
-    )[meta_cols + feat_cols],
+    )[meta_cols + fs_feats],
     groupby_key="injury_type",
     column_name=data_col_name[2],
 )
@@ -558,3 +566,9 @@ merged_summary_df.to_csv(data_split_dir / "summary_data_split.csv", index=False)
 
 # display
 merged_summary_df
+
+
+# In[20]:
+
+
+X_train

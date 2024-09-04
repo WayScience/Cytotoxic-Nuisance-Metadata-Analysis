@@ -118,6 +118,24 @@ We applied our trained multi-class logistic regression model to the JUMP dataset
 We loaded the JUMP dataset and selected only the features that were shared with the `cell-injury` dataset.
 Using the model, we generated predictions for each well and then analyzed these predictions to understand the distribution and types of injuries.
 
+### Generating figures
+
+We used R to generate the figures, which requires switching to a specific `conda` environment that contains all the necessary dependencies. All the files used to generate these figures can be found in the `./results` directory. To replicate the figures, follow the steps below (assuming you are in the project's root directory):
+
+1. Navigate to the visualization module:
+
+   ```bash
+   cd ./notebooks/4.visualization/
+   ```
+
+2. Execute the bash script that sets up the Conda environment and runs the R scripts to generate the figures:
+
+   ```bash
+   source ./4.visualization.sh
+   ```
+
+This script will automatically create the required environment and execute the necessary R code. Once the process completes, all figures will be saved in the `./figures` directory.
+
 ## Citing our work
 
 Please consider using our paper to cite our work or the usage of Pycytominer.

@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
+  - conda-forge::nbconvert
   - conda-forge::r-essentials
   - conda-forge::r-dplyr
   - conda-forge::r-patchwork

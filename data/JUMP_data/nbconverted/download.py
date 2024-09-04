@@ -47,8 +47,7 @@ jump_df.to_csv(
 )
 
 
-# Here, we obtain information about the feature space by splitting both the meta and feature column names and storing them in a dictionary.
-# This dictionary holds information about the feature space and will be utilized for downstream analysis when identifying shared features across different datasets, such as the Cell-injury dataset.
+# Here, we obtain information about the feature space by splitting both the meta and feature column names and storing them in a dictionary. This dictionary holds information about the feature space and will be utilized for downstream analysis when identifying shared features across different datasets, such as the Cell-injury dataset.
 
 # In[4]:
 

@@ -155,7 +155,7 @@ shared_features_df.head()
 
 # ## Applying Feature Selection with Pycytominer
 #
-# In this section, we utilize Pycytominer's feature selection function to obtain informative features that will be employed in training our machine learning models.
+# In this section, we utilize Pycytominer's feature selection function to obtain features that will be used in training our machine learning models.
 
 # In[6]:
 
@@ -227,6 +227,21 @@ jump_feature_space = {
     "features": fs_injury_feats,
 }
 
-# save json file
-with open(fs_dir / "cell_injury_shared_feature_space.json", mode="w") as f:
-    json.dump(jump_feature_space, f)
+# if the feature space file does not exists, create one and use this feature space for downstream
+selected_feature_space_path = (
+    fs_dir / "cell_injury_shared_feature_space.json"
+).resolve()
+if not selected_feature_space_path.exists():
+    print("Feature space file does not exist, creating one...")
+    with open(selected_feature_space_path, mode="w") as f:
+        json.dump(jump_feature_space, f)
+
+# if it d oes exist then we have to check the selected features in this notebook matches with the one saved
+loaded_selected_feature_space = utils.load_json_file(selected_feature_space_path)[
+    "features"
+]
+
+# Check if all elements of list1 are in list2 and vice versa
+all_in_list2 = all(item in fs_injury_feats for item in loaded_selected_feature_space)
+all_in_list1 = all(item in loaded_selected_feature_space for item in fs_injury_feats)
+assert all_in_list2 and all_in_list1, "The lists do not contain the same elements."

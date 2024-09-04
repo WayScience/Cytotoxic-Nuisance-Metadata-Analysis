@@ -30,7 +30,7 @@ from src.utils import (
 # In[2]:
 
 
-# setting random seeds varaibles
+# setting random seeds variables
 seed = 0
 np.random.seed(seed)
 
@@ -62,7 +62,7 @@ modeling_dir = (results_dir / "2.modeling").resolve()
 modeling_dir.mkdir(exist_ok=True)
 
 
-# Below are the paramters used:
+# Below are the parameters used:
 #
 # - **penalty**: Specifies the type of penalty (regularization) applied during logistic regression. It can be 'l1' for L1 regularization, 'l2' for L2 regularization, or 'elasticnet' for a combination of both.
 # - **C**: Inverse of regularization strength; smaller values specify stronger regularization. Controls the trade-off between fitting the training data and preventing overfitting.
@@ -106,7 +106,7 @@ y_train = pd.read_csv(y_train_path)
 y_test = pd.read_csv(y_test_path)
 
 
-# spliting meta and feature column names
+# splitting meta and feature column names
 _, feat_cols = split_meta_and_features(X_train)
 
 # checking if the feature space are identical (also looks for feature space order)
@@ -324,7 +324,7 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
 )
 
 
-# In[14]:
+# In[ ]:
 
 
 # creating confusion matrix with plate holdout (shuffled and not shuffled)
@@ -379,7 +379,7 @@ shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
 # Storing all f1 and pr scores
 #
 
-# In[15]:
+# In[ ]:
 
 
 # storing all f1 scores
@@ -409,7 +409,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[16]:
+# In[ ]:
 
 
 # storing pr scores
@@ -439,7 +439,7 @@ all_pr_scores.to_csv(
 )
 
 
-# In[17]:
+# In[ ]:
 
 
 all_cm_dfs = pd.concat(
