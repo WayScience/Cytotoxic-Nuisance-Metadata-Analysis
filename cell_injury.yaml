@@ -1,13 +1,10 @@
 name: cell-injury
 channels:
+  - anaconda
   - conda-forge
-  - defaults
 dependencies:
   - python=3.11
-  - pandas
-  - numpy
+  - requests=2.32
+  - pycytominer=1.1.0
   - pre-commit
-  - ipykernel
-  - requests
-  - dataframe_image
-  - conda-forge::pycytominer==1.1.0
+  - ipykernel=6.28
