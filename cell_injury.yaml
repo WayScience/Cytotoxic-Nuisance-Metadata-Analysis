@@ -6,5 +6,6 @@ dependencies:
   - python=3.11
   - requests=2.32
   - pycytominer=1.1.0
-  - pre-commit
   - ipykernel=6.28
+  - nbconvert=7.16
+  - pre-commit
