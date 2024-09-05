@@ -162,7 +162,8 @@ Once the process completes, all figures will be saved in the `./figures` directo
 
 ## Development Tools Used
 
-In our project, we utilized a variety of development tools to enforce coding standards, formatting, and improve overall code quality. Below is a list of the primary technologies and linters used:
+In our project, we utilized a variety of development tools to enforce coding standards, formatting, and improve overall code quality. 
+Below is a list of the primary technologies and linters used:
 
 - [**pre-commit**](https://github.com/pre-commit/pre-commit): A framework for managing and maintaining multi-language pre-commit hooks. This ensures that code meets the necessary quality standards before committing changes to the repository.
 - [**pycln**](https://github.com/hadialqattan/pycln): A tool to automatically remove unused imports from Python files, keeping the codebase clean and optimized.
