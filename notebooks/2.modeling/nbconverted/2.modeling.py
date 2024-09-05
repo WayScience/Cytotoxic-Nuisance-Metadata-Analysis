@@ -324,7 +324,7 @@ well_ho_shuffle_precision_recall_df, well_ho_shuffle_f1_score_df = (
 )
 
 
-# In[ ]:
+# In[14]:
 
 
 # creating confusion matrix with plate holdout (shuffled and not shuffled)
@@ -379,7 +379,7 @@ shuffled_well_ho_cm_df = generate_confusion_matrix_tl(
 # Storing all f1 and pr scores
 #
 
-# In[ ]:
+# In[15]:
 
 
 # storing all f1 scores
@@ -409,7 +409,7 @@ all_f1_scores.to_csv(
 )
 
 
-# In[ ]:
+# In[16]:
 
 
 # storing pr scores
@@ -439,7 +439,7 @@ all_pr_scores.to_csv(
 )
 
 
-# In[ ]:
+# In[17]:
 
 
 all_cm_dfs = pd.concat(
