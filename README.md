@@ -157,7 +157,8 @@ To replicate the figures, follow the steps below (assuming you are in the projec
    source ./4.visualization.sh
    ```
 
-This script will automatically create the required environment and execute the necessary R code. Once the process completes, all figures will be saved in the `./figures` directory.
+This script will automatically create the required environment and execute the necessary R code.
+Once the process completes, all figures will be saved in the `./figures` directory.
 
 ## Development Tools Used
 
