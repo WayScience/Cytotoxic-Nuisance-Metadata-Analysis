@@ -566,9 +566,3 @@ merged_summary_df.to_csv(data_split_dir / "summary_data_split.csv", index=False)
 
 # display
 merged_summary_df
-
-
-# In[20]:
-
-
-X_train
