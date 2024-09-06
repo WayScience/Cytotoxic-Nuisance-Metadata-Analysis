@@ -140,9 +140,12 @@ y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.79, 
 
 # generate dataframe responsible for placing the f1 boxes within the plot
 f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
-  mutate(f1_label = paste("F1 score:\nTrain:", train_f1_score, "\n", "Test:", test_f1_score),
-         x = x_values,
-         y = y_values)
+  mutate(f1_label = paste(
+    "F1 score:\nTrain:", sprintf("%.2f", train_f1_score), "\n",
+    "Test:", sprintf("%.2f", test_f1_score)
+  ),
+  x = x_values,
+  y = y_values)
 f1_scores_per_injury_df
 
 # plot data
@@ -175,10 +178,9 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
         legend.text = element_text(size = 18)) +
 
   # adding labels within the facet
-  # fig2_B_pr_curve_plot_train_test +
     geom_point(
       data = f1_scores_per_injury_df,
-      aes(x = x, y = y),
+      aes(x = x, y = y, ),
       shape = 22,      # Use filled circle shape
       size = 38,        # Increase point size
       color = "black", # Point border color
@@ -196,8 +198,10 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
 
     labs(linetype = "Model type", color = "Dataset split")
 
-ggsave("figures/fig2_B_only_test_train_pr_curve.png", width = width, height = height, dpi=600)
+ggsave("figures/fig2_B_only_test_train_pr_curve.png", width = width, height = height, dpi=900)
 fig2_B_pr_curve_plot_train_test
+
+
 
 # creating final model confusion matrix with Non-shuffled data
 final_model_cm <- cm_df %>%
@@ -541,8 +545,11 @@ ggsave(
 )
 
 # Define plot dimensions
-height = 25
-width = 28
+# height = 25
+# width = 28
+
+height <- 26
+width <- 28
 
 layout <- c(
     area(t=0, b=1, l=0, r=20), # A
@@ -551,7 +558,7 @@ layout <- c(
     area(t=5, b=6, l=0, r=10), # D
     area(t=5, b=6, l=11, r=20) # empty space
 )
-options(repr.plot.width=width, repr.plot.height=height, units = "in", dpi = 600)
+options(repr.plot.width=width, repr.plot.height=height, units = "in", dpi = 900)
 
 fig2 <- (
     free(fig2_A_wf_image)
@@ -574,5 +581,5 @@ ggsave(
   filename = "figures/Final_Figure2.png",
   height = height,
   width = width,
-  dpi = 700
+  dpi = 900
 )
