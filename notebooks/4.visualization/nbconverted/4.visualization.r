@@ -180,7 +180,7 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
   # adding labels within the facet
     geom_point(
       data = f1_scores_per_injury_df,
-      aes(x = x, y = y, ),
+      aes(x = x, y = y)
       shape = 22,      # Use filled circle shape
       size = 38,        # Increase point size
       color = "black", # Point border color
