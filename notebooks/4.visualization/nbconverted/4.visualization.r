@@ -166,7 +166,7 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
         legend.box.spacing = unit(0.1, "cm"),
         legend.key.size = unit(0.7, "lines"),
         legend.key.width = unit(1, "lines"),
-        axis.text.x = element_text(angle = 90, size = 20),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, size = 20),
         axis.text.y = element_text(size = 20),
         strip.text = element_text(size = 17),
         strip.text.x = element_text(margin = margin(t=0.2, b=0.2, r=0, l=0, "cm")),
@@ -244,7 +244,7 @@ fig2_C_final_model_cm <- (
         legend.text = element_text(size = 15),
 
         strip.text = element_text(size = 20),
-        axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 18),
         axis.text.y = element_text(hjust = 1, size = 18),
         axis.title.x.bottom = element_text(size = 20),
         axis.title.y.left = element_text(size = 20)
@@ -295,7 +295,7 @@ sfig2_model_cm <- (
         legend.title =  element_text(size = 20, margin = margin(b = 20)),
         legend.text = element_text(size = 15),
         strip.text = element_text(size = 20),
-        axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 18),
         axis.text.y = element_text(hjust = 1, size = 18),
         axis.title.x.bottom = element_text(size = 18),
         axis.title.y.left = element_text(size = 18)
@@ -345,7 +345,7 @@ sfig3_treatment_holdout_cm <- (
         legend.title =  element_text(size = 20, margin = margin(b = 20)),
         legend.text = element_text(size = 15),
         strip.text = element_text(size = 20),
-        axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 18),
         axis.text.y = element_text(hjust = 1, size = 18),
         axis.title.x.bottom = element_text(size = 20),
         axis.title.y.left = element_text(size = 20)
