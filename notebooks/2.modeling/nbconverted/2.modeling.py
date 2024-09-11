@@ -136,7 +136,15 @@ if model_path.exists():
 
 # train model and save
 else:
-    best_model = train_multiclass(X_train, y_train, param_grid=param_grid, seed=seed)
+    # this path is used to save the cv results
+    cv_outpath = (modeling_dir / "multi_class_cv_results.csv").resolve()
+    best_model = train_multiclass(
+        X_train,
+        y_train,
+        param_grid=param_grid,
+        cv_results_outpath=cv_outpath,
+        seed=seed,
+    )
     joblib.dump(best_model, model_path)
 
 
@@ -191,8 +199,16 @@ if shuffled_model_path.exists():
 
 # train model and save
 else:
+    # this path is used to save the cv results
+    shuffled_cv_outpath = (
+        modeling_dir / "shuffled_multi_class_cv_results.csv"
+    ).resolve()
     shuffled_best_model = train_multiclass(
-        shuffled_X_train, y_train, param_grid=param_grid, seed=seed
+        shuffled_X_train,
+        y_train,
+        param_grid=param_grid,
+        cv_results_outpath=shuffled_cv_outpath,
+        seed=seed,
     )
     joblib.dump(shuffled_best_model, shuffled_model_path)
 

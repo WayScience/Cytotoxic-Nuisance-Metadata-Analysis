@@ -184,7 +184,11 @@ def shuffle_features(
 
 
 def train_multiclass(
-    X_train: np.ndarray, y_train: np.ndarray, param_grid: dict, seed: Optional[int] = 0
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    param_grid: dict,
+    cv_results_outpath: pathlib.Path,
+    seed: Optional[int] = 0,
 ) -> BaseEstimator:
     """This approach utilizes RandomizedSearchCV to explore a range of parameters
     specified in the param_grid, ultimately identifying the most suitable model
@@ -200,6 +204,9 @@ def train_multiclass(
         Training labels
     param_grid : dict
         parameters to tune
+    cv_results_outpath: pathlib.Path
+        path were to save the model cross validation parameter
+        search scores
     seed : Optional[int]
         set random seed, default = 0
 
@@ -235,8 +242,13 @@ def train_multiclass(
             # fit with training data
             random_search.fit(X_train, y_train)
 
+    # save the cv results search results
+    cv_results_df = pd.DataFrame(random_search.cv_results_)
+    cv_results_df.to_csv(cv_results_outpath, index=False)
+
     # get the best model
     best_model = random_search.best_estimator_
+
     return best_model
 
 
