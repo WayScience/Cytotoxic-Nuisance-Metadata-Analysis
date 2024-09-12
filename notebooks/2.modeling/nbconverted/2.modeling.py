@@ -61,6 +61,10 @@ wells_holdout_path = (data_splits_dir / "wells_holdout.csv.gz").resolve(strict=T
 modeling_dir = (results_dir / "2.modeling").resolve()
 modeling_dir.mkdir(exist_ok=True)
 
+# setting cv score output paths for both shuffled and non-shuffled models
+cv_outpath = (modeling_dir / "multi_class_cv_results.csv").resolve()
+shuffled_cv_outpath = (modeling_dir / "shuffled_multi_class_cv_results.csv").resolve()
+
 
 # Below are the parameters used:
 #
@@ -118,7 +122,7 @@ assert check_feature_order(
 print("X training size", X_train.shape)
 print("X testing size", X_test.shape)
 print("y training size", y_train.shape)
-print("y testing size", y_test.shape)  #
+print("y testing size", y_test.shape)
 
 
 # ## Training and Evaluating Multi-class Logistic Model with original dataset split
@@ -136,8 +140,6 @@ if model_path.exists():
 
 # train model and save
 else:
-    # this path is used to save the cv results
-    cv_outpath = (modeling_dir / "multi_class_cv_results.csv").resolve()
     best_model = train_multiclass(
         X_train,
         y_train,
@@ -199,10 +201,6 @@ if shuffled_model_path.exists():
 
 # train model and save
 else:
-    # this path is used to save the cv results
-    shuffled_cv_outpath = (
-        modeling_dir / "shuffled_multi_class_cv_results.csv"
-    ).resolve()
     shuffled_best_model = train_multiclass(
         shuffled_X_train,
         y_train,
@@ -483,3 +481,25 @@ all_cm_dfs = pd.concat(
 all_cm_dfs.to_csv(
     modeling_dir / "confusion_matrix.csv.gz", index=False, compression="gzip"
 )
+
+
+# In this section, we combine the cross-validation (CV) scores from both the non-shuffled and shuffled models into a single dataset. The resulting concatenated `cv_score` file will include all the CV scores and solvers used during the training of our multi-class regression model, forming a comprehensive table. This table will contain a `model_type` column, which specifies the model being hyperparameterized during the execution of `RandomSearchCV`. The generated file will be saved in the `./results/2.modeling` directory.
+
+# In[18]:
+
+
+# Opening saved cv scores after hyper-parameter tuning the model
+cv_scores = pd.read_csv(cv_outpath)
+shuffled_cv_scores = pd.read_csv(shuffled_cv_outpath)
+
+# add a column for both data frame indicating which model is shuffled
+cv_scores["model_type"] = "not shuffled"
+shuffled_cv_scores["model_type"] = "not shuffled"
+
+# now concatenate both DataFrame into a single one and save it as csv file
+# this table will be used as the supplementary table
+concat_cv_score = pd.concat([cv_scores, shuffled_cv_scores])
+concat_cv_score.to_csv(modeling_dir / "all_cv_scores.csv", index=False)
+
+# display the concatenated cv score data
+concat_cv_score.head()
