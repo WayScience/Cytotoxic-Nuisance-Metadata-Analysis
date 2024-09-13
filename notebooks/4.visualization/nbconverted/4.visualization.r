@@ -246,7 +246,7 @@ final_model_cm <- cm_df %>%
 final_model_cm$dataset_type <- factor(final_model_cm$dataset_type, levels = c("Train", "Test", "Plate holdout", "Well holdout"))
 
 # Define the desired order of x-axis labels
-x_label_order <- c("Control", "Cytoskeletal", "Hsp90", "Kinase", "Genotoxin", "Miscellaneous", "Redox", "HDAC", "mTOR", "Proteasome", "Saponin", "Mitochondria", "Ferroptosis", "Tannin", "Nonspecific reactive")
+x_label_order <- c("Control", "Cytoskeletal", "Hsp90", "Kinase", "Genotoxin", "Miscellaneous", "Redox", "HDAC", "mTOR", "Proteasome", "Saponin", "Mitochondria", "Ferroptosis", "Tannin", "Nonspecific")
 
 # Reorder the predicted_labels factor variable with the desired order
 final_model_cm$true_labels <- factor(final_model_cm$true_labels, levels = rev(unique(final_model_cm$true_labels)))
