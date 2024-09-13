@@ -7,7 +7,6 @@ suppressPackageStartupMessages(suppressWarnings(library(RColorBrewer))) # color 
 suppressPackageStartupMessages(suppressWarnings(library(patchwork))) # used to attach multiple figures into one
 suppressPackageStartupMessages(library(png)) # allows to load in figures in memory
 
-
 # helper functions
 load_image <- function(path) {
     img <- png::readPNG(path)
@@ -20,7 +19,6 @@ load_image <- function(path) {
         theme_void()
     return(p)
 }
-
 
 # getting all paths
 # confusing matrix paths
@@ -63,7 +61,6 @@ all_injury_proba_df <- read.csv(injury_proba_path)
 # loading workflow image
 fig2_A_wf_image <- load_image(wf_image)
 
-
 # pre-formatting data before plotting
 # Update 'shuffled_model' column in cm_df
 # rename Nonspecific reactive to Nonspecific
@@ -102,7 +99,6 @@ pr_df <- pr_df %>%
     injury_type = ifelse(injury_type == "Nonspecific reactive", "Nonspecific", injury_type)
   )
 
-
 # Update 'shuffled_model' column in proba_df
 # rename Nonspecific reactive to Nonspecific
 cyto_proba_df <- cyto_proba_df %>%
@@ -126,7 +122,6 @@ all_injury_proba_df <- all_injury_proba_df %>%
          injury_compared_to = replace(injury_compared_to, injury_compared_to == "Nonspecific reactive", "Nonspecific"))
 
 fig2_A_wf_image
-
 
 # Selecting only the Test and Train data splits PR curves
 test_train_pr <- pr_df %>%
@@ -232,6 +227,8 @@ ggsave("figures/fig2_B_only_test_train_pr_curve.png", width = width, height = he
 fig2_B_pr_curve_plot_train_test
 
 
+confusion_matrix_scale_bar_label <- "Proportion of predictions\nper true class (rowwise)"
+
 # creating final model confusion matrix with Non-shuffled data
 final_model_cm <- cm_df %>%
   filter(shuffled_model == "Not Shuffled" & dataset_type %in% c("Train", "Test", "Plate Holdout", "Well Holdout")) %>%
@@ -252,6 +249,14 @@ x_label_order <- c("Control", "Cytoskeletal", "Hsp90", "Kinase", "Genotoxin", "M
 final_model_cm$true_labels <- factor(final_model_cm$true_labels, levels = rev(unique(final_model_cm$true_labels)))
 final_model_cm$predicted_labels <- factor(final_model_cm$predicted_labels, levels = x_label_order)
 
+# Calculate rowwise ratios
+final_model_cm <- final_model_cm %>%
+    dplyr::group_by(dataset_type, shuffled_model, true_labels) %>%
+    dplyr::mutate(total_true_count = sum(count)) %>%
+    dplyr::mutate(ratio_rowwise = count / total_true_count)
+
+# NA introduced by divide by zero. Convert to zero for plotting purposes
+final_model_cm[is.na(final_model_cm$ratio_rowwise), "ratio_rowwise"] <- 0
 
 # image size
 img_height <- 15
@@ -259,17 +264,22 @@ img_width <- 15
 
 options(repr.plot.width = img_width, repr.plot.height = img_height)
 
-
 # Now proceed with plotting
 fig2_C_final_model_cm <- (
     ggplot(final_model_cm, aes(x = predicted_labels, y = true_labels))
     + facet_wrap(~dataset_type)
-        + geom_point(aes(color = recall), size = 11, shape = 15)
+        + geom_point(aes(color = ratio_rowwise), size = 11, shape = 15)
         + geom_text(aes(label = count), size = 5)
-        + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1), guide = guide_colorbar(
-            barheight = unit(1, "cm"),
-            barwidth = unit(10, "cm")
-        ))
+        + scale_color_gradient(
+            confusion_matrix_scale_bar_label,
+            low = "white",
+            high = "red",
+            limits = c(0, 1),
+            guide = guide_colorbar(
+                barheight = unit(1, "cm"),
+                barwidth = unit(10, "cm")
+            )
+        )
         + theme_bw()
         + xlab("Predicted class")
         + ylab("True class")
@@ -290,7 +300,6 @@ fig2_C_final_model_cm <- (
 ggsave(filename = "figures/fig2_C_training_confusion_matrix.png", height = height, width = width, dpi = 600)
 
 fig2_C_final_model_cm
-
 
 width <- 20
 height <- 20
@@ -316,12 +325,30 @@ final_model_cm$predicted_labels <- factor(final_model_cm$predicted_labels, level
 facet_order <- c("Train", "Test", "Plate holdout", "Treatment holdout", "Well holdout")
 final_model_cm$dataset_type <- factor(final_model_cm$dataset_type, levels = facet_order)
 
+# Calculate rowwise ratios
+final_model_cm <- final_model_cm %>%
+    dplyr::group_by(dataset_type, shuffled_model, true_labels) %>%
+    dplyr::mutate(total_true_count = sum(count)) %>%
+    dplyr::mutate(ratio_rowwise = count / total_true_count)
+
+# NA introduced by divide by zero. Convert to zero for plotting purposes
+final_model_cm[is.na(final_model_cm$ratio_rowwise), "ratio_rowwise"] <- 0
+
 sfig2_model_cm <- (
   ggplot(final_model_cm, aes(y = true_labels, x = predicted_labels))
-  + facet_wrap(~dataset_type)
-    + geom_point(aes(color = recall), size = 10, shape = 15)
+    + facet_wrap(~dataset_type)
+    + geom_point(aes(color = ratio_rowwise), size = 10, shape = 15)
     + geom_text(aes(label = count), size = 4.3)
-    + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1))
+    + scale_color_gradient(
+        confusion_matrix_scale_bar_label,
+        low = "white",
+        high = "red",
+        limits = c(0, 1),
+        guide = guide_colorbar(
+            barheight = unit(1, "cm"),
+            barwidth = unit(10, "cm")
+        )
+    )
     + theme_bw()
     + xlab("Predicted Class")
     + ylab("True Class")
@@ -329,21 +356,20 @@ sfig2_model_cm <- (
       # legend settings
       legend.title = element_text(size = 20, margin = margin(b = 20)),
       legend.text = element_text(size = 15),
+      legend.position = "bottom",
       strip.text = element_text(size = 25),
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 20),
       axis.text.y = element_text(hjust = 1, size = 20),
       axis.title.x.bottom = element_text(size = 23),
       axis.title.y.left = element_text(size = 23)
     )
-    +
-    ggplot2::coord_fixed()
+    + ggplot2::coord_fixed()
 )
 
 # saving file
 ggsave(filename = "figures/supplemental/sfig2_shuffled_confusion_matrix.png", height = height, width = width, dpi = 600)
 
 sfig2_model_cm
-
 
 # creating final model confusion matrix with Non-shuffled data
 treat_cm <- cm_df %>%
@@ -353,7 +379,7 @@ treat_cm <- cm_df %>%
 treat_cm$shuffled_model <- ifelse(treat_cm$shuffled_model == "Not Shuffled", "Not shuffled", treat_cm$shuffled_model)
 
 # Define the desired order of x-axis labels
-x_label_order <- c("Control", "Cytoskeletal", "Hsp90", "Kinase", "Genotoxin", "Miscellaneous", "Redox", "HDAC", "mTOR", "Proteasome", "Saponin", "Mitochondria", "Ferroptosis", "Tannin", "Nonspecific reactive")
+x_label_order <- c("Control", "Cytoskeletal", "Hsp90", "Kinase", "Genotoxin", "Miscellaneous", "Redox", "HDAC", "mTOR", "Proteasome", "Saponin", "Mitochondria", "Ferroptosis", "Tannin", "Nonspecific")
 
 # Reorder the predicted_labels factor variable with the desired order
 treat_cm$true_labels <- factor(treat_cm$true_labels, levels = rev(unique(treat_cm$true_labels)))
@@ -362,6 +388,19 @@ treat_cm$predicted_labels <- factor(treat_cm$predicted_labels, levels = x_label_
 # Add a column to indicate if recall is 0 or not
 treat_cm$recall_zero <- ifelse(treat_cm$recall == 0, TRUE, FALSE)
 
+# Calculate rowwise ratios
+treat_cm <- treat_cm %>%
+    dplyr::group_by(dataset_type, shuffled_model, true_labels) %>%
+    dplyr::mutate(total_true_count = sum(count)) %>%
+    dplyr::mutate(ratio_rowwise = count / total_true_count)
+
+# NA introduced by divide by zero. Convert to zero for plotting purposes
+treat_cm[is.na(treat_cm$ratio_rowwise), "ratio_rowwise"] <- 0
+
+# Select only diagonal comparisons so we can draw boxes
+focus_correct_predictions_to_draw_boxes <- treat_cm %>%
+    dplyr::filter(true_labels == predicted_labels)
+
 # size of plot
 width <- 15
 height <- 15
@@ -369,11 +408,20 @@ options(repr.plot.width = width, repr.plot.height = height)
 
 sfig3_treatment_holdout_cm <- (
   ggplot(treat_cm, aes(x = predicted_labels, y = true_labels))
-  +
-    facet_wrap(~shuffled_model)
-    + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1))
-    + geom_point(aes(color = recall, alpha = !recall_zero), size = 10, shape = 15)
-    + geom_text(aes(label = ifelse(count > 0, as.character(count), "")), size = 6)
+    + facet_wrap(~shuffled_model)
+    + scale_color_gradient(
+        confusion_matrix_scale_bar_label,
+        low = "white",
+        high = "red",
+        limits = c(0, 1),
+        guide = guide_colorbar(
+            barheight = unit(1, "cm"),
+            barwidth = unit(10, "cm")
+        )
+    )
+    + geom_point(aes(color = ratio_rowwise), size = 10, shape = 15)
+    + geom_point(data = focus_correct_predictions_to_draw_boxes, color = "purple", size = 11, shape = 0)
+    + geom_text(aes(label = count), size = 4.3)
     + theme_bw()
     + xlab("Predicted Class")
     + ylab("True Class")
@@ -382,19 +430,19 @@ sfig3_treatment_holdout_cm <- (
       # legend settings
       legend.title = element_text(size = 20, margin = margin(b = 20)),
       legend.text = element_text(size = 15),
+      legend.position = "bottom",
       strip.text = element_text(size = 25),
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 20),
       axis.text.y = element_text(hjust = 1, size = 20),
       axis.title.x.bottom = element_text(size = 23),
       axis.title.y.left = element_text(size = 23)
     )
-    + ggplot2::coord_fixed())
+    )
 
 # saving file
-ggsave(filename = "figures/supplemental/sfig3_treatment_holdout_confusion_matrix.png", height = height, width = width, dpi = 600)
+ggsave(filename = "figures/supplemental/sfig3_treatment_holdout_confusion_matrix.png", height = 9, width = 14, dpi = 600)
 
 sfig3_treatment_holdout_cm
-
 
 # Define the desired order of y-axis labels
 desired_order <- c("Other Injuries", "Cyto Injury", "Cyto JUMP Overlap")
@@ -403,7 +451,7 @@ desired_order <- c("Other Injuries", "Cyto Injury", "Cyto JUMP Overlap")
 label_descriptions <- c(
   "Other Injuries" = "Cytoskeletal injury\n as not top\n predicted probability",
   "Cyto Injury" = "Cytoskeletal injury\n as top predicted\n probability",
-  "Cyto JUMP Overlap" = "Cytoskeletal injury\n compound\n ground truth"
+  "Cyto JUMP Overlap" = "Known cytoskeletal\ninjury compounds\noverlap in CPJUMP1"
 )
 
 # Convert the 'injury' variable to factor with the desired order of levels
@@ -438,7 +486,7 @@ fig2_D_probabilities_ridge_plot <- (
       "Not shuffled" = "#03bfc4"
     )) +
     labs(
-      y = "Predicted injuries",
+      y = "CPJUMP1 compound categories",
       x = "Cytoskeletal injury probability",
       fill = "Model type"
     ) +
@@ -450,13 +498,15 @@ ggsave(filename = "figures/fig2_D_JUMP_cyto_injury_probability_ridgeplot.png", h
 fig2_D_probabilities_ridge_plot
 
 
+# How many points are here?
+print(dim(cyto_proba_df))
+head(cyto_proba_df)
+
 # Subset the dataframe to drop rows where datatype equals "JUMP Overlap"
 jump_proba_no_cyto <- subset(all_injury_proba_df, datatype != "JUMP Overlap")
+
+print(dim(jump_proba_no_cyto))
 head(jump_proba_no_cyto)
-
-
-# Load the required libraries
-library(patchwork)
 
 # Define image dimensions
 img_height <- 5
@@ -565,7 +615,6 @@ for (i in 1:length(class_order)) {
   ridge_plots_list[[class]] <- ridge_plot
 }
 
-
 img_height <- 25
 img_width <- 20
 
@@ -586,9 +635,8 @@ ggsave(
   dpi = 700
 )
 
-
 # Define plot dimensions
-height = 25
+height = 24.5
 width = 26
 
 layout <- c(
@@ -613,7 +661,7 @@ fig2 <- (
     + plot_spacer()
 
     # plot layouts
-    + plot_layout(design = layout, heights = c(3, 3, 2))  # Freeze Row 2 with a higher relative height (3)
+    + plot_layout(design = layout, heights = c(3, 3, 1.85))  # Freeze Row 2 with a higher relative height (3)
 
     + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 35, face = "bold"))
 )
