@@ -479,8 +479,6 @@ all_cm_dfs.to_csv(
 #
 # This file will allow for easy examination of the importance of each feature in predicting different injury types, facilitating a deeper understanding of the model's behavior.
 
-#
-
 # In[18]:
 
 
@@ -516,8 +514,11 @@ sorted_scores = []
 
 # Iterate over each group
 for score, df in score_group:
+    # get the absolute values of the coefficients
+    df["abs_coefficient"] = df["coefficient"].abs()
+
     # Sort the DataFrame by 'coefficient' in descending order
-    df = df.sort_values(by="coefficient", ascending=False)
+    df = df.sort_values(by="abs_coefficient", ascending=False)
 
     # Append the sorted DataFrame to the list
     sorted_scores.append(df)
