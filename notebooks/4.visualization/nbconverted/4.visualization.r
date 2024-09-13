@@ -106,31 +106,24 @@ pr_df <- pr_df %>%
 # Update 'shuffled_model' column in proba_df
 # rename Nonspecific reactive to Nonspecific
 cyto_proba_df <- cyto_proba_df %>%
-  mutate(
-    shuffled = case_when(
-      shuffled == "False" ~ "Not Shuffled",
-      shuffled == "True" ~ "Shuffled",
-      TRUE ~ shuffled
-    ),
-    pred_injury = ifelse(pred_injury == "Nonspecific reactive", "Nonspecific", pred_injury),
-    injury = case_when(
-      grepl("Cytoskeletal", pred_injury) ~ "Cyto Injury",
-      datatype == "JUMP Overlap" ~ "Cyto JUMP Overlap",
-      TRUE ~ "Other Injuries"
-    )
-  )
+  mutate(shuffled = replace(shuffled, shuffled == "False", "Not Shuffled"),
+         shuffled = replace(shuffled, shuffled == "True", "Shuffled"))
 
+# Adding the new column based on the condition
+cyto_proba_df <- cyto_proba_df %>%
+  mutate(injury = ifelse(grepl('Cytoskeletal', pred_injury), 'Cyto Injury', 'Other Injuries'))
+
+## Update the 'injury' column based on 'datatype' condition
+cyto_proba_df <- cyto_proba_df %>%
+  mutate(injury = ifelse(datatype == "JUMP Overlap", "Cyto JUMP Overlap", injury))
+
+
+# Update injury proba columns
 all_injury_proba_df <- all_injury_proba_df %>%
-  mutate(
-    shuffled = case_when(
-      shuffled == "False" ~ "Not shuffled",
-      shuffled == "True" ~ "Shuffled",
-      TRUE ~ shuffled
-    ),
-    pred_injury = ifelse(pred_injury == "Nonspecific reactive", "Nonspecific", pred_injury),
-    injury_compared_to = ifelse(injury_compared_to == "Nonspecific reactive", "Nonspecific", injury_compared_to)
-  )
-
+  mutate(shuffled = replace(shuffled, shuffled == "False", "Not shuffled"),
+         shuffled = replace(shuffled, shuffled == "True", "Shuffled"),
+         pred_injury = replace(pred_injury, pred_injury == "Nonspecific reactive", "Nonspecific"),
+         injury_compared_to = replace(injury_compared_to, injury_compared_to == "Nonspecific reactive", "Nonspecific"))
 
 fig2_A_wf_image
 
@@ -171,13 +164,13 @@ f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
 
 # These values manually move the F1 score box within each subplot.
 # The position of these values corresponds to the row of the table below.
-x_values <- c(0.50, 0.50, 0.35, 0.30, 0.50, 0.50, 0.40, 0.70, 0.40, 0.40, 0.70, 0.35, 0.75, 0.75, 0.75)
-y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.80, 0.50, 0.75, 0.75, 0.75)
+x_values <- c(0.50, 0.50, 0.35, 0.30, 0.50, 0.50, 0.40, 0.70, 0.40, 0.40, 0.70, 0.35, 0.74, 0.74, 0.74)
+y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.80, 0.50, 0.90, 0.90, 0.90)
 
 # generate dataframe responsible for placing the f1 boxes within the plot
 f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
   mutate(
-    f1_label = paste(
+    f1_label = paste0(
       "F1 Train:", sprintf("%.2f", train_f1_score), "\n",
       "F1 Test:", sprintf("%.2f", test_f1_score)
     ),
@@ -214,8 +207,8 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
     strip.text = element_text(size = 25),
     strip.text.x = element_text(margin = margin(t = 0.2, b = 0.2, r = 0, l = 0, "cm")),
     axis.title = element_text(size = 23),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 18),
+    legend.title = element_text(size = 25),
+    legend.text = element_text(size = 22),
     legend.position = c(0.88, 0.09)
   ) +
   # adding labels within the facet
@@ -229,7 +222,7 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
     aes(x = x, y = y, label = f1_label),
     hjust = 0.5, # Center horizontally
     vjust = 0.5, # Adjust vertically for position
-    size = 6, # Increase font size
+    size = 6.3, # Increase font size
     color = "black", # Text color
     show.legend = FALSE # Hide legend for this layer
   ) +
@@ -271,7 +264,7 @@ options(repr.plot.width = img_width, repr.plot.height = img_height)
 fig2_C_final_model_cm <- (
     ggplot(final_model_cm, aes(x = predicted_labels, y = true_labels))
     + facet_wrap(~dataset_type)
-        + geom_point(aes(color = recall), size = 12, shape = 15)
+        + geom_point(aes(color = recall), size = 11, shape = 15)
         + geom_text(aes(label = count), size = 5)
         + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1), guide = guide_colorbar(
             barheight = unit(1, "cm"),
@@ -427,7 +420,7 @@ options(repr.plot.width = img_width, repr.plot.height = img_height)
 
 fig2_D_probabilities_ridge_plot <- (
   ggplot(cyto_proba_df, aes(x = Cytoskeletal, y = injury, fill = shuffled)) +
-    geom_density_ridges(alpha = 0.6, scale = 1) +
+    geom_density_ridges(alpha = 0.6, scale = 1.1) +
     theme_bw() +
     theme(
       axis.text.x = element_text(size = 23, angle = 45, hjust = 1),
@@ -577,6 +570,7 @@ img_height <- 25
 img_width <- 20
 
 options(repr.plot.width = img_width, repr.plot.height = img_height)
+
 # Convert the list of ridge plots to a patchwork layout
 all_injury_probas_ridge_plot <- wrap_plots(ridge_plots_list[1:14], ncol = 3)
 
@@ -595,33 +589,39 @@ ggsave(
 
 # Define plot dimensions
 height = 25
-width = 28
+width = 26
 
 layout <- c(
-    area(t=0, b=1, l=0, r=20), # A
-    area(t=2, b=4, l=0, r=10), # B
-    area(t=2, b=4, l=11, r=20), # C
-    area(t=5, b=6, l=0, r=8), # D
-    area(t=5, b=6, l=11, r=20) # empty space
+    # Row 1
+    area(t=0, b=5, l=0, r=20), # A
+
+    # row 2
+    area(t=6, b=18, l=0, r=9), # B
+    area(t=6, b=19, l=10, r=20), # C
+
+    # row 3
+    area(t=19, b=25, l=0, r=8), # D
+    area(t=20, b=25, l=11, r=20) # empty space
 )
 options(repr.plot.width=width, repr.plot.height=height, units = "in", dpi = 600)
 
 fig2 <- (
-    free(fig2_A_wf_image)
-    + wrap_elements( full = fig2_B_pr_curve_plot_train_test)
+    wrap_elements(fig2_A_wf_image)
+    / wrap_elements( full = fig2_B_pr_curve_plot_train_test)
     + free(fig2_C_final_model_cm)
     + wrap_elements(fig2_D_probabilities_ridge_plot)
     + plot_spacer()
 
     # plot layouts
-    + plot_layout(design = layout, heights = c(1, 1, 0.1))
+    + plot_layout(design = layout, heights = c(3, 3, 2))  # Freeze Row 2 with a higher relative height (3)
+
     + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 35, face = "bold"))
 )
 
 # Display the combined plot
 fig2
 
-# Save the plot
+# # Save the plot
 ggsave(
   plot = fig2,
   filename = "figures/Final_Figure2.png",
