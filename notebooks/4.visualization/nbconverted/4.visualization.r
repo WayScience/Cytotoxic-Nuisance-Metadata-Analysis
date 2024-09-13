@@ -419,7 +419,7 @@ img_width <- 12
 options(repr.plot.width = img_width, repr.plot.height = img_height)
 
 fig2_D_probabilities_ridge_plot <- (
-  ggplot(cyto_proba_df, aes(x = Cytoskeletal, y = injury, fill = shuffled)) +
+  ggplot(cyto_proba_df, aes(x = Cytoskeletal_proba, y = injury, fill = shuffled)) +
     geom_density_ridges(alpha = 0.6, scale = 1.1) +
     theme_bw() +
     theme(
