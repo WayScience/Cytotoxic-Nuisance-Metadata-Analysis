@@ -159,6 +159,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# Mac specific files
+*.DS_Store
+
 # large dataset
 data/JUMP_data/JUMP_all_plates_normalized_negcon.csv.gz
 notebooks/3.jump-analysis/overlapp-issue-check.ipynb
