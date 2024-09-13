@@ -467,3 +467,64 @@ all_cm_dfs = pd.concat(
 all_cm_dfs.to_csv(
     modeling_dir / "confusion_matrix.csv.gz", index=False, compression="gzip"
 )
+
+
+# Next, we will extract the coefficient scores for all morphological features for each class and save the results into a single CSV file.
+#
+# The generated CSV file will include the following columns:
+# - **injury_id**: A numeric identifier assigned to each injury type.
+# - **injury_name**: The name of the injury type.
+# - **feature**: The name of the morphological feature.
+# - **coefficient**: The coefficient score associated with the morphological feature for the specific injury class.
+#
+# This file will allow for easy examination of the importance of each feature in predicting different injury types, facilitating a deeper understanding of the model's behavior.
+
+# In[18]:
+
+
+# load
+# get feature names
+feature_names = X_train.columns
+
+# get coeff scores
+scores = best_model.coef_
+
+# creating a data frame that contains the injury code, injury name and coef scores
+coef_score_df = (
+    pd.DataFrame(data=scores, columns=feature_names)
+    .reset_index()
+    .rename(columns={"index": "injury_name"})
+)
+coef_score_df["injury_name"] = coef_score_df["injury_name"].apply(
+    lambda code: injury_codes["decoder"][str(code)]
+)
+coef_score_df = coef_score_df.reset_index().rename(columns={"index": "injury_code"})
+
+# Melt the DataFrame from wide to long format
+# Converts the DataFrame to have 'injury_code', 'injury_name', 'feature', and 'coefficient' columns
+score_group = pd.melt(
+    coef_score_df,
+    id_vars=["injury_code", "injury_name"],
+    var_name="feature",
+    value_name="coefficient",
+).groupby(by="injury_code")
+
+# Initialize a list to hold sorted DataFrames
+sorted_scores = []
+
+# Iterate over each group
+for score, df in score_group:
+    # get the absolute values of the coefficients
+    df["abs_coefficient"] = df["coefficient"].abs()
+
+    # Sort the DataFrame by 'abs_coefficient' in descending order
+    df = df.sort_values(by="abs_coefficient", ascending=False)
+
+    # Append the sorted DataFrame to the list
+    sorted_scores.append(df)
+
+# Concatenate all sorted DataFrames into a single DataFrame
+sorted_scores = pd.concat(sorted_scores)
+
+# save scores
+sorted_scores.to_csv(modeling_dir / "coeff_scores_per_injury.csv", index=False)

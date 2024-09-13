@@ -16,7 +16,7 @@ repos:
 
   # Ruff python linter and formatter
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.1
+    rev: v0.6.4
     hooks:
       - id: ruff
         types_or: [python, pyi, jupyter]
@@ -33,7 +33,7 @@ repos:
           - black==24.8.0
   # additional hooks found with in the pre-commit lib
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace # removes trailing white spaces
       - id: mixed-line-ending # removes mixed end of line
