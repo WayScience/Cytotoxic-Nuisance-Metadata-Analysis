@@ -334,7 +334,7 @@ final_model_cm <- final_model_cm %>%
 # NA introduced by divide by zero. Convert to zero for plotting purposes
 final_model_cm[is.na(final_model_cm$ratio_rowwise), "ratio_rowwise"] <- 0
 
-sfig2_model_cm <- (
+sfig3_model_cm <- (
   ggplot(final_model_cm, aes(y = true_labels, x = predicted_labels))
     + facet_wrap(~dataset_type)
     + geom_point(aes(color = ratio_rowwise), size = 10, shape = 15)
@@ -367,9 +367,9 @@ sfig2_model_cm <- (
 )
 
 # saving file
-ggsave(filename = "figures/supplemental/sfig2_shuffled_confusion_matrix.png", height = height, width = width, dpi = 600)
+ggsave(filename = "figures/supplemental/sfig3_shuffled_confusion_matrix.png", height = height, width = width, dpi = 600)
 
-sfig2_model_cm
+sfig3_model_cm
 
 # creating final model confusion matrix with Non-shuffled data
 treat_cm <- cm_df %>%
@@ -406,7 +406,7 @@ width <- 15
 height <- 15
 options(repr.plot.width = width, repr.plot.height = height)
 
-sfig3_treatment_holdout_cm <- (
+sfig4_treatment_holdout_cm <- (
   ggplot(treat_cm, aes(x = predicted_labels, y = true_labels))
     + facet_wrap(~shuffled_model)
     + scale_color_gradient(
@@ -440,9 +440,9 @@ sfig3_treatment_holdout_cm <- (
     )
 
 # saving file
-ggsave(filename = "figures/supplemental/sfig3_treatment_holdout_confusion_matrix.png", height = 9, width = 14, dpi = 600)
+ggsave(filename = "figures/supplemental/sfig4_treatment_holdout_confusion_matrix.png", height = 9, width = 14, dpi = 600)
 
-sfig3_treatment_holdout_cm
+sfig4_treatment_holdout_cm
 
 # Define the desired order of y-axis labels
 desired_order <- c("Other Injuries", "Cyto Injury", "Cyto JUMP Overlap")
@@ -629,7 +629,7 @@ all_injury_probas_ridge_plot
 # Save the plot
 ggsave(
   plot = all_injury_probas_ridge_plot,
-  filename = "figures/supplemental/sfig4_all_injury_probabilities.png",
+  filename = "figures/supplemental/sfig5_all_injury_probabilities.png",
   height = img_height,
   width = img_width,
   dpi = 700
