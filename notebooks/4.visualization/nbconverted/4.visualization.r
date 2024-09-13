@@ -211,9 +211,9 @@ fig2_B_pr_curve_plot_train_test <- ggplot(pr_f1_curve, aes(x = recall, y = preci
     legend.key.width = unit(1, "lines"),
     axis.text.x = element_text(angle = 90, vjust = 0.5, size = 20),
     axis.text.y = element_text(size = 20),
-    strip.text = element_text(size = 20),
+    strip.text = element_text(size = 25),
     strip.text.x = element_text(margin = margin(t = 0.2, b = 0.2, r = 0, l = 0, "cm")),
-    axis.title = element_text(size = 22),
+    axis.title = element_text(size = 23),
     legend.title = element_text(size = 20),
     legend.text = element_text(size = 18),
     legend.position = c(0.88, 0.09)
@@ -270,34 +270,26 @@ options(repr.plot.width = img_width, repr.plot.height = img_height)
 # Now proceed with plotting
 fig2_C_final_model_cm <- (
     ggplot(final_model_cm, aes(x = predicted_labels, y = true_labels))
-    +
-        facet_wrap(~dataset_type)
-        +
-        geom_point(aes(color = recall), size = 12, shape = 15)
-        +
-        geom_text(aes(label = count), size = 5)
-        +
-        scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1), guide = guide_colorbar(
+    + facet_wrap(~dataset_type)
+        + geom_point(aes(color = recall), size = 12, shape = 15)
+        + geom_text(aes(label = count), size = 5)
+        + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1), guide = guide_colorbar(
             barheight = unit(1, "cm"),
             barwidth = unit(10, "cm")
         ))
-        +
-        theme_bw()
-        +
-        xlab("Predicted class")
-        +
-        ylab("True class")
-        +
-        theme(
+        + theme_bw()
+        + xlab("Predicted class")
+        + ylab("True class")
+        + theme(
             # legend settings
             legend.title = element_text(size = 20, margin = margin(b = 20)),
             legend.text = element_text(size = 15),
             legend.position = "bottom", # Move legend to the right to align it vertically
-            strip.text = element_text(size = 20),
-            axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 18),
-            axis.text.y = element_text(hjust = 1, size = 18),
-            axis.title.x.bottom = element_text(size = 20),
-            axis.title.y.left = element_text(size = 20)
+            strip.text = element_text(size = 25),
+            axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 20),
+            axis.text.y = element_text(hjust = 1, size = 20),
+            axis.title.x.bottom = element_text(size = 23),
+            axis.title.y.left = element_text(size = 23)
         )
 )
 
@@ -333,30 +325,22 @@ final_model_cm$dataset_type <- factor(final_model_cm$dataset_type, levels = face
 
 sfig2_model_cm <- (
   ggplot(final_model_cm, aes(y = true_labels, x = predicted_labels))
-  +
-    facet_wrap(~dataset_type)
-    +
-    geom_point(aes(color = recall), size = 10, shape = 15)
-    +
-    geom_text(aes(label = count), size = 4.3)
-    +
-    scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1))
-    +
-    theme_bw()
-    +
-    xlab("Predicted Class")
-    +
-    ylab("True Class")
-    +
-    theme(
+  + facet_wrap(~dataset_type)
+    + geom_point(aes(color = recall), size = 10, shape = 15)
+    + geom_text(aes(label = count), size = 4.3)
+    + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1))
+    + theme_bw()
+    + xlab("Predicted Class")
+    + ylab("True Class")
+    + theme(
       # legend settings
       legend.title = element_text(size = 20, margin = margin(b = 20)),
       legend.text = element_text(size = 15),
       strip.text = element_text(size = 25),
-      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 18),
-      axis.text.y = element_text(hjust = 1, size = 18),
-      axis.title.x.bottom = element_text(size = 18),
-      axis.title.y.left = element_text(size = 18)
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 20),
+      axis.text.y = element_text(hjust = 1, size = 20),
+      axis.title.x.bottom = element_text(size = 23),
+      axis.title.y.left = element_text(size = 23)
     )
     +
     ggplot2::coord_fixed()
@@ -394,33 +378,24 @@ sfig3_treatment_holdout_cm <- (
   ggplot(treat_cm, aes(x = predicted_labels, y = true_labels))
   +
     facet_wrap(~shuffled_model)
-    +
-    scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1))
-    +
-    geom_point(aes(color = recall, alpha = !recall_zero), size = 10, shape = 15)
-    +
-    geom_text(aes(label = ifelse(count > 0, as.character(count), "")), size = 6)
-    +
-    theme_bw()
-    +
-    xlab("Predicted Class")
-    +
-    ylab("True Class")
-    +
-    guides(alpha = FALSE) # Remove the legend for alpha
-    +
-    theme(
+    + scale_color_gradient("Ratio", low = "white", high = "red", limits = c(0, 1))
+    + geom_point(aes(color = recall, alpha = !recall_zero), size = 10, shape = 15)
+    + geom_text(aes(label = ifelse(count > 0, as.character(count), "")), size = 6)
+    + theme_bw()
+    + xlab("Predicted Class")
+    + ylab("True Class")
+    + guides(alpha = FALSE) # Remove the legend for alpha
+    + theme(
       # legend settings
       legend.title = element_text(size = 20, margin = margin(b = 20)),
       legend.text = element_text(size = 15),
-      strip.text = element_text(size = 20),
-      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 18),
-      axis.text.y = element_text(hjust = 1, size = 18),
-      axis.title.x.bottom = element_text(size = 20),
-      axis.title.y.left = element_text(size = 20)
+      strip.text = element_text(size = 25),
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 20),
+      axis.text.y = element_text(hjust = 1, size = 20),
+      axis.title.x.bottom = element_text(size = 23),
+      axis.title.y.left = element_text(size = 23)
     )
-    +
-    ggplot2::coord_fixed())
+    + ggplot2::coord_fixed())
 
 # saving file
 ggsave(filename = "figures/supplemental/sfig3_treatment_holdout_confusion_matrix.png", height = height, width = width, dpi = 600)
@@ -455,11 +430,11 @@ fig2_D_probabilities_ridge_plot <- (
     geom_density_ridges(alpha = 0.6, scale = 1) +
     theme_bw() +
     theme(
-      axis.text.x = element_text(size = 20, angle = 45, hjust = 1),
-      axis.text.y = element_text(size = 20),
-      axis.title = element_text(size = 22),
-      legend.title = element_text(size = 20),
-      legend.text = element_text(size = 20),
+      axis.text.x = element_text(size = 23, angle = 45, hjust = 1),
+      axis.text.y = element_text(size = 23),
+      axis.title = element_text(size = 25),
+      legend.title = element_text(size = 23),
+      legend.text = element_text(size = 23),
       legend.spacing.y = unit(0.1, "cm"),
       legend.box.spacing = unit(0.2, "cm"),
       legend.key.size = unit(0.7, "lines"),
