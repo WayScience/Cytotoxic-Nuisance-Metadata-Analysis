@@ -517,7 +517,7 @@ for score, df in score_group:
     # get the absolute values of the coefficients
     df["abs_coefficient"] = df["coefficient"].abs()
 
-    # Sort the DataFrame by 'coefficient' in descending order
+    # Sort the DataFrame by 'abs_coefficient' in descending order
     df = df.sort_values(by="abs_coefficient", ascending=False)
 
     # Append the sorted DataFrame to the list
