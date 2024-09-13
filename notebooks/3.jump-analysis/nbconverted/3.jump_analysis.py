@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Module 3: JUMP Analysis 
-# 
-# In this notebook, we utilize the Joint Undertaking in Morphological Profile [dataset](https://jump-cellpainting.broadinstitute.org/cell-painting) and integrate it into our model. Our objective is to assess the probability of specific cell injuries present within each well entry from the JUMP dataset. 
-# 
+# # Module 3: JUMP Analysis
+#
+# In this notebook, we utilize the Joint Undertaking in Morphological Profile [dataset](https://jump-cellpainting.broadinstitute.org/cell-painting) and integrate it into our model. Our objective is to assess the probability of specific cell injuries present within each well entry from the JUMP dataset.
+#
 # Additionally, we identify shared treatments between the JUMP and cell-injury datasets to construct a confusion matrix. This enables us to evaluate the performance of predicting cellular injury across different datasets.
 
 # In[3]:
 
 
-import sys
 import pathlib
+import sys
 
 import joblib
 import pandas as pd
@@ -19,12 +19,11 @@ import pandas as pd
 # project module imports
 sys.path.append("../../")  # noqa
 from src.utils import (
-    load_json_file,
-    split_meta_and_features,
     check_feature_order,
     generate_confusion_matrix_tl,
+    load_json_file,
+    split_meta_and_features,
 )
-
 
 # ## Setting up parameters and paths
 
@@ -70,7 +69,7 @@ jump_analysis_dir.mkdir(exist_ok=True)
 
 
 # ## Loading in datasets and json files
-# 
+#
 # Here we are loading the JUMP dataset along with the cell injury metadata, injury codes and the files representing the overlapping feature space.
 
 # In[5]:
@@ -113,9 +112,9 @@ jump_df.head()
 
 
 # ## Updating the JUMP Dataset by Selecting Only Shared Features
-# 
+#
 # During this step, we utilize the shared feature list to update our JUMP dataset, selecting only those features that overlap.
-# 
+#
 # Note that the shared feature space file maintains the same order as the feature space used during model training.
 
 # In[6]:
@@ -157,7 +156,7 @@ shared_jump_df.to_csv(
 
 # ## Identifying shared treatments
 # Once the feature space has been narrowed down to only those features shared between both datasets, the next step is to generate a dataset containing shared treatments that are both presentin in the `cell_injury` and `JUMP` datasets. These shared compounds will then be utilized to subset the `JUMP` dataset, which will be considered as the ground truth for downstream analyses.
-# 
+#
 # **Approach**:
 # 1. **Identifying shared Compounds**: We compare the compounds present in both datasets to identify the overlapping ones.
 # 2. **Subsetting the JUMP Dataset**: Once the overlapping compounds are identified, we subset the `JUMP` dataset to include only those compounds, forming our ground truth dataset.
@@ -504,7 +503,7 @@ pd.concat([jump_overlap_cm, shuffled_jump_overlap_cm]).to_csv(
 
 # ## Creating supplemental Table
 
-# Below we are creating a supplemental table showing the types of injury predicted associated with the compounds found in the JUMP-CP datat set 
+# Below we are creating a supplemental table showing the types of injury predicted associated with the compounds found in the JUMP-CP datat set
 
 # In[22]:
 
@@ -598,4 +597,3 @@ predicted_df.head()
 predicted_df.to_csv(
     jump_analysis_dir / "JUMP_CP_Pilot_predicted_injuries.csv", index=False
 )
-
