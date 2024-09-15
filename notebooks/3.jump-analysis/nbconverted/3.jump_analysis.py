@@ -7,7 +7,7 @@
 #
 # Additionally, we identify shared treatments between the JUMP and cell-injury datasets to construct a confusion matrix. This enables us to evaluate the performance of predicting cellular injury across different datasets.
 
-# In[3]:
+# In[1]:
 
 
 import pathlib
@@ -27,7 +27,7 @@ from src.utils import (
 
 # ## Setting up parameters and paths
 
-# In[4]:
+# In[2]:
 
 
 # setting up paths and output paths
@@ -72,7 +72,7 @@ jump_analysis_dir.mkdir(exist_ok=True)
 #
 # Here we are loading the JUMP dataset along with the cell injury metadata, injury codes and the files representing the overlapping feature space.
 
-# In[5]:
+# In[3]:
 
 
 # loading in JUMP dataset
@@ -117,7 +117,7 @@ jump_df.head()
 #
 # Note that the shared feature space file maintains the same order as the feature space used during model training.
 
-# In[6]:
+# In[4]:
 
 
 # update the over lapping jump df
@@ -143,7 +143,7 @@ print("Number of features", len(shared_feats))
 shared_jump_df.head()
 
 
-# In[7]:
+# In[5]:
 
 
 # save overlapping files
@@ -165,7 +165,7 @@ shared_jump_df.to_csv(
 # ### Identifying Overlapping Compounds
 # Here, we used the International Chemical Identifier (InChI) to identify chemicals shared between the JUMP dataset and the Cell Injury dataset.
 
-# In[8]:
+# In[6]:
 
 
 cell_injury_InChI_keys = cell_injury_meta_df["Compound InChIKey"].unique().tolist()
@@ -201,7 +201,7 @@ overlapping_compounds_df
 
 # Once the common compounds and their associated cell injury types are identified, the next step involves selecting it from the JUMP dataset to select only wells that possess the common InChI keys.
 
-# In[9]:
+# In[7]:
 
 
 # selecting rows that contains the overlapping compounds
@@ -224,7 +224,7 @@ shared_treat_jump_df.head()
 
 # Now that we have identified the wells treated with overlapping treatments, we want to know the amount of wells that a specific treatment have.
 
-# In[10]:
+# In[8]:
 
 
 # count number of wells and augment with injury_code injury_type and compound name
@@ -254,7 +254,7 @@ well_counts_df.columns = [
 well_counts_df
 
 
-# In[11]:
+# In[9]:
 
 
 # Here we select the the compound associated with the cytoskeletal injury
@@ -270,7 +270,7 @@ shared_jump_df = shared_jump_df.drop(index=gt_jump_cyto_injury_df.index, inplace
 
 # Finally we save the shared_treaments_df as a csv.gz file.
 
-# In[12]:
+# In[10]:
 
 
 # save overlapping files
@@ -283,7 +283,7 @@ shared_treat_jump_df.to_csv(
 
 # ## Applying JUMP dataset to Multi-Class Logistics Regression Model
 
-# In[13]:
+# In[11]:
 
 
 # metadata to select from the jump dataset to add into the ground truth
@@ -312,7 +312,7 @@ assert check_feature_order(
 ), "Feature space are not identical"
 
 
-# In[14]:
+# In[12]:
 
 
 # Loading in model
@@ -322,7 +322,7 @@ shuffled_model = joblib.load(modeling_dir / "shuffled_multi_class_model.joblib")
 
 # Here, we apply the JUMP dataset to the model to calculate the probabilities of each injury being present per well. These probabilities are then saved in a tidy long format suitable for plotting in R.
 
-# In[15]:
+# In[13]:
 
 
 # cols to selected
@@ -381,7 +381,7 @@ all_proba_scores["pred_injury"] = all_proba_scores["pred_injury"].apply(
 
 # We will now save the ground truth predictions, which include probability scores for each injury type and model type, as well as the predicted injury. These results will be stored in the `./results/3.jump_analysis` directory.
 
-# In[16]:
+# In[14]:
 
 
 # update columns by replacing the column index (which are the injury codes) to the injury type
@@ -430,7 +430,7 @@ gt_proba_preds_df.head()
 
 # Next, we will focus only on the probability scores for JUMP wells predicted to have cytoskeletal injury (excluding ground truth data).
 
-# In[24]:
+# In[15]:
 
 
 # next only select cytoskeletal probability scores
@@ -452,7 +452,7 @@ cytoskeletal_proba_scores.head()
 
 # Next, we will obtain all probability scores for JUMP wells predicted to have any injury (excluding ground truth data).
 
-# In[18]:
+# In[16]:
 
 
 # making all probabilities tidy long
@@ -471,7 +471,7 @@ all_injury_proba.head()
 
 # ## Generating Confusion Matrix
 
-# In[19]:
+# In[17]:
 
 
 shared_treat_meta, shared_treat_feats = split_meta_and_features(shared_treat_jump_df)
@@ -479,7 +479,7 @@ shared_X = shared_treat_jump_df[shared_treat_feats]
 shared_y = shared_treat_jump_df["injury_code"]
 
 
-# In[20]:
+# In[18]:
 
 
 jump_overlap_cm = generate_confusion_matrix_tl(
@@ -490,7 +490,7 @@ shuffled_jump_overlap_cm = generate_confusion_matrix_tl(
 ).fillna(0)
 
 
-# In[21]:
+# In[19]:
 
 
 # save confusion matrix
@@ -505,7 +505,7 @@ pd.concat([jump_overlap_cm, shuffled_jump_overlap_cm]).to_csv(
 
 # Below we are creating a supplemental table showing the types of injury predicted associated with the compounds found in the JUMP-CP datat set
 
-# In[22]:
+# In[20]:
 
 
 # setting column arrangement
@@ -591,7 +591,7 @@ print(predicted_df.shape)
 predicted_df.head()
 
 
-# In[23]:
+# In[21]:
 
 
 predicted_df.to_csv(
