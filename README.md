@@ -169,7 +169,7 @@ Below is a list of the primary technologies and linters used:
 - [**pycln**](https://github.com/hadialqattan/pycln): A tool to automatically remove unused imports from Python files, keeping the codebase clean and optimized.
 - [**isort**](https://github.com/PyCQA/isort): An import sorting tool that organizes imports according to a specific style (in this case, aligned with Black's formatting rules). This helps maintain consistency in the order of imports throughout the codebase.
 - [**ruff-pre-commit**](https://github.com/astral-sh/ruff-pre-commit): A fast Python linter and formatter that checks code style and can automatically fix formatting issues.
-- [**blacken-docs**](https://github.com/adamchainz/blacken-docs): A utility that formats Python code within documentation blocks, ensuring that example code snippets in docstrings and markdown files adhere to the same standards as the main codebase.
+- [**blacken-docs**](https://github.com/adamchainz/blacken-docs): A utility that formats Python code within documentation blocks, ensuring that example code snippets in docstring and markdown files adhere to the same standards as the main codebase.
 - [**pre-commit-hooks**](https://github.com/pre-commit/pre-commit-hooks): A collection of various hooks, such as removing trailing whitespace, fixing end-of-line issues, and formatting JSON files.
 
 **Note:** to see the pre-commit configurations please refer to the `./.pre-commit-config.yaml` file
