@@ -122,7 +122,7 @@ assert check_feature_order(
 print("X training size", X_train.shape)
 print("X testing size", X_test.shape)
 print("y training size", y_train.shape)
-print("y testing size", y_test.shape)  #
+print("y testing size", y_test.shape)
 
 
 # ## Training and Evaluating Multi-class Logistic Model with original dataset split
