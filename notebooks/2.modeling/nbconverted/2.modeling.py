@@ -61,9 +61,9 @@ wells_holdout_path = (data_splits_dir / "wells_holdout.csv.gz").resolve(strict=T
 modeling_dir = (results_dir / "2.modeling").resolve()
 modeling_dir.mkdir(exist_ok=True)
 
-# setting cv score output paths for both shuffled and non-shuffled models
-cv_outpath = (modeling_dir / "multi_class_cv_results.csv").resolve()
-shuffled_cv_outpath = (modeling_dir / "shuffled_multi_class_cv_results.csv").resolve()
+# file paths to save cv scors
+original_model_cv_results = modeling_dir / "multi_class_cv_results.csv"
+shuffled_model_cv_results = modeling_dir / "shuffled_multi_class_cv_results.csv"
 
 
 # Below are the parameters used:
@@ -122,7 +122,7 @@ assert check_feature_order(
 print("X training size", X_train.shape)
 print("X testing size", X_test.shape)
 print("y training size", y_train.shape)
-print("y testing size", y_test.shape)
+print("y testing size", y_test.shape)  #
 
 
 # ## Training and Evaluating Multi-class Logistic Model with original dataset split
@@ -144,8 +144,8 @@ else:
         X_train,
         y_train,
         param_grid=param_grid,
-        cv_results_outpath=cv_outpath,
         seed=seed,
+        cv_results_outpath=original_model_cv_results,
     )
     joblib.dump(best_model, model_path)
 
@@ -205,8 +205,8 @@ else:
         shuffled_X_train,
         y_train,
         param_grid=param_grid,
-        cv_results_outpath=shuffled_cv_outpath,
         seed=seed,
+        cv_results_outpath=shuffled_model_cv_results,
     )
     joblib.dump(shuffled_best_model, shuffled_model_path)
 
