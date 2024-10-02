@@ -2,19 +2,19 @@
 # coding: utf-8
 
 # # Feature Processing and Selection
-#
+# 
 # This notebook focuses on exploration using two essential files: the annotations data extracted from the actual screening profile (available in the [IDR repository](https://github.com/IDR/idr0133-dahlin-cellpainting/tree/main/screenA)) and the metadata retrieved from the supplementary section of the [research paper](https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-36829-x/MediaObjects/41467_2023_36829_MOESM5_ESM.xlsx).
-#
+# 
 # We explore the number of unique compounds associated with each cell injury and subsequently cross-reference this information with the screening profile. The aim is to assess the feasibility of using the data for training a machine learning model to predict cell injury.
-#
+# 
 # We apply feature selection through [pycytominer](https://github.com/cytomining/pycytominer) to capture the most informative features representing various cellular injury types within the morphology space. Then, we utilize the selected feature profiles for machine learning applications.
 
-# In[1]:
+# In[7]:
 
 
+import sys
 import json
 import pathlib
-import sys
 from collections import defaultdict
 
 import pandas as pd
@@ -23,9 +23,10 @@ from pycytominer import feature_select
 sys.path.append("../../")
 from src import utils
 
+
 # Setting up paths and parameters
 
-# In[2]:
+# In[8]:
 
 
 # data directory
@@ -62,7 +63,7 @@ print("Cell injury screen shape:", image_profile_df.shape)
 
 # Here, we are collecting all the samples treated solely with DMSO. Any well treated with DMSO will be labeled as "Control."
 
-# In[3]:
+# In[9]:
 
 
 # Get all wells treated with DMSO and label them as "Control" as the injury_type
@@ -76,7 +77,7 @@ control_df.head()
 
 # Next, the `injured_df` is generated, which will exclusively contain wells treated with a component that induces an injury. This was accomplished by utilizing supplemental data that detailed which treatments caused specific injuries. We then cross-referenced this data with the image-based profile to identify wells treated with those components and labeled them with the associated injury.
 
-# In[4]:
+# In[10]:
 
 
 # creating a dictionary that contains the {injury_type : [list of treatments]}
@@ -120,11 +121,49 @@ print("List of Injuries", injured_df["injury_type"].unique())
 injured_df.head()
 
 
+# ## Feature Selection on the Cell-Injury Data
+# 
+# Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data 
+
+# In[11]:
+
+
+fs_cell_injury_profile = feature_select(
+    profiles=injured_df,
+    features=injury_feats,
+    operation=["correlation_threshold", "variance_threshold", "drop_outliers", "drop_na_columns"],
+
+)
+
+# split meta and morphology feature columns
+fs_cell_injury_meta, fs_cell_injury_feats = utils.split_meta_and_features(fs_cell_injury_profile)
+
+# display
+print(f"N features cell-injury profile {len(injury_feats)}")
+print(f"N features fs-cell-injury profile {len(fs_cell_injury_feats)}")
+print(f"N features dropped {len(injury_feats) - len(fs_cell_injury_feats)}")
+
+# saving morphology feature space in JSON file
+fs_cell_injury_feature_space = {}
+fs_cell_injury_feature_space["name"] = "fs_cell_injury"
+fs_cell_injury_feature_space["n_plates"] = len(fs_cell_injury_profile["Plate"].unique())
+fs_cell_injury_feature_space["n_meta_features"] = len(fs_cell_injury_meta)
+fs_cell_injury_feature_space["n_features"] = len(fs_cell_injury_feats)
+fs_cell_injury_feature_space["meta_features"] = fs_cell_injury_meta
+fs_cell_injury_feature_space["features"] = fs_cell_injury_feats
+
+with open(fs_dir / "fs_cell_inkiry_only.feature_space,json", mode="w") as stream:
+    json.dump(fs_cell_injury_feature_space, stream)
+
+# saving feature selected cell-injury profile
+fs_cell_injury_profile.to_csv(fs_dir / "fs_cell_injury_only.csv.gz", index=False)
+
+
 # ## Identifying Shared Features between JUMP and Cell Injury Datasets
-#
+# 
 # In this section, we identify the shared features present in both the normalized cell-injury and the JUMP pilot dataset. Next, we utilize these shared features to update our dataset and use it for feature selection in the next step.
 
-# In[5]:
+# In[12]:
 
 
 # load in JUMP feature space
@@ -154,10 +193,10 @@ shared_features_df.head()
 
 
 # ## Applying Feature Selection with Pycytominer
-#
+# 
 # In this section, we utilize Pycytominer's feature selection function to obtain features that will be used in training our machine learning models.
 
-# In[6]:
+# In[13]:
 
 
 # Applying feature selection using pycytominer
@@ -181,7 +220,7 @@ fs_injury_df.head()
 
 # Generate encoders and decoders for injuries, and save the file as a JSON file. Additionally, update the feature-selected profile with the injury codes and save it.
 
-# In[7]:
+# In[14]:
 
 
 # next lets make an injury code
@@ -211,7 +250,7 @@ fs_injury_df.to_csv(
 
 # Save feature space information while maintaining feature space order
 
-# In[8]:
+# In[15]:
 
 
 # split meta and feature column names
@@ -245,3 +284,4 @@ loaded_selected_feature_space = utils.load_json_file(selected_feature_space_path
 all_in_list2 = all(item in fs_injury_feats for item in loaded_selected_feature_space)
 all_in_list1 = all(item in loaded_selected_feature_space for item in fs_injury_feats)
 assert all_in_list2 and all_in_list1, "The lists do not contain the same elements."
+
