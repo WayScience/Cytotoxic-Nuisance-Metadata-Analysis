@@ -9,7 +9,7 @@
 #
 # We apply feature selection through [pycytominer](https://github.com/cytomining/pycytominer) to capture the most informative features representing various cellular injury types within the morphology space. Then, we utilize the selected feature profiles for machine learning applications.
 
-# In[7]:
+# In[1]:
 
 
 import json
@@ -25,7 +25,7 @@ from src import utils
 
 # Setting up paths and parameters
 
-# In[8]:
+# In[2]:
 
 
 # data directory
@@ -62,7 +62,7 @@ print("Cell injury screen shape:", image_profile_df.shape)
 
 # Here, we are collecting all the samples treated solely with DMSO. Any well treated with DMSO will be labeled as "Control."
 
-# In[9]:
+# In[3]:
 
 
 # Get all wells treated with DMSO and label them as "Control" as the injury_type
@@ -76,7 +76,7 @@ control_df.head()
 
 # Next, the `injured_df` is generated, which will exclusively contain wells treated with a component that induces an injury. This was accomplished by utilizing supplemental data that detailed which treatments caused specific injuries. We then cross-referenced this data with the image-based profile to identify wells treated with those components and labeled them with the associated injury.
 
-# In[10]:
+# In[4]:
 
 
 # creating a dictionary that contains the {injury_type : [list of treatments]}
@@ -105,8 +105,27 @@ injured_df = pd.concat(
     ]
 )
 
+# creating cell injury coder and encoder dictionary
+cell_injuries = injured_df["injury_type"].unique()
+injury_codes = defaultdict(lambda: {})
+for idx, injury in enumerate(cell_injuries):
+    injury_codes["encoder"][injury] = idx
+    injury_codes["decoder"][idx] = injury
+
+
+# update injured_df with injury codes
+injured_df.insert(
+    0,
+    "injury_code",
+    injured_df["injury_type"].apply(lambda injury: injury_codes["encoder"][injury]),
+)
+
 # split meta and feature column names
 injury_meta, injury_feats = utils.split_meta_and_features(injured_df)
+
+# save the injury codes json file
+with open(fs_dir / "injury_codes.json", mode="w") as f:
+    json.dump(injury_codes, f)
 
 # display
 print("Shape of cell injury dataframe", injured_df.shape)
@@ -124,9 +143,10 @@ injured_df.head()
 #
 # Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data
 
-# In[11]:
+# In[5]:
 
 
+# conduct feature selection using pycytominer
 fs_cell_injury_profile = feature_select(
     profiles=injured_df,
     features=injury_feats,
@@ -148,27 +168,39 @@ print(f"N features cell-injury profile {len(injury_feats)}")
 print(f"N features fs-cell-injury profile {len(fs_cell_injury_feats)}")
 print(f"N features dropped {len(injury_feats) - len(fs_cell_injury_feats)}")
 
-# saving morphology feature space in JSON file
-fs_cell_injury_feature_space = {}
-fs_cell_injury_feature_space["name"] = "fs_cell_injury"
-fs_cell_injury_feature_space["n_plates"] = len(fs_cell_injury_profile["Plate"].unique())
-fs_cell_injury_feature_space["n_meta_features"] = len(fs_cell_injury_meta)
-fs_cell_injury_feature_space["n_features"] = len(fs_cell_injury_feats)
-fs_cell_injury_feature_space["meta_features"] = fs_cell_injury_meta
-fs_cell_injury_feature_space["features"] = fs_cell_injury_feats
 
-with open(fs_dir / "fs_cell_inkiry_only.feature_space,json", mode="w") as stream:
-    json.dump(fs_cell_injury_feature_space, stream)
+# if the feature space json file does not exists, create one and use this feature space for downstream
+cell_injury_selected_feature_space_path = (
+    fs_dir / "fs_cell_injury_only_feature_space.json"
+).resolve()
+if not cell_injury_selected_feature_space_path.exists():
+    # saving morphology feature space in JSON file
+    print("Feature space file does not exist, creating one...")
+    fs_cell_injury_feature_space = {}
+    fs_cell_injury_feature_space["name"] = "fs_cell_injury"
+    fs_cell_injury_feature_space["n_plates"] = len(
+        fs_cell_injury_profile["Plate"].unique()
+    )
+    fs_cell_injury_feature_space["n_meta_features"] = len(fs_cell_injury_meta)
+    fs_cell_injury_feature_space["n_features"] = len(fs_cell_injury_feats)
+    fs_cell_injury_feature_space["meta_features"] = fs_cell_injury_meta
+    fs_cell_injury_feature_space["features"] = fs_cell_injury_feats
+    with open(fs_dir / "fs_cell_injury_only_feature_space.json", mode="w") as stream:
+        json.dump(fs_cell_injury_feature_space, stream)
+
 
 # saving feature selected cell-injury profile
 fs_cell_injury_profile.to_csv(fs_dir / "fs_cell_injury_only.csv.gz", index=False)
+
+print(fs_cell_injury_profile.shape)
+fs_cell_injury_profile.head()
 
 
 # ## Identifying Shared Features between JUMP and Cell Injury Datasets
 #
 # In this section, we identify the shared features present in both the normalized cell-injury and the JUMP pilot dataset. Next, we utilize these shared features to update our dataset and use it for feature selection in the next step.
 
-# In[12]:
+# In[6]:
 
 
 # load in JUMP feature space
@@ -201,70 +233,54 @@ shared_features_df.head()
 #
 # In this section, we utilize Pycytominer's feature selection function to obtain features that will be used in training our machine learning models.
 
-# In[13]:
+# In[7]:
 
 
 # Applying feature selection using pycytominer
-fs_injury_df = feature_select(
+aligned_cell_injury_fs_df = feature_select(
     profiles=shared_features_df,
     features=shared_feats,
 )
 
 # split meta and feature column names
-fs_injury_meta, fs_injury_feats = utils.split_meta_and_features(fs_injury_df)
-cell_injuries = fs_injury_df["injury_type"].unique()
+fs_injury_meta, fs_injury_feats = utils.split_meta_and_features(
+    aligned_cell_injury_fs_df
+)
+
+# counting number of cell injuries
+cell_injuries = aligned_cell_injury_fs_df["injury_type"].unique()
 
 # display
 print("Number of meta features", len(fs_injury_meta))
 print("Number of features", len(fs_injury_feats))
-print("Shape of fs shared profile", fs_injury_df.shape)
+print("Shape of fs shared profile", aligned_cell_injury_fs_df.shape)
 print("number of cell injury types", len(cell_injuries))
 print(cell_injuries)
-fs_injury_df.head()
-
-
-# Generate encoders and decoders for injuries, and save the file as a JSON file. Additionally, update the feature-selected profile with the injury codes and save it.
-
-# In[14]:
-
-
-# next lets make an injury code
-injury_codes = defaultdict(lambda: {})
-for idx, injury in enumerate(cell_injuries):
-    injury_codes["encoder"][injury] = idx
-    injury_codes["decoder"][idx] = injury
-
-# update shared fs profile with injury codes
-fs_injury_df.insert(
-    0,
-    "injury_code",
-    fs_injury_df["injury_type"].apply(lambda injury: injury_codes["encoder"][injury]),
-)
-
-# now save the injury codes json file
-with open(fs_dir / "injury_codes.json", mode="w") as f:
-    json.dump(injury_codes, f)
+print(aligned_cell_injury_fs_df.shape)
+aligned_cell_injury_fs_df.head()
 
 # save shared feature selected profile
-fs_injury_df.to_csv(
+aligned_cell_injury_fs_df.to_csv(
     fs_dir / "cell_injury_profile_fs.csv.gz",
     index=False,
     compression="gzip",
 )
 
 
-# Save feature space information while maintaining feature space order
+# Save the aligned feature space information while maintaining feature space order
 
-# In[15]:
+# In[8]:
 
 
 # split meta and feature column names
-fs_injury_meta, fs_injury_feats = utils.split_meta_and_features(fs_injury_df)
+fs_injury_meta, fs_injury_feats = utils.split_meta_and_features(
+    aligned_cell_injury_fs_df
+)
 
 # saving info of feature space
 jump_feature_space = {
     "name": "cell_injury",
-    "n_plates": len(fs_injury_df["Plate"].unique()),
+    "n_plates": len(aligned_cell_injury_fs_df["Plate"].unique()),
     "n_meta_features": len(fs_injury_meta),
     "n_features": len(fs_injury_feats),
     "meta_features": fs_injury_meta,
@@ -273,7 +289,7 @@ jump_feature_space = {
 
 # if the feature space file does not exists, create one and use this feature space for downstream
 selected_feature_space_path = (
-    fs_dir / "cell_injury_shared_feature_space.json"
+    fs_dir / "aligned_cell_injury_shared_feature_space.json"
 ).resolve()
 if not selected_feature_space_path.exists():
     print("Feature space file does not exist, creating one...")
