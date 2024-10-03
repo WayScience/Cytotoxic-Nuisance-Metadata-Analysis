@@ -1,0 +1,36 @@
+{
+    "encoder": {
+        "Control": 0,
+        "Cytoskeletal": 1,
+        "Hsp90": 2,
+        "Kinase": 3,
+        "Genotoxin": 4,
+        "Miscellaneous": 5,
+        "Redox": 6,
+        "HDAC": 7,
+        "mTOR": 8,
+        "Proteasome": 9,
+        "Saponin": 10,
+        "Mitochondria": 11,
+        "Ferroptosis": 12,
+        "Tannin": 13,
+        "Nonspecific reactive": 14
+    },
+    "decoder": {
+        "0": "Control",
+        "1": "Cytoskeletal",
+        "2": "Hsp90",
+        "3": "Kinase",
+        "4": "Genotoxin",
+        "5": "Miscellaneous",
+        "6": "Redox",
+        "7": "HDAC",
+        "8": "mTOR",
+        "9": "Proteasome",
+        "10": "Saponin",
+        "11": "Mitochondria",
+        "12": "Ferroptosis",
+        "13": "Tannin",
+        "14": "Nonspecific reactive"
+    }
+}
