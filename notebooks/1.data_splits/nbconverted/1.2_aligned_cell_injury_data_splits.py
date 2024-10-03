@@ -59,7 +59,9 @@ fs_profile_path = (fs_dir / "cell_injury_profile_fs.csv.gz").resolve(strict=True
 
 # load in feature space file
 fs_feature_space = load_json_file(
-    fpath=(fs_dir / "cell_injury_shared_feature_space.json").resolve(strict=True)
+    fpath=(fs_dir / "aligned_cell_injury_shared_feature_space.json").resolve(
+        strict=True
+    )
 )
 fs_feats = fs_feature_space["features"]
 
@@ -155,7 +157,7 @@ for injury, df in fs_profile_df.groupby("injury_type"):
     injury_meta_dict[injury] = treatment_meta
 
 # save dictionary into a json file
-with open(data_split_dir / "injury_metadata.json", mode="w") as stream:
+with open(data_split_dir / "aligned_injury_metadata.json", mode="w") as stream:
     json.dump(injury_meta_dict, stream)
 
 
@@ -181,7 +183,7 @@ for plate_id, df in fs_profile_df.groupby("Plate"):
     plate_meta[plate_id] = treatment_counter
 
 # save dictionary into a json file
-with open(data_split_dir / "cell_injury_plate_info.json", mode="w") as stream:
+with open(data_split_dir / "aligned_cell_injury_plate_info.json", mode="w") as stream:
     json.dump(plate_meta, stream)
 
 
@@ -238,7 +240,7 @@ assert all(
 
 # saving the holdout data
 plate_holdout_df.to_csv(
-    data_split_dir / "plate_holdout.csv.gz", index=False, compression="gzip"
+    data_split_dir / "aligned_plate_holdout.csv.gz", index=False, compression="gzip"
 )
 
 # display
@@ -322,7 +324,7 @@ assert all(
 ), "index to be dropped found in the main dataframe"
 # saving the holdout data
 treatment_holdout_df.to_csv(
-    data_split_dir / "treatment_holdout.csv.gz", index=False, compression="gzip"
+    data_split_dir / "aligned_treatment_holdout.csv.gz", index=False, compression="gzip"
 )
 
 # display
@@ -378,7 +380,7 @@ assert all(
 
 # saving the holdout data
 wells_heldout_df.to_csv(
-    data_split_dir / "wells_holdout.csv.gz", index=False, compression="gzip"
+    data_split_dir / "aligned_wells_holdout.csv.gz", index=False, compression="gzip"
 )
 
 # display
@@ -427,10 +429,14 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # saving training dataset as csv file
-X_train.to_csv(data_split_dir / "X_train.csv.gz", compression="gzip", index=False)
-X_test.to_csv(data_split_dir / "X_test.csv.gz", compression="gzip", index=False)
-y_train.to_csv(data_split_dir / "y_train.csv.gz", compression="gzip", index=False)
-y_test.to_csv(data_split_dir / "y_test.csv.gz", compression="gzip", index=False)
+X_train.to_csv(
+    data_split_dir / "X_train_aligned.csv.gz", compression="gzip", index=False
+)
+X_test.to_csv(data_split_dir / "X_test_aligned.csv.gz", compression="gzip", index=False)
+y_train.to_csv(
+    data_split_dir / "y_train_aligned.csv.gz", compression="gzip", index=False
+)
+y_test.to_csv(data_split_dir / "y_test_aligned.csv.gz", compression="gzip", index=False)
 
 # display data split sizes
 print("X training size", X_train.shape)
@@ -445,7 +451,7 @@ print("y testing size", y_test.shape)
 # save metadata after holdout
 cell_injury_metadata = fs_profile_df[fs_meta]
 cell_injury_metadata.to_csv(
-    data_split_dir / "cell_injury_metadata_after_holdout.csv.gz",
+    data_split_dir / "aligned_cell_injury_metadata_after_holdout.csv.gz",
     compression="gzip",
     index=False,
 )
@@ -562,7 +568,7 @@ merged_summary_df = merged_summary_df.reset_index().rename(
 )
 
 # save as csv file
-merged_summary_df.to_csv(data_split_dir / "summary_data_split.csv", index=False)
+merged_summary_df.to_csv(data_split_dir / "aligned_summary_data_split.csv", index=False)
 
 # display
 merged_summary_df
