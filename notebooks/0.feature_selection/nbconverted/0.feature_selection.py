@@ -168,7 +168,6 @@ print(f"N features cell-injury profile {len(injury_feats)}")
 print(f"N features fs-cell-injury profile {len(fs_cell_injury_feats)}")
 print(f"N features dropped {len(injury_feats) - len(fs_cell_injury_feats)}")
 
-
 # if the feature space json file does not exists, create one and use this feature space for downstream
 cell_injury_selected_feature_space_path = (
     fs_dir / "fs_cell_injury_only_feature_space.json"
@@ -187,7 +186,6 @@ if not cell_injury_selected_feature_space_path.exists():
     fs_cell_injury_feature_space["features"] = fs_cell_injury_feats
     with open(fs_dir / "fs_cell_injury_only_feature_space.json", mode="w") as stream:
         json.dump(fs_cell_injury_feature_space, stream)
-
 
 # saving feature selected cell-injury profile
 fs_cell_injury_profile.to_csv(fs_dir / "fs_cell_injury_only.csv.gz", index=False)
