@@ -139,11 +139,30 @@ print("List of Injuries", injured_df["injury_type"].unique())
 injured_df.head()
 
 
+# After generating the complete cell injury dataframe, we will check for any rows containing NaN values and remove them if found.
+
+# In[5]:
+
+
+# next is to drop rows that NaNs
+df = injured_df[injury_feats]
+nan_idx_to_drop = df[df.isna().any(axis=1)].index
+
+# display
+print(f"shape of dataframe before drop NaN rows {injured_df.shape}")
+print(f"There are {len(nan_idx_to_drop)} rows to drop that contains NaN's")
+
+# update
+injured_df = injured_df.drop(nan_idx_to_drop)
+print(injured_df.shape)
+injured_df.head()
+
+
 # ## Feature Selection on the Cell-Injury Data
 #
 # Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data
 
-# In[5]:
+# In[6]:
 
 
 # conduct feature selection using pycytominer
@@ -198,7 +217,7 @@ fs_cell_injury_profile.head()
 #
 # In this section, we identify the shared features present in both the normalized cell-injury and the JUMP pilot dataset. Next, we utilize these shared features to update our dataset and use it for feature selection in the next step.
 
-# In[6]:
+# In[7]:
 
 
 # load in JUMP feature space
@@ -231,7 +250,7 @@ shared_features_df.head()
 #
 # In this section, we utilize Pycytominer's feature selection function to obtain features that will be used in training our machine learning models.
 
-# In[7]:
+# In[8]:
 
 
 # Applying feature selection using pycytominer
@@ -259,7 +278,7 @@ aligned_cell_injury_fs_df.head()
 
 # save shared feature selected profile
 aligned_cell_injury_fs_df.to_csv(
-    fs_dir / "cell_injury_profile_fs.csv.gz",
+    fs_dir / "aligned_cell_injury_profile_fs.csv.gz",
     index=False,
     compression="gzip",
 )
@@ -267,7 +286,7 @@ aligned_cell_injury_fs_df.to_csv(
 
 # Save the aligned feature space information while maintaining feature space order
 
-# In[8]:
+# In[9]:
 
 
 # split meta and feature column names
