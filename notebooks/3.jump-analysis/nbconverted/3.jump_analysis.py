@@ -44,20 +44,20 @@ jump_data_path = (jump_data_dir / "JUMP_all_plates_normalized_negcon.csv.gz").re
 barcode_path = (jump_data_dir / "barcode_platemap.csv").resolve(strict=True)
 # loading only cell injury metadata (after holdout has been applied)
 cell_injury_metadata_path = (
-    data_split_dir / "cell_injury_metadata_after_holdout.csv.gz"
+    data_split_dir / "aligned_cell_injury_metadata_after_holdout.csv.gz"
 ).resolve(strict=True)
 
 # model paths
-multi_class_model_path = (modeling_dir / "multi_class_model.joblib").resolve(
+multi_class_model_path = (modeling_dir / "aligned_multi_class_model.joblib").resolve(
     strict=True
 )
 shuffled_multi_class_model_path = (
-    modeling_dir / "shuffled_multi_class_model.joblib"
+    modeling_dir / "aligned_shuffled_multi_class_model.joblib"
 ).resolve(strict=True)
 
 # overlapping feature space path
 shared_feature_space_path = (
-    fs_results_dir / "cell_injury_shared_feature_space.json"
+    fs_results_dir / "aligned_cell_injury_shared_feature_space.json"
 ).resolve(strict=True)
 
 # injury codes
@@ -148,7 +148,7 @@ shared_jump_df.head()
 
 # save overlapping files
 shared_jump_df.to_csv(
-    jump_analysis_dir / "shared_feats_jump_data.csv.gz",
+    jump_analysis_dir / "JUMP_shared_feats_jump_data.csv.gz",
     compression="gzip",
     index=False,
 )
@@ -165,7 +165,7 @@ shared_jump_df.to_csv(
 # ### Identifying Overlapping Compounds
 # Here, we used the International Chemical Identifier (InChI) to identify chemicals shared between the JUMP dataset and the Cell Injury dataset.
 
-# In[6]:
+# In[ ]:
 
 
 cell_injury_InChI_keys = cell_injury_meta_df["Compound InChIKey"].unique().tolist()
@@ -201,7 +201,7 @@ overlapping_compounds_df
 
 # Once the common compounds and their associated cell injury types are identified, the next step involves selecting it from the JUMP dataset to select only wells that possess the common InChI keys.
 
-# In[7]:
+# In[ ]:
 
 
 # selecting rows that contains the overlapping compounds
@@ -275,7 +275,7 @@ shared_jump_df = shared_jump_df.drop(index=gt_jump_cyto_injury_df.index, inplace
 
 # save overlapping files
 shared_treat_jump_df.to_csv(
-    jump_analysis_dir / "shared_treatments_jump_data.csv.gz",
+    jump_analysis_dir / "JUMP_shared_treatments_jump_data.csv.gz",
     compression="gzip",
     index=False,
 )
@@ -316,8 +316,8 @@ assert check_feature_order(
 
 
 # Loading in model
-model = joblib.load(modeling_dir / "multi_class_model.joblib")
-shuffled_model = joblib.load(modeling_dir / "shuffled_multi_class_model.joblib")
+model = joblib.load(modeling_dir / "aligned_multi_class_model.joblib")
+shuffled_model = joblib.load(modeling_dir / "aligned_shuffled_multi_class_model.joblib")
 
 
 # Here, we apply the JUMP dataset to the model to calculate the probabilities of each injury being present per well. These probabilities are then saved in a tidy long format suitable for plotting in R.
@@ -381,7 +381,7 @@ all_proba_scores["pred_injury"] = all_proba_scores["pred_injury"].apply(
 
 # We will now save the ground truth predictions, which include probability scores for each injury type and model type, as well as the predicted injury. These results will be stored in the `./results/3.jump_analysis` directory.
 
-# In[14]:
+# In[ ]:
 
 
 # update columns by replacing the column index (which are the injury codes) to the injury type
@@ -421,7 +421,7 @@ gt_proba_preds_df["pred_injury"] = (
 )
 
 # saving ground truth probabilities
-gt_save_path = (jump_analysis_dir / "ground_truth_probabilities.csv").resolve()
+gt_save_path = (jump_analysis_dir / "JUMP_ground_truth_probabilities.csv").resolve()
 gt_proba_preds_df.to_csv(gt_save_path, index=False)
 
 # display dataframe
@@ -441,7 +441,7 @@ cytoskeletal_proba_scores = cytoskeletal_proba_scores.rename(
 
 # Saving only cytoskeletal probability scores
 cytoskeletal_proba_scores.to_csv(
-    jump_analysis_dir / "cytoskeletal_proba_scores.csv.gz",
+    jump_analysis_dir / "JUMP_cytoskeletal_proba_scores.csv.gz",
     compression="gzip",
     index=False,
 )
@@ -464,7 +464,7 @@ all_injury_proba = all_proba_scores[col_to_sel + injury_classes].melt(
 
 # save file
 all_injury_proba.to_csv(
-    jump_analysis_dir / "all_injury_proba.csv.gz", index=False, compression="gzip"
+    jump_analysis_dir / "JUMP_all_injury_proba.csv.gz", index=False, compression="gzip"
 )
 all_injury_proba.head()
 
