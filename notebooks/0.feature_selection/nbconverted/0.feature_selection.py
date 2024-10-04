@@ -169,6 +169,19 @@ print(injured_df.shape)
 injured_df.head()
 
 
+# Save the labeled cell-injury dataset into the ./data directory
+#
+
+# In[7]:
+
+
+injured_df.to_csv(
+    data_dir / "JUMP_data/labeled_JUMP_all_plates_normalized_negcon.csv.gz",
+    index=False,
+    compression="gzip",
+)
+
+
 # ## Feature Selection on the Cell-Injury Data
 #
 # Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data.
@@ -177,7 +190,7 @@ injured_df.head()
 # - feature selected cell injury profiles
 # - the feature space associated with this profile.
 
-# In[7]:
+# In[8]:
 
 
 # conduct feature selection using pycytominer
@@ -210,7 +223,7 @@ print(f"N features dropped {len(injury_feats) - len(fs_cell_injury_feats)}")
 
 # After generating the feature-selected cell-injury profiles, we will save both the selected features space and the profiles in the `results/0.feature_selection/` directory.
 
-# In[8]:
+# In[9]:
 
 
 # if feature space json file does not exists, create one and use this feature space for downstream
@@ -243,7 +256,7 @@ fs_cell_injury_profile.head()
 #
 # In this section, we identify the shared features present in both the normalized cell-injury and the JUMP pilot dataset. Next, we utilize these shared features to update our dataset and use it for feature selection in the next step.
 
-# In[9]:
+# In[10]:
 
 
 # Grab all JUMP morphological features
@@ -278,7 +291,7 @@ shared_features_df.head()
 # - A feature-selected, aligned cell injury profile
 # - The aligned selected feature space, saved in a JSON file
 
-# In[10]:
+# In[11]:
 
 
 # Applying feature selection using pycytominer
@@ -322,7 +335,7 @@ aligned_cell_injury_fs_df.to_csv(
 
 # Save the aligned feature space information while maintaining feature space order
 
-# In[11]:
+# In[12]:
 
 
 # split meta and feature column names
