@@ -117,7 +117,7 @@ jump_df.head()
 #
 # Note that the shared feature space file maintains the same order as the feature space used during model training.
 
-# In[4]:
+# In[ ]:
 
 
 # update the over lapping jump df
@@ -165,7 +165,7 @@ shared_jump_df.to_csv(
 # ### Identifying Overlapping Compounds
 # Here, we used the International Chemical Identifier (InChI) to identify chemicals shared between the JUMP dataset and the Cell Injury dataset.
 
-# In[ ]:
+# In[6]:
 
 
 cell_injury_InChI_keys = cell_injury_meta_df["Compound InChIKey"].unique().tolist()
@@ -201,7 +201,7 @@ overlapping_compounds_df
 
 # Once the common compounds and their associated cell injury types are identified, the next step involves selecting it from the JUMP dataset to select only wells that possess the common InChI keys.
 
-# In[ ]:
+# In[7]:
 
 
 # selecting rows that contains the overlapping compounds
@@ -381,7 +381,7 @@ all_proba_scores["pred_injury"] = all_proba_scores["pred_injury"].apply(
 
 # We will now save the ground truth predictions, which include probability scores for each injury type and model type, as well as the predicted injury. These results will be stored in the `./results/3.jump_analysis` directory.
 
-# In[ ]:
+# In[14]:
 
 
 # update columns by replacing the column index (which are the injury codes) to the injury type
