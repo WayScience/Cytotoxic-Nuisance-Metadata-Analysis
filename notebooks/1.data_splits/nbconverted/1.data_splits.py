@@ -628,20 +628,47 @@ data_col_name = [
 injury_before_holdout_info_df = injury_before_holdout_info_df.rename(
     columns={"n_wells": data_col_name[0]}
 )
+# Data Splitting: Train-Test Summary
+# This process creates the test split profile and compares its values
+# to the raw data to ensure no changes were made at the index level.
+# By verifying the test split against the original data, we confirm that
+# the indices remain consistent and unchanged during the split.
 
-# Data splits train test summary
+# full aligned fs profile feature space
+full_aligned_fs_space = meta_cols + aligned_fs_features
+
+# generate profile summary for aligned_X_train data
+profile = aligned_X_train.merge(
+    aligned_fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
+)
+profile = profile[full_aligned_fs_space]
+
+# check to see if indices have not change
+assert profile.equals(
+    raw_cell_injury_profile_df[full_aligned_fs_space].loc[profile.index]
+)
+
+# generating summary for aligned train data
 injury_train_info_df = get_and_rename_injury_info(
-    profile=aligned_X_train.merge(
-        aligned_fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
-    )[meta_cols + aligned_fs_features],
+    profile=profile,
     groupby_key="injury_type",
     column_name=data_col_name[1],
 )
 
+# generate profile summary for aligned_X_test data
+profile = aligned_X_test.merge(
+    aligned_fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
+)
+profile = profile[full_aligned_fs_space]
+
+# check to see if indices have not change
+assert profile.equals(
+    raw_cell_injury_profile_df[full_aligned_fs_space].loc[profile.index]
+)
+
+# generate profile summary for aligned_X_test data
 injury_test_info_df = get_and_rename_injury_info(
-    profile=aligned_X_test.merge(
-        aligned_fs_profile_df[meta_cols], how="left", right_index=True, left_index=True
-    )[meta_cols + aligned_fs_features],
+    profile=profile,
     groupby_key="injury_type",
     column_name=data_col_name[2],
 )
@@ -698,4 +725,7 @@ merged_summary_df.to_csv(data_split_dir / "aligned_summary_data_split.csv", inde
 merged_summary_df
 
 
-# In[ ]:
+# In[29]:
+
+
+aligned_X_train
