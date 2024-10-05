@@ -43,8 +43,6 @@ jump_feature_space_path = (data_dir / "JUMP_data/jump_feature_space.json").resol
 suppl_meta_path = (data_dir / "41467_2023_36829_MOESM5_ESM.csv.gz").resolve(strict=True)
 screen_anno_path = (data_dir / "idr0133-screenA-annotation.csv.gz").resolve(strict=True)
 
-#
-
 
 # Loading cell-injury well aggregated profiles
 
@@ -73,7 +71,7 @@ print("Cell injury screen shape:", image_profile_df.shape)
 
 # Here, we are collecting all the samples treated solely with DMSO. Any well treated with DMSO will be labeled as "Control."
 
-# In[4]:
+# In[ ]:
 
 
 # Get all wells treated with DMSO and label them as "Control" as the injury_type
@@ -123,7 +121,6 @@ for idx, injury in enumerate(cell_injuries):
     injury_codes["encoder"][injury] = idx
     injury_codes["decoder"][idx] = injury
 
-
 # update injured_df with injury codes
 injured_df.insert(
     0,
@@ -152,7 +149,7 @@ injured_df.head()
 
 # After generating the complete cell injury dataframe, we will check for any rows containing NaN values and remove them if found.
 
-# In[6]:
+# In[ ]:
 
 
 # next is to drop rows that NaNs
@@ -182,7 +179,7 @@ injured_df.to_csv(
 )
 
 
-# ## Feature Selection on the Cell-Injury Data
+# ## Feature Selection with Cell-Injury Data
 #
 # Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data.
 #
@@ -256,7 +253,7 @@ fs_cell_injury_profile.head()
 #
 # In this section, we identify the shared features present in both the normalized cell-injury and the JUMP pilot dataset. Next, we utilize these shared features to update our dataset and use it for feature selection in the next step.
 
-# In[10]:
+# In[ ]:
 
 
 # Grab all JUMP morphological features
