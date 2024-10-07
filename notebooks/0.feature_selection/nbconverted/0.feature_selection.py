@@ -23,7 +23,7 @@ from pycytominer import feature_select
 sys.path.append("../../")
 from src import utils
 
-# Setting up paths and parameters
+# Setting up paths
 
 # In[2]:
 
@@ -43,7 +43,16 @@ jump_feature_space_path = (data_dir / "JUMP_data/jump_feature_space.json").resol
 suppl_meta_path = (data_dir / "41467_2023_36829_MOESM5_ESM.csv.gz").resolve(strict=True)
 screen_anno_path = (data_dir / "idr0133-screenA-annotation.csv.gz").resolve(strict=True)
 
-# load data
+
+# Loading cell-injury well aggregated profiles
+
+# In[3]:
+
+
+# loading jump feature space
+jump_feature_space = utils.load_json_file(jump_feature_space_path)
+
+# loading in cell-injury dataset
 image_profile_df = pd.read_csv(screen_anno_path)
 
 # spit columns and only get metadata dataframe
@@ -62,7 +71,7 @@ print("Cell injury screen shape:", image_profile_df.shape)
 
 # Here, we are collecting all the samples treated solely with DMSO. Any well treated with DMSO will be labeled as "Control."
 
-# In[3]:
+# In[ ]:
 
 
 # Get all wells treated with DMSO and label them as "Control" as the injury_type
@@ -76,7 +85,7 @@ control_df.head()
 
 # Next, the `injured_df` is generated, which will exclusively contain wells treated with a component that induces an injury. This was accomplished by utilizing supplemental data that detailed which treatments caused specific injuries. We then cross-referenced this data with the image-based profile to identify wells treated with those components and labeled them with the associated injury.
 
-# In[4]:
+# In[5]:
 
 
 # creating a dictionary that contains the {injury_type : [list of treatments]}
@@ -112,7 +121,6 @@ for idx, injury in enumerate(cell_injuries):
     injury_codes["encoder"][injury] = idx
     injury_codes["decoder"][idx] = injury
 
-
 # update injured_df with injury codes
 injured_df.insert(
     0,
@@ -141,7 +149,7 @@ injured_df.head()
 
 # After generating the complete cell injury dataframe, we will check for any rows containing NaN values and remove them if found.
 
-# In[5]:
+# In[ ]:
 
 
 # next is to drop rows that NaNs
@@ -158,11 +166,28 @@ print(injured_df.shape)
 injured_df.head()
 
 
-# ## Feature Selection on the Cell-Injury Data
+# Save the labeled cell-injury dataset into the ./data directory
 #
-# Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data
 
-# In[6]:
+# In[7]:
+
+
+injured_df.to_csv(
+    data_dir / "JUMP_data/labeled_JUMP_all_plates_normalized_negcon.csv.gz",
+    index=False,
+    compression="gzip",
+)
+
+
+# ## Feature Selection with Cell-Injury Data
+#
+# Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data.
+#
+# In this section we generated to two files:
+# - feature selected cell injury profiles
+# - the feature space associated with this profile.
+
+# In[8]:
 
 
 # conduct feature selection using pycytominer
@@ -175,6 +200,11 @@ fs_cell_injury_profile = feature_select(
         "drop_outliers",
         "drop_na_columns",
     ],
+    corr_threshold=0.9,
+    corr_method="pearson",
+    freq_cut=0.05,
+    outlier_cutoff=500,
+    na_cutoff=0.05,
 )
 
 # split meta and morphology feature columns
@@ -187,7 +217,13 @@ print(f"N features cell-injury profile {len(injury_feats)}")
 print(f"N features fs-cell-injury profile {len(fs_cell_injury_feats)}")
 print(f"N features dropped {len(injury_feats) - len(fs_cell_injury_feats)}")
 
-# if the feature space json file does not exists, create one and use this feature space for downstream
+
+# After generating the feature-selected cell-injury profiles, we will save both the selected features space and the profiles in the `results/0.feature_selection/` directory.
+
+# In[9]:
+
+
+# if feature space json file does not exists, create one and use this feature space for downstream
 cell_injury_selected_feature_space_path = (
     fs_dir / "fs_cell_injury_only_feature_space.json"
 ).resolve()
@@ -217,11 +253,10 @@ fs_cell_injury_profile.head()
 #
 # In this section, we identify the shared features present in both the normalized cell-injury and the JUMP pilot dataset. Next, we utilize these shared features to update our dataset and use it for feature selection in the next step.
 
-# In[7]:
+# In[ ]:
 
 
-# load in JUMP feature space
-jump_feature_space = utils.load_json_file(jump_feature_space_path)
+# Grab all JUMP morphological features
 jump_feats = set(jump_feature_space["features"])
 
 # find shared features and create data frame
@@ -248,15 +283,26 @@ shared_features_df.head()
 
 # ## Applying Feature Selection with Pycytominer
 #
-# In this section, we utilize Pycytominer's feature selection function to obtain features that will be used in training our machine learning models.
+# In this section, we apply Pycytominer's feature selection function to the JUMP-aligned cell injury profiles. This process generates two key outputs:
+#
+# - A feature-selected, aligned cell injury profile
+# - The aligned selected feature space, saved in a JSON file
 
-# In[8]:
+# In[11]:
 
 
 # Applying feature selection using pycytominer
 aligned_cell_injury_fs_df = feature_select(
     profiles=shared_features_df,
     features=shared_feats,
+    operation=[
+        "variance_threshold",
+        "drop_outliers",
+        "drop_na_columns",
+    ],
+    freq_cut=0.05,
+    outlier_cutoff=500,
+    na_cutoff=0.05,
 )
 
 # split meta and feature column names
@@ -286,7 +332,7 @@ aligned_cell_injury_fs_df.to_csv(
 
 # Save the aligned feature space information while maintaining feature space order
 
-# In[9]:
+# In[12]:
 
 
 # split meta and feature column names
