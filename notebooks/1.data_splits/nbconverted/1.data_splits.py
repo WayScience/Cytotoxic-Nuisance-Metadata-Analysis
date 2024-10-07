@@ -89,9 +89,9 @@ aligned_fs_feature_space_path = (
 ).resolve(strict=True)
 
 # data paths
-raw_cell_injury_path = (
-    JUMP_data_dir / "labeled_JUMP_all_plates_normalized_negcon.csv.gz"
-).resolve(strict=True)
+raw_cell_injury_path = (data_dir / "labeled_cell_injury_profile.csv.gz").resolve(
+    strict=True
+)
 fs_profile_path = (fs_dir / "fs_cell_injury_only.csv.gz").resolve(strict=True)
 aligned_fs_profile_path = (fs_dir / "aligned_cell_injury_profile_fs.csv.gz").resolve(
     strict=True
@@ -322,7 +322,7 @@ fs_plate_holdout_df.to_csv(
 #
 # Once the cell injuries are identified for treatment holdout, we select our holdout treatment by grouping each injury type and choosing the treatment with the fewest wells. This becomes our treatment holdout dataset
 
-# In[14]:
+# In[ ]:
 
 
 injury_treatment_metadata = (
@@ -510,7 +510,7 @@ fs_wells_holdout_df.to_csv(
 #
 # Once the data holdout has been generated, the next step is to save the training dataset that will serve as the basis for training the multi-class logistic regression model.
 
-# In[22]:
+# In[ ]:
 
 
 # get summary cell injury dataset treatment and well info after holdouts
@@ -699,7 +699,7 @@ treatment_holdout_summary = injury_treatment_holdout_info_df[
 well_holdout_summary = injury_well_holdout_info_df[["injury_type", data_col_name[5]]]
 
 
-# In[28]:
+# In[ ]:
 
 
 # merge the summary data splits into one, update data type to integers
@@ -725,7 +725,7 @@ merged_summary_df.to_csv(data_split_dir / "aligned_summary_data_split.csv", inde
 merged_summary_df
 
 
-# In[29]:
+# In[ ]:
 
 
 aligned_X_train

@@ -173,7 +173,7 @@ injured_df.head()
 
 
 injured_df.to_csv(
-    data_dir / "JUMP_data/labeled_JUMP_all_plates_normalized_negcon.csv.gz",
+    data_dir / "labeled_cell_injury_profile.csv.gz",
     index=False,
     compression="gzip",
 )
@@ -332,7 +332,7 @@ aligned_cell_injury_fs_df.to_csv(
 
 # Save the aligned feature space information while maintaining feature space order
 
-# In[12]:
+# In[ ]:
 
 
 # split meta and feature column names
