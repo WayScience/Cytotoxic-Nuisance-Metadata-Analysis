@@ -5,7 +5,7 @@
 #
 # Here, we utilize the both the JUMP aligned and non-aligned feature-selected cell-injury profiles generated in the preceding module notebook [here](../0.feature_selection/0.feature_selection.ipynb), focusing on dividing the data into training, testing, and holdout sets for machine learning training.
 
-# In[32]:
+# In[1]:
 
 
 import json
@@ -30,7 +30,7 @@ warnings.catch_warnings(action="ignore")
 
 # ## Helper functions
 
-# In[33]:
+# In[2]:
 
 
 def get_and_rename_injury_info(
@@ -59,7 +59,7 @@ def get_and_rename_injury_info(
 
 # Setting up parameters and file paths
 
-# In[34]:
+# In[3]:
 
 
 # setting seed constants
@@ -67,7 +67,7 @@ seed = 0
 np.random.seed(seed)
 
 
-# In[35]:
+# In[4]:
 
 
 # directory to get all the inputs for this notebook
@@ -98,7 +98,7 @@ aligned_fs_profile_path = (fs_dir / "aligned_cell_injury_profile_fs.csv.gz").res
 )
 
 
-# In[36]:
+# In[5]:
 
 
 # loading in feature spaces and setting morphological feature spaces
@@ -122,7 +122,7 @@ aligned_fs_profile_df = pd.read_csv(aligned_fs_profile_path)
 
 # Below demonstrates the amount of wells does each treatment have.
 
-# In[37]:
+# In[6]:
 
 
 well_treatments_counts_df = (
@@ -134,7 +134,7 @@ well_treatments_counts_df
 
 # Below we show the amount of wells does a specific cell celluar injury has
 
-# In[38]:
+# In[7]:
 
 
 # Displaying how many how wells does each cell injury have
@@ -148,7 +148,7 @@ cell_injury_well_counts
 #
 # This will be saved in the `results/0.data_splits` directory
 
-# In[39]:
+# In[8]:
 
 
 # get summary information and save it
@@ -165,7 +165,7 @@ injury_before_holdout_info_df
 #
 # This will be saved in the `results/0.data_splits` directory
 
-# In[40]:
+# In[9]:
 
 
 injury_meta_dict = {}
@@ -199,7 +199,7 @@ with open(data_split_dir / "cell_injury_metadata.json", mode="w") as stream:
 #
 # This will be saved in `results/0.data_splits`
 
-# In[41]:
+# In[10]:
 
 
 plate_meta = {}
@@ -247,7 +247,7 @@ with open(data_split_dir / "cell_injury_plate_info.json", mode="w") as stream:
 #
 # Plates are randomly selected based on their Plate ID and save them as our `plate_holdout` data.
 
-# In[42]:
+# In[11]:
 
 
 # plate
@@ -289,7 +289,7 @@ plate_holdout_df.head()
 #
 # The indices used to generate the plate holdout for the aligned dataset will also be applied to create the non-aligned plate holdout.
 
-# In[43]:
+# In[12]:
 
 
 # select
@@ -300,7 +300,7 @@ fs_plate_holdout_df.head()
 
 # Verify that the indices of the holdouts are identical between `fs_plate_holdout` and `aligned_plate_holdout`.
 
-# In[44]:
+# In[13]:
 
 
 # lets check that both data
@@ -322,7 +322,7 @@ fs_plate_holdout_df.to_csv(
 #
 # Once the cell injuries are identified for treatment holdout, we select our holdout treatment by grouping each injury type and choosing the treatment with the fewest wells. This becomes our treatment holdout dataset
 
-# In[45]:
+# In[14]:
 
 
 injury_treatment_metadata = (
@@ -333,7 +333,7 @@ injury_treatment_metadata = (
 injury_treatment_metadata
 
 
-# In[46]:
+# In[15]:
 
 
 # setting random seed
@@ -367,7 +367,7 @@ print("Below are the accepted cell injuries and treatments to be held out")
 selected_treatments_to_holdout
 
 
-# In[47]:
+# In[16]:
 
 
 # select all wells that have the treatments to be heldout
@@ -401,7 +401,7 @@ treatment_holdout_df.head()
 #
 # The indices used to generate the treatment holdout for the aligned dataset will also be applied to create the non-aligned plate holdout.
 
-# In[48]:
+# In[17]:
 
 
 # select
@@ -410,7 +410,7 @@ fs_treatment_holdout_df = fs_treatment_holdout_df.iloc[aligned_treatment_holdout
 fs_treatment_holdout_df.head()
 
 
-# In[49]:
+# In[18]:
 
 
 # lets check that both data
@@ -429,7 +429,7 @@ fs_treatment_holdout_df.to_csv(
 # To generate the well hold out data, each plate was iterated and random wells were selected. However, an additional step was conducting which was to separate the control wells and the treated wells, due to the large label imbalance with the controls. Therefore, 5 wells were randomly selected and 10 wells were randomly selected from each individual plate
 #
 
-# In[50]:
+# In[19]:
 
 
 # parameters
@@ -484,7 +484,7 @@ wells_heldout_df.head()
 #
 # The indices used to generate the well holdout for the aligned dataset will also be applied to create the non-aligned plate holdout.
 
-# In[51]:
+# In[20]:
 
 
 fs_wells_holdout_df = raw_cell_injury_profile_df[fs_meta + fs_features]
@@ -492,7 +492,7 @@ fs_wells_holdout_df = fs_wells_holdout_df.iloc[aligned_wells_holdout_idx]
 fs_wells_holdout_df.head()
 
 
-# In[52]:
+# In[21]:
 
 
 # lets check that both data
@@ -510,7 +510,7 @@ fs_wells_holdout_df.to_csv(
 #
 # Once the data holdout has been generated, the next step is to save the training dataset that will serve as the basis for training the multi-class logistic regression model.
 
-# In[53]:
+# In[22]:
 
 
 # get summary cell injury dataset treatment and well info after holdouts
@@ -523,7 +523,7 @@ print("shape:", injury_after_holdout_info_df.shape)
 injury_after_holdout_info_df
 
 
-# In[54]:
+# In[23]:
 
 
 # shape of the update training and testing dataset after removing holdout
@@ -533,7 +533,7 @@ fs_profile_df.head()
 
 # Generating the training and testing sets for both the aligned and non-aligned feature-selected profiles.
 
-# In[55]:
+# In[24]:
 
 
 # split the data into trianing and testing sets
@@ -569,7 +569,7 @@ print("aligned y testing size", aligned_y_test.shape)
 
 # Next, using the indexes produced from the data splits, we will generate the training and testing sets for the non-aligned (feature-selected only) cell injury profiles. These indexes are derived from the raw labeled cell injury dataset, but we will apply them only to the feature space of the feature-selected cell injury profiles.
 
-# In[56]:
+# In[25]:
 
 
 # generating the train test split split for the unaligned cell injury
@@ -593,7 +593,7 @@ print("feature selected only y training size", fs_y_train.shape)
 print("feature selected only y testing size", fs_y_test.shape)
 
 
-# In[57]:
+# In[26]:
 
 
 # save metadata after holdout
@@ -610,7 +610,7 @@ cell_injury_metadata.head()
 
 # ## Generating data split summary file
 
-# In[58]:
+# In[27]:
 
 
 # name of the columns
@@ -699,7 +699,7 @@ treatment_holdout_summary = injury_treatment_holdout_info_df[
 well_holdout_summary = injury_well_holdout_info_df[["injury_type", data_col_name[5]]]
 
 
-# In[59]:
+# In[28]:
 
 
 # merge the summary data splits into one, update data type to integers
@@ -725,7 +725,7 @@ merged_summary_df.to_csv(data_split_dir / "aligned_summary_data_split.csv", inde
 merged_summary_df
 
 
-# In[60]:
+# In[29]:
 
 
 aligned_X_train

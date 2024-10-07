@@ -245,7 +245,7 @@ shuffle_train_precision_recall_df, shuffle_train_f1_score_df = (
     )
 )
 
-# valuating shuffled model on test dataset
+# evaluating shuffled model on test dataset
 shuffle_test_precision_recall_df, shuffle_test_f1_score_df = evaluate_model_performance(
     model=fs_shuffled_best_model,
     X=fs_X_test_df,
