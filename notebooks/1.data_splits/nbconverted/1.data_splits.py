@@ -322,7 +322,7 @@ fs_plate_holdout_df.to_csv(
 #
 # Once the cell injuries are identified for treatment holdout, we select our holdout treatment by grouping each injury type and choosing the treatment with the fewest wells. This becomes our treatment holdout dataset
 
-# In[ ]:
+# In[14]:
 
 
 injury_treatment_metadata = (
@@ -510,7 +510,7 @@ fs_wells_holdout_df.to_csv(
 #
 # Once the data holdout has been generated, the next step is to save the training dataset that will serve as the basis for training the multi-class logistic regression model.
 
-# In[ ]:
+# In[22]:
 
 
 # get summary cell injury dataset treatment and well info after holdouts
@@ -699,7 +699,7 @@ treatment_holdout_summary = injury_treatment_holdout_info_df[
 well_holdout_summary = injury_well_holdout_info_df[["injury_type", data_col_name[5]]]
 
 
-# In[ ]:
+# In[28]:
 
 
 # merge the summary data splits into one, update data type to integers
@@ -725,7 +725,7 @@ merged_summary_df.to_csv(data_split_dir / "aligned_summary_data_split.csv", inde
 merged_summary_df
 
 
-# In[ ]:
+# In[29]:
 
 
 aligned_X_train
