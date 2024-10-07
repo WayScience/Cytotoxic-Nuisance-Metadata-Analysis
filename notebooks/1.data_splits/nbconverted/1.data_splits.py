@@ -2,23 +2,27 @@
 # coding: utf-8
 
 # # Splitting Data
-# 
+#
 # Here, we utilize the both the JUMP aligned and non-aligned feature-selected cell-injury profiles generated in the preceding module notebook [here](../0.feature_selection/0.feature_selection.ipynb), focusing on dividing the data into training, testing, and holdout sets for machine learning training.
 
 # In[1]:
 
 
-import sys
 import json
 import pathlib
+import sys
 import warnings
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
 sys.path.append("../../")  # noqa
-from src.utils import split_meta_and_features, get_injury_treatment_info, load_json_file  # noqa
+from src.utils import (  # noqa
+    get_injury_treatment_info,
+    load_json_file,
+    split_meta_and_features,
+)
 
 # ignoring warnings
 warnings.catch_warnings(action="ignore")
@@ -113,7 +117,7 @@ aligned_fs_profile_df = pd.read_csv(aligned_fs_profile_path)
 
 
 # ## Exploring the data set
-# 
+#
 # Below is a exploration of the selected features dataset. The aim is to identify treatments, extract metadata, and gain a understanding of the experiment's design.
 
 # Below demonstrates the amount of wells does each treatment have.
@@ -141,7 +145,7 @@ cell_injury_well_counts
 
 
 # Next we wanted to extract some metadata regarding how many compound and wells are treated with a given compounds
-# 
+#
 # This will be saved in the `results/0.data_splits` directory
 
 # In[8]:
@@ -158,7 +162,7 @@ injury_before_holdout_info_df
 
 
 # Next, we construct the profile metadata. This provides a structured overview of how the treatments associated with injuries were applied, detailing the treatments administered to each plate.
-# 
+#
 # This will be saved in the `results/0.data_splits` directory
 
 # In[9]:
@@ -192,7 +196,7 @@ with open(data_split_dir / "cell_injury_metadata.json", mode="w") as stream:
 
 
 # Here we build a plate metadata information where we look at the type of treatments and amount of wells with the treatment that are present in the dataset
-# 
+#
 # This will be saved in `results/0.data_splits`
 
 # In[10]:
@@ -216,31 +220,31 @@ with open(data_split_dir / "cell_injury_plate_info.json", mode="w") as stream:
     json.dump(plate_meta, stream)
 
 
-# 
+#
 # ## Data Splitting
-# 
+#
 # ---
-# 
+#
 # In this section, we split the data into training, testing, and holdout sets. The process involves generating and splitting the holdout and train-test sets using the JUMP-aligned dataset. To ensure consistency, we extract the same samples from the non-aligned cell injury features, matching those used in the aligned dataset. This approach preserves sample variance and helps prevent errors due to sample discrepancies.
-# 
+#
 # Each subsection will describe how the splits and holdouts were generated.
 
 # ### holdout dataset
-# 
+#
 # here we collected out holdout dataset. the holdout dataset is a subset of the dataset that is not used during model training or tuning. instead, it is reserved solely for evaluating the model's performance after it has been trained.
-# 
+#
 # in this notebook, we will include three different types of held-out datasets before proceeding with our machine learning training and evaluation.
-# 
+#
 # - plate hold out
 # - treatment hold out
 # - well hold out
-# 
+#
 # each of these held outdata will be stored in the `results/1.data_splits` directory
-# 
-# 
+#
+#
 
 # ### Plate Holdout (JUMP aligned cell-injury profile)
-# 
+#
 # Plates are randomly selected based on their Plate ID and save them as our `plate_holdout` data.
 
 # In[11]:
@@ -282,8 +286,8 @@ plate_holdout_df.head()
 
 
 # ### Plate Holdout (non aligned cell-injury profile)
-# 
-# The indices used to generate the plate holdout for the aligned dataset will also be applied to create the non-aligned plate holdout. 
+#
+# The indices used to generate the plate holdout for the aligned dataset will also be applied to create the non-aligned plate holdout.
 
 # In[12]:
 
@@ -311,11 +315,11 @@ fs_plate_holdout_df.to_csv(
 
 
 # ### Treatment holdout (JUMP aligned cell-injury profile)
-# 
+#
 # To establish our treatment holdout, we first need to find the number of treatments and wells associated with a specific cell injury, considering the removal of randomly selected plates from the previous step.
-# 
+#
 # To determine which cell injuries should be considered for a single treatment holdout, we establish a threshold of 10 unique compounds. This means that a cell injury type must have at least 10 unique compounds to qualify for selection in the treatment holdout. Any cell injury types failing to meet this criterion will be disregarded.
-# 
+#
 # Once the cell injuries are identified for treatment holdout, we select our holdout treatment by grouping each injury type and choosing the treatment with the fewest wells. This becomes our treatment holdout dataset
 
 # In[14]:
@@ -394,8 +398,8 @@ treatment_holdout_df.head()
 
 
 # ### Treatment Holdout (non aligned cell-injury profile)
-# 
-# The indices used to generate the treatment holdout for the aligned dataset will also be applied to create the non-aligned plate holdout. 
+#
+# The indices used to generate the treatment holdout for the aligned dataset will also be applied to create the non-aligned plate holdout.
 
 # In[17]:
 
@@ -421,9 +425,9 @@ fs_treatment_holdout_df.to_csv(
 
 
 # ### Well holdout (JUMP aligned cell-injury profile)
-# 
+#
 # To generate the well hold out data, each plate was iterated and random wells were selected. However, an additional step was conducting which was to separate the control wells and the treated wells, due to the large label imbalance with the controls. Therefore, 5 wells were randomly selected and 10 wells were randomly selected from each individual plate
-# 
+#
 
 # In[19]:
 
@@ -477,8 +481,8 @@ wells_heldout_df.head()
 
 
 # ### Treatment Holdout (non aligned cell-injury profile)
-# 
-# The indices used to generate the well holdout for the aligned dataset will also be applied to create the non-aligned plate holdout. 
+#
+# The indices used to generate the well holdout for the aligned dataset will also be applied to create the non-aligned plate holdout.
 
 # In[20]:
 
@@ -503,7 +507,7 @@ fs_wells_holdout_df.to_csv(
 
 
 # ## Saving training dataset
-# 
+#
 # Once the data holdout has been generated, the next step is to save the training dataset that will serve as the basis for training the multi-class logistic regression model.
 
 # In[22]:
@@ -725,4 +729,3 @@ merged_summary_df
 
 
 aligned_X_train
-

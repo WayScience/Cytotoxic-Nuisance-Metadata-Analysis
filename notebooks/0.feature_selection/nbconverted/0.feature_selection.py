@@ -2,19 +2,19 @@
 # coding: utf-8
 
 # # Feature Processing and Selection
-# 
+#
 # This notebook focuses on exploration using two essential files: the annotations data extracted from the actual screening profile (available in the [IDR repository](https://github.com/IDR/idr0133-dahlin-cellpainting/tree/main/screenA)) and the metadata retrieved from the supplementary section of the [research paper](https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-36829-x/MediaObjects/41467_2023_36829_MOESM5_ESM.xlsx).
-# 
+#
 # We explore the number of unique compounds associated with each cell injury and subsequently cross-reference this information with the screening profile. The aim is to assess the feasibility of using the data for training a machine learning model to predict cell injury.
-# 
+#
 # We apply feature selection through [pycytominer](https://github.com/cytomining/pycytominer) to capture the most informative features representing various cellular injury types within the morphology space. Then, we utilize the selected feature profiles for machine learning applications.
 
 # In[1]:
 
 
-import sys
 import json
 import pathlib
+import sys
 from collections import defaultdict
 
 import pandas as pd
@@ -22,7 +22,6 @@ from pycytominer import feature_select
 
 sys.path.append("../../")
 from src import utils
-
 
 # Setting up paths
 
@@ -168,7 +167,7 @@ injured_df.head()
 
 
 # Save the labeled cell-injury dataset into the ./data directory
-# 
+#
 
 # In[7]:
 
@@ -181,11 +180,11 @@ injured_df.to_csv(
 
 
 # ## Feature Selection with Cell-Injury Data
-# 
-# Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data. 
-# 
+#
+# Here, we will perform a feature selection using Pycytominer on the labeled cell-injury dataset to identify morphological features that are indicative of cellular damage. By selecting these key features, we aim to enhance our understanding of the biological mechanisms underlying cellular injuries. The selected features will be utilized to train a multi-class logistic regression model, allowing us to determine which morphological characteristics are most significant in discerning various types of cellular injuries.## Feature selecting on the cell-injury data.
+#
 # In this section we generated to two files:
-# - feature selected cell injury profiles 
+# - feature selected cell injury profiles
 # - the feature space associated with this profile.
 
 # In[8]:
@@ -251,7 +250,7 @@ fs_cell_injury_profile.head()
 
 
 # ## Identifying Shared Features between JUMP and Cell Injury Datasets
-# 
+#
 # In this section, we identify the shared features present in both the normalized cell-injury and the JUMP pilot dataset. Next, we utilize these shared features to update our dataset and use it for feature selection in the next step.
 
 # In[10]:
@@ -283,9 +282,9 @@ shared_features_df.head()
 
 
 # ## Applying Feature Selection with Pycytominer
-# 
+#
 # In this section, we apply Pycytominer's feature selection function to the JUMP-aligned cell injury profiles. This process generates two key outputs:
-# 
+#
 # - A feature-selected, aligned cell injury profile
 # - The aligned selected feature space, saved in a JSON file
 
@@ -369,4 +368,3 @@ loaded_selected_feature_space = utils.load_json_file(selected_feature_space_path
 all_in_list2 = all(item in fs_injury_feats for item in loaded_selected_feature_space)
 all_in_list1 = all(item in loaded_selected_feature_space for item in fs_injury_feats)
 assert all_in_list2 and all_in_list1, "The lists do not contain the same elements."
-
