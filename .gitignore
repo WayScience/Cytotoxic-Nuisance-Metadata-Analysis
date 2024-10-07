@@ -165,3 +165,7 @@ cython_debug/
 # large dataset
 data/JUMP_data/JUMP_all_plates_normalized_negcon.csv.gz
 notebooks/3.jump-analysis/overlapp-issue-check.ipynb
+
+# removing vscode user defined setting files
+.vscode/
+.vscode/settings.json
