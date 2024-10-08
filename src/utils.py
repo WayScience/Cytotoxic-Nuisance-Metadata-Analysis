@@ -187,6 +187,7 @@ def train_multiclass(
     X_train: np.ndarray,
     y_train: np.ndarray,
     param_grid: dict,
+    model_label: str,
     cv_results_outpath: pathlib.Path,
     seed: Optional[int] = 0,
 ) -> BaseEstimator:
@@ -204,6 +205,8 @@ def train_multiclass(
         Training labels
     param_grid : dict
         parameters to tune
+    mode_label : str
+        label to indicate what model you are training for tracking purposes.
     cv_results_outpath: pathlib.Path
         path were to save the model cross validation parameter
         search scores
@@ -244,6 +247,9 @@ def train_multiclass(
 
     # save the cv results search results
     cv_results_df = pd.DataFrame(random_search.cv_results_)
+
+    # add label
+    cv_results_df.insert(0, "model_label", model_label)
     cv_results_df.to_csv(cv_results_outpath, index=False)
 
     # get the best model

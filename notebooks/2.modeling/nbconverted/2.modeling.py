@@ -183,6 +183,7 @@ else:
         fs_X_train_df,
         fs_y_train_df,
         param_grid=param_grid,
+        model_label="fs_model",
         seed=seed,
         cv_results_outpath=fs_model_cv_results_path,
     )
@@ -210,6 +211,7 @@ else:
         fs_shuffled_X_train,
         fs_y_train_df,
         param_grid=param_grid,
+        model_label="shuffled_fs_model",
         seed=seed,
         cv_results_outpath=fs_shuffled_model_cv_results_path,
     )
@@ -537,6 +539,7 @@ else:
         aligned_X_train_df[aligned_feats],
         aligned_y_train_df["injury_code"],
         param_grid=param_grid,
+        model_label="aligned_model",
         seed=seed,
         cv_results_outpath=aligned_model_cv_results_path,
     )
@@ -563,6 +566,7 @@ else:
         aligned_shuffled_X_train[aligned_feats],
         aligned_y_train_df["injury_code"],
         param_grid=param_grid,
+        model_label="shuffled_aligned_model",
         seed=seed,
         cv_results_outpath=aligned_shuffled_model_cv_results_path,
     )
@@ -612,3 +616,22 @@ all_coeff_scores.to_csv(modeling_dir / "all_model_coeff_scores.csv", index=False
 
 # display
 all_coeff_scores.head()
+
+
+# ## Merging all cross validation scores of both the feature-selected and JUMP aligned models
+#
+
+# In[18]:
+
+
+# loading the cv and merge them
+all_cv_score_paths = [
+    fs_model_cv_results_path,
+    fs_shuffled_model_cv_results_path,
+    aligned_model_cv_results_path,
+    aligned_shuffled_model_cv_results_path,
+]
+cv_df = pd.concat([pd.read_csv(cv_path) for cv_path in all_cv_score_paths])
+
+# save it as a single file
+cv_df.to_csv(modeling_dir / "all_cv_scores.csv")
