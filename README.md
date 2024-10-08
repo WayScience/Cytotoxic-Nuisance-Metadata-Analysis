@@ -150,7 +150,7 @@ The models also included `class_weight="balanced"` to ensure the model pays more
 
 ### Applying model to JUMP data
 
-We applied our trained shuffled and non shuffled aligned feature selected multi-class logistic regression model to the JUMP dataset to predict injuries present in each well.
+We applied our trained shuffled and non-shuffled aligned feature-selected multi-class logistic regression model to the JUMP dataset to predict injuries present in each well.
 We loaded the JUMP dataset and selected only the features that were shared with the `cell-injury` dataset.
 Using the model, we generated predictions for each well and then analyzed these predictions to understand the distribution and types of injuries.
 
