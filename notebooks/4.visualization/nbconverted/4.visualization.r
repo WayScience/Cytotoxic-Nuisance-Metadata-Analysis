@@ -159,8 +159,8 @@ f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
 
 # These values manually move the F1 score box within each subplot.
 # The position of these values corresponds to the row of the table below.
-x_values <- c(0.50, 0.50, 0.35, 0.30, 0.50, 0.50, 0.40, 0.70, 0.40, 0.40, 0.70, 0.35, 0.74, 0.74, 0.74)
-y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.80, 0.50, 0.90, 0.90, 0.90)
+x_values <- c(0.50, 0.50, 0.35, 0.30, 0.50, 0.50, 0.40, 0.70, 0.40, 0.40, 0.75, 0.35, 0.74, 0.74, 0.74)
+y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.80, 0.50, 0.50, 0.90, 0.50, 0.90, 0.90, 0.90)
 
 # generate dataframe responsible for placing the f1 boxes within the plot
 f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
@@ -242,7 +242,7 @@ final_model_cm <- cm_df %>%
 
 final_model_cm$dataset_type <- factor(final_model_cm$dataset_type, levels = c("Train", "Test", "Plate holdout", "Well holdout"))
 
-# # Define the desired order of x-axis labels
+# Define the desired order of x-axis labels
 x_label_order <- c("Control", "Cytoskeletal", "Hsp90", "Kinase", "Genotoxin", "Miscellaneous", "Redox", "HDAC", "mTOR", "Proteasome", "Saponin", "Mitochondria", "Ferroptosis", "Tannin", "Nonspecific")
 
 # # Reorder the predicted_labels factor variable with the desired order
