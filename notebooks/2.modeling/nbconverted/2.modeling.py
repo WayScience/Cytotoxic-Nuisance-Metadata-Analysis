@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Module 1: Modeling
+# # Module 2: Modeling
 #
-# In this notebook, we focus on developing and training a Multi-class logistic regression model, employing Randomized Cross-Validation (CV) for hyperparameter tuning to address our classification task. The dataset is split into an 79% training set and a 20% testing set. To evaluate the performance of our model during training, we used performance evaluation metrics such as precision, recall, and F1 scores. Additionally, we extend our evaluation by testing our model on a holdout dataset, which includes plate, treatment, and well information, providing a comprehensive assessment of its real-world performance.
+# In this notebook, we focus on developing and training a Multi-class logistic regression model, employing Randomized Cross-Validation (CV) for hyperparameter tuning to address our classification task. The dataset is split into an 80% training set and a 20% testing set. To evaluate the performance of our model during training, we used performance evaluation metrics such as precision, recall, and F1 scores. Additionally, we extend our evaluation by testing our model on a holdout dataset, which includes plate, treatment, and well information, providing a comprehensive assessment of its real-world performance.
 #
 # In this notebook, we will train four models:
 #
@@ -25,6 +25,7 @@ import pandas as pd
 # import local modules
 sys.path.append("../../")
 from src.utils import (
+    check_feature_order,
     evaluate_model_performance,
     generate_confusion_matrix_tl,
     get_coeff_scores,
@@ -137,6 +138,11 @@ fs_feats = fs_feature_space["features"]
 aligned_aligned = aligned_feature_space["meta_features"]
 aligned_feats = aligned_feature_space["features"]
 
+# checking if the feature space are identical (also looks for feature space order)
+assert check_feature_order(
+    ref_feat_order=aligned_feats, input_feat_order=aligned_X_test_df.columns.tolist()
+), "Feature space are not identical"
+
 
 # ## Training and evaluating Multi-class Logistic model with feature selected cell injury profiles (not jump aligned)
 
@@ -188,7 +194,10 @@ else:
 fs_shuffled_X_train = shuffle_features(fs_X_train_df, features=fs_feats, seed=seed)
 
 # checking if the shuffled and original feature space are the same
-assert not fs_X_train_df.equals(fs_shuffled_X_train), "DataFrames are the same!"
+assert not fs_shuffled_X_train.equals(fs_X_train_df), "DataFrames are the same!"
+
+if fs_shuffled_X_train.equals(fs_X_train_df):
+    raise ValueError("Error: DataFrames are the same")
 
 # if trained model exists, skip training
 if fs_shuffled_model_path.exists():
@@ -541,9 +550,8 @@ aligned_shuffled_X_train = shuffle_features(
 )
 
 # checking if the shuffled and original feature space are the same
-assert not aligned_X_train_df.equals(
-    aligned_shuffled_X_train
-), "DataFrames are the same!"
+if aligned_X_train_df.equals(aligned_shuffled_X_train):
+    raise ValueError("Error: DataFrames are the same")
 
 # if trained shuffled aligned model exists, skip training
 if aligned_shuffled_model_path.exists():
