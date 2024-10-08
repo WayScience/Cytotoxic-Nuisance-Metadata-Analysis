@@ -623,3 +623,78 @@ def get_injury_treatment_info(profile: pd.DataFrame, groupby_key: str):
 
     # display
     return injury_meta_df
+
+
+def get_coeff_scores(
+    best_model: BaseEstimator, features: list[str], injury_codes: dict, model_name: str
+) -> pd.DataFrame:
+    """Retrieve coefficient scores for all morphological features across injury types.
+
+    Parameters
+    ----------
+    best_model : object
+        Trained model containing the best parameters, which includes the coefficients (`coef_`) for each feature.
+    features : list[str]
+        List of morphological feature names corresponding to the model coefficients.
+    model_name : str
+        Name of the model, useful for tagging and tracking results.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the coefficient scores with the following columns:
+        - 'injury_code': Unique identifier for each injury type.
+        - 'injury_name': Descriptive name for each injury type.
+        - 'feature': Name of the morphological feature.
+        - 'coefficient': Coefficient value from the model indicating feature importance.
+        - 'abs_coefficient': Absolute value of the coefficient score, used to rank feature importance.
+        - 'model_name': name of the mode that produced these scores
+
+    Notes
+    -----
+    This function processes the coefficients of the trained model to provide insights
+    into the most important features for each injury type based on their absolute values.
+    """
+
+    # get coeff scores
+    scores = best_model.coef_
+
+    # creating a data frame that contains the injury code, injury name and coef scores
+    coef_score_df = (
+        pd.DataFrame(data=scores, columns=features)
+        .reset_index()
+        .rename(columns={"index": "injury_name"})
+    )
+    coef_score_df["injury_name"] = coef_score_df["injury_name"].apply(
+        lambda code: injury_codes["decoder"][str(code)]
+    )
+    coef_score_df = coef_score_df.reset_index().rename(columns={"index": "injury_code"})
+
+    # adding the name of the mode to the dataframe
+    coef_score_df["model_type"] = model_name
+
+    # Melt the DataFrame from wide to long format
+    # Converts the DataFrame to have 'injury_code', 'injury_name', 'feature', and 'coefficient' columns
+    score_group = pd.melt(
+        coef_score_df,
+        id_vars=["injury_code", "injury_name", "model_type"],
+        var_name="feature",
+        value_name="coefficient",
+    ).groupby(by="injury_code")
+
+    # Initialize a list to hold sorted DataFrames
+    sorted_scores = []
+
+    # Iterate over each group
+    for score, df in score_group:
+        # get the absolute values of the coefficients
+        df["abs_coefficient"] = df["coefficient"].abs()
+
+        # Sort the DataFrame by 'abs_coefficient' in descending order
+        df = df.sort_values(by="abs_coefficient", ascending=False)
+
+        # Append the sorted DataFrame to the list
+        sorted_scores.append(df)
+
+    # Concatenate all sorted DataFrames into a single DataFrame
+    return pd.concat(sorted_scores)

@@ -42,6 +42,7 @@ jump_data_path = (jump_data_dir / "JUMP_all_plates_normalized_negcon.csv.gz").re
     strict=True
 )
 barcode_path = (jump_data_dir / "barcode_platemap.csv").resolve(strict=True)
+
 # loading only cell injury metadata (after holdout has been applied)
 cell_injury_metadata_path = (
     data_split_dir / "aligned_cell_injury_metadata_after_holdout.csv.gz"
@@ -63,6 +64,11 @@ shared_feature_space_path = (
 # injury codes
 injury_codes_path = (fs_results_dir / "injury_codes.json").resolve(strict=True)
 
+# setting feature spaces paths
+aligned_feature_space_path = (
+    fs_results_dir / "aligned_cell_injury_shared_feature_space.json"
+).resolve(strict=True)
+
 # output paths
 jump_analysis_dir = (results_dir / "3.jump_analysis").resolve()
 jump_analysis_dir.mkdir(exist_ok=True)
@@ -74,6 +80,11 @@ jump_analysis_dir.mkdir(exist_ok=True)
 
 # In[3]:
 
+
+# loading feature spaces
+aligned_feature_space = load_json_file(aligned_feature_space_path)
+aligned_meta = aligned_feature_space["meta_features"]
+aligned_feats = aligned_feature_space["features"]
 
 # loading in JUMP dataset
 jump_df = pd.read_csv(jump_data_path)
@@ -102,7 +113,6 @@ jump_exp_meta = pd.read_csv(
     delimiter="\t",
 )
 
-
 # Display data
 print("JUMP dataset shape", jump_df.shape)
 print("Number of Meta features", len(jump_meta))
@@ -122,8 +132,7 @@ jump_df.head()
 
 # update the over lapping jump df
 # Augment the overlapping feature space with the metadata
-shared_jump_df = jump_df[shared_features]
-shared_jump_df = pd.concat([jump_df[jump_meta], shared_jump_df], axis=1)
+shared_jump_df = jump_df[jump_meta + aligned_feats]
 
 # # split the features
 shared_meta, shared_feats = split_meta_and_features(shared_jump_df, metadata_tag=True)
@@ -165,7 +174,7 @@ shared_jump_df.to_csv(
 # ### Identifying Overlapping Compounds
 # Here, we used the International Chemical Identifier (InChI) to identify chemicals shared between the JUMP dataset and the Cell Injury dataset.
 
-# In[ ]:
+# In[6]:
 
 
 cell_injury_InChI_keys = cell_injury_meta_df["Compound InChIKey"].unique().tolist()
@@ -201,7 +210,7 @@ overlapping_compounds_df
 
 # Once the common compounds and their associated cell injury types are identified, the next step involves selecting it from the JUMP dataset to select only wells that possess the common InChI keys.
 
-# In[ ]:
+# In[7]:
 
 
 # selecting rows that contains the overlapping compounds
@@ -381,7 +390,7 @@ all_proba_scores["pred_injury"] = all_proba_scores["pred_injury"].apply(
 
 # We will now save the ground truth predictions, which include probability scores for each injury type and model type, as well as the predicted injury. These results will be stored in the `./results/3.jump_analysis` directory.
 
-# In[ ]:
+# In[14]:
 
 
 # update columns by replacing the column index (which are the injury codes) to the injury type

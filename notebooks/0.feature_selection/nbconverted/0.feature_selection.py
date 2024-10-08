@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Feature Processing and Selection
+# # Module 0: Feature Processing and Selection
 #
 # This notebook focuses on exploration using two essential files: the annotations data extracted from the actual screening profile (available in the [IDR repository](https://github.com/IDR/idr0133-dahlin-cellpainting/tree/main/screenA)) and the metadata retrieved from the supplementary section of the [research paper](https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-36829-x/MediaObjects/41467_2023_36829_MOESM5_ESM.xlsx).
 #
@@ -71,7 +71,7 @@ print("Cell injury screen shape:", image_profile_df.shape)
 
 # Here, we are collecting all the samples treated solely with DMSO. Any well treated with DMSO will be labeled as "Control."
 
-# In[ ]:
+# In[4]:
 
 
 # Get all wells treated with DMSO and label them as "Control" as the injury_type
@@ -149,7 +149,7 @@ injured_df.head()
 
 # After generating the complete cell injury dataframe, we will check for any rows containing NaN values and remove them if found.
 
-# In[ ]:
+# In[6]:
 
 
 # next is to drop rows that NaNs
@@ -173,7 +173,7 @@ injured_df.head()
 
 
 injured_df.to_csv(
-    data_dir / "JUMP_data/labeled_JUMP_all_plates_normalized_negcon.csv.gz",
+    data_dir / "labeled_cell_injury_profile.csv.gz",
     index=False,
     compression="gzip",
 )
@@ -253,7 +253,7 @@ fs_cell_injury_profile.head()
 #
 # In this section, we identify the shared features present in both the normalized cell-injury and the JUMP pilot dataset. Next, we utilize these shared features to update our dataset and use it for feature selection in the next step.
 
-# In[ ]:
+# In[10]:
 
 
 # Grab all JUMP morphological features

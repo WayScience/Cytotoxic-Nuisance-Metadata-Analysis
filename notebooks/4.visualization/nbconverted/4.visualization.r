@@ -22,19 +22,19 @@ load_image <- function(path) {
 
 # getting all paths
 # confusing matrix paths
-confusion_matrix_path <- file.path("../../results/2.modeling/confusion_matrix.csv.gz")
+confusion_matrix_path <- file.path("../../results/2.modeling/fs_confusion_matrix.csv.gz")
 
 # f1 score path
-f1_score_path <- file.path("../../results/2.modeling/all_f1_scores.csv.gz")
+f1_score_path <- file.path("../../results/2.modeling/fs_all_f1_scores.csv.gz")
 
 # precision and recall curve path
-pr_file_path <- file.path("../../results/2.modeling/precision_recall_scores.csv.gz")
+pr_file_path <- file.path("../../results/2.modeling/fs_precision_recall_scores.csv.gz")
 
 # probability plot
-cyto_proba_path <- file.path("../../results/3.jump_analysis/cytoskeletal_proba_scores.csv.gz")
+cyto_proba_path <- file.path("../../results/3.jump_analysis/JUMP_cytoskeletal_proba_scores.csv.gz")
 
 # injury probabilities
-injury_proba_path <- file.path("../../results/3.jump_analysis/all_injury_proba.csv.gz")
+injury_proba_path <- file.path("../../results/3.jump_analysis/JUMP_all_injury_proba.csv.gz")
 
 # path to workflow image
 wf_image <- file.path("./figures/workflow_fig.png")
@@ -159,8 +159,8 @@ f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
 
 # These values manually move the F1 score box within each subplot.
 # The position of these values corresponds to the row of the table below.
-x_values <- c(0.50, 0.50, 0.35, 0.30, 0.50, 0.50, 0.40, 0.70, 0.40, 0.40, 0.70, 0.35, 0.74, 0.74, 0.74)
-y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.80, 0.50, 0.90, 0.90, 0.90)
+x_values <- c(0.50, 0.50, 0.35, 0.30, 0.50, 0.50, 0.40, 0.70, 0.40, 0.40, 0.75, 0.35, 0.74, 0.74, 0.74)
+y_values <- c(0.25, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.80, 0.50, 0.50, 0.90, 0.50, 0.90, 0.90, 0.90)
 
 # generate dataframe responsible for placing the f1 boxes within the plot
 f1_scores_per_injury_df <- f1_scores_per_injury_df %>%
@@ -245,17 +245,17 @@ final_model_cm$dataset_type <- factor(final_model_cm$dataset_type, levels = c("T
 # Define the desired order of x-axis labels
 x_label_order <- c("Control", "Cytoskeletal", "Hsp90", "Kinase", "Genotoxin", "Miscellaneous", "Redox", "HDAC", "mTOR", "Proteasome", "Saponin", "Mitochondria", "Ferroptosis", "Tannin", "Nonspecific")
 
-# Reorder the predicted_labels factor variable with the desired order
+# # Reorder the predicted_labels factor variable with the desired order
 final_model_cm$true_labels <- factor(final_model_cm$true_labels, levels = rev(unique(final_model_cm$true_labels)))
 final_model_cm$predicted_labels <- factor(final_model_cm$predicted_labels, levels = x_label_order)
 
-# Calculate rowwise ratios
+# # Calculate rowwise ratios
 final_model_cm <- final_model_cm %>%
     dplyr::group_by(dataset_type, shuffled_model, true_labels) %>%
     dplyr::mutate(total_true_count = sum(count)) %>%
     dplyr::mutate(ratio_rowwise = count / total_true_count)
 
-# NA introduced by divide by zero. Convert to zero for plotting purposes
+# # NA introduced by divide by zero. Convert to zero for plotting purposes
 final_model_cm[is.na(final_model_cm$ratio_rowwise), "ratio_rowwise"] <- 0
 
 # image size
