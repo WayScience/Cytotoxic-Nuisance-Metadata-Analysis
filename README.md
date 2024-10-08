@@ -138,19 +138,15 @@ Here’s an improved version of your paragraph for clarity and conciseness:
 Here’s a clearer and more concise version of your text:
 
 Since our models will be trained using JUMP-aligned and feature-selected cell injury profiles, which result in different feature spaces, it is essential to split the data effectively for model training.
-We accomplished this by splitting the data while retaining the index IDs of the selected samples, allowing us to ensure that the same samples are represented across different feature spaces.
-This approach enables us to conduct a comparable analysis between the JUMP-aligned and non-aligned cell injury profiles.
-
-This revision enhances clarity by eliminating redundancy and improving the flow of ideas.
+We achieved this by splitting the data while retaining the index IDs of the selected samples, ensuring consistency across different feature spaces.
+This approach preserves similar sample variance, reducing the likelihood of unexpected results caused by random variation.
 
 ### Training the model
 
-In this study, we developed four distinct types of multi-class regression models:
+In this study, we developed two distinct types of multi-class regression models:
 
 1. **Model Trained on Feature-Selected Cell Injury Profiles**
-2. **Model Trained on Shuffled Feature-Selected Cell Injury Profiles**
-3. **Model Trained on Aligned Feature-Selected Cell Injury Profiles**
-4. **Model Trained on Shuffled Aligned Feature-Selected Cell Injury Profiles**
+2. **Model Trained on Aligned Feature-Selected Cell Injury Profiles**
 
 We trained our models using randomized cross-validation for hyperparameter tuning to fine-tune our model.
 Our logistic regression models was set to `multi_class="multinomial"`, indicating that it applies a softmax approach to handle and classify multiple classes.
