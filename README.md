@@ -133,10 +133,6 @@ All holdout datasets were removed from the main dataset.
 The remaining data was then split into training and testing sets using an 80/20 train/test split, respectively.
 We used the `stratify` parameter to preserve the distribution of labels, preventing label imbalances that could lead to classification problems.
 
-Here’s an improved version of your paragraph for clarity and conciseness:
-
-Here’s a clearer and more concise version of your text:
-
 Since our models will be trained using JUMP-aligned and feature-selected cell injury profiles, which result in different feature spaces, it is essential to split the data effectively for model training.
 We achieved this by splitting the data while retaining the index IDs of the selected samples, ensuring consistency across different feature spaces.
 This approach preserves similar sample variance, reducing the likelihood of unexpected results caused by random variation.
