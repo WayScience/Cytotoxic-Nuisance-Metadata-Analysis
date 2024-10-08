@@ -142,7 +142,7 @@ This approach preserves similar sample variance, reducing the likelihood of unex
 In this study, we developed two distinct types of multi-class regression models:
 
 1. **Model Trained on Feature-Selected Cell Injury Profiles**
-2. **Model Trained on Aligned Feature-Selected Cell Injury Profiles**
+2. **Model Trained on JUMP-Aligned Feature-Selected Cell Injury Profiles**
 
 We trained our models using randomized cross-validation for hyperparameter tuning to fine-tune our model.
 Our logistic regression models was set to `multi_class="multinomial"`, indicating that it applies a softmax approach to handle and classify multiple classes.
