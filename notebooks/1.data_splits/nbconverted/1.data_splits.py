@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Splitting Data
+# # Module 1: Splitting Data
 #
 # Here, we utilize the both the JUMP aligned and non-aligned feature-selected cell-injury profiles generated in the preceding module notebook [here](../0.feature_selection/0.feature_selection.ipynb), focusing on dividing the data into training, testing, and holdout sets for machine learning training.
 
@@ -144,7 +144,7 @@ cell_injury_well_counts = (
 cell_injury_well_counts
 
 
-# Next we wanted to extract some metadata regarding how many compound and wells are treated with a given compounds
+# Next, we aimed to extract metadata related to the number of wells and treatments associated with each specific cell injury.
 #
 # This will be saved in the `results/0.data_splits` directory
 
@@ -225,13 +225,13 @@ with open(data_split_dir / "cell_injury_plate_info.json", mode="w") as stream:
 #
 # ---
 #
-# In this section, we split the data into training, testing, and holdout sets. The process involves generating and splitting the holdout and train-test sets using the JUMP-aligned dataset. To ensure consistency, we extract the same samples from the non-aligned cell injury features, matching those used in the aligned dataset. This approach preserves sample variance and helps prevent errors due to sample discrepancies.
+# In this section, we split the data into training, testing, and holdout sets. The process involves generating and splitting the holdout and train-test sets using the JUMP-aligned dataset. To ensure consistency, we extract the same samples from the aligned cell injury features, matching those used in the non-aligned dataset. This approach preserves sample same variance and helps prevent errors due to sample discrepancies.
 #
 # Each subsection will describe how the splits and holdouts were generated.
 
 # ### holdout dataset
 #
-# here we collected out holdout dataset. the holdout dataset is a subset of the dataset that is not used during model training or tuning. instead, it is reserved solely for evaluating the model's performance after it has been trained.
+# Here we collected out holdout dataset. The holdout dataset is a subset of the dataset that is not used during model training or tuning. Instead, it is reserved solely for evaluating the model's performance after it has been trained.
 #
 # in this notebook, we will include three different types of held-out datasets before proceeding with our machine learning training and evaluation.
 #
@@ -239,7 +239,7 @@ with open(data_split_dir / "cell_injury_plate_info.json", mode="w") as stream:
 # - treatment hold out
 # - well hold out
 #
-# each of these held outdata will be stored in the `results/1.data_splits` directory
+# Each of these heldout data will be stored in the `results/1.data_splits` directory
 #
 #
 
